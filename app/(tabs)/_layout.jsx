@@ -10,8 +10,11 @@ export default function TabLayout() {
         tabBarInactiveTintColor: "black",
         tabBarActiveTintColor: "black",
         tabBarStyle: {
-          height: 40,
+          height: 46,
           borderTopWidth: 0,
+        },
+        tabBarIconStyle: {
+          marginTop: 4,
         },
       }}
     >
@@ -22,31 +25,51 @@ export default function TabLayout() {
           tabBarIcon: ({ focused, color }) => (
             <Ionicons
               name={focused ? "home" : "home-outline"}
-              size={22}
+              size={24}
               color={color}
             />
           ),
         }}
       />
       <Tabs.Screen
-        name="books"
+        name="blog"
         options={{
           tabBarIcon: ({ focused, color }) => (
             <Ionicons
-              name={focused ? "book" : "book-outline"}
-              size={22}
+              name={focused ? "earth" : "earth-outline"}
+              size={24}
               color={color}
             />
           ),
         }}
       />
       <Tabs.Screen
-        name="search"
+        name="create"
         options={{
           tabBarIcon: ({ focused, color }) => (
             <Ionicons
-              name={focused ? "search-circle" : "search-circle-outline"}
-              size={28}
+              name={focused ? "add-circle" : "add-circle-outline"}
+              size={40}
+              color={"white"}
+            />
+          ),
+          tabBarIconStyle: {
+            position: "absolute",
+            top: -15,
+            backgroundColor: "black",
+            borderRadius: "50%",
+            width: 40,
+            height: 40,
+          },
+        }}
+      />
+      <Tabs.Screen
+        name="history"
+        options={{
+          tabBarIcon: ({ focused, color }) => (
+            <Ionicons
+              name={focused ? "save" : "save-outline"}
+              size={24}
               color={color}
             />
           ),
@@ -58,7 +81,7 @@ export default function TabLayout() {
           tabBarIcon: ({ focused, color }) => (
             <Ionicons
               name={focused ? "person" : "person-outline"}
-              size={22}
+              size={24}
               color={color}
             />
           ),
