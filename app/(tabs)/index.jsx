@@ -14,7 +14,9 @@ export default function HomeScreen() {
   return (
     <View>
       {/*Header */}
-      <View style={styles.header}></View>
+      <View style={styles.header}>
+        <Text>TravelDiary</Text>
+      </View>
       <Text>view</Text>
     </View>
   );

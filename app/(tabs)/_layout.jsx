@@ -7,6 +7,7 @@ export default function TabLayout() {
       screenOptions={{
         headerTitleAlign: "center",
         tabBarShowLabel: false,
+        headerShown: false,
         tabBarInactiveTintColor: "black",
         tabBarActiveTintColor: "black",
         tabBarStyle: {
@@ -48,7 +49,7 @@ export default function TabLayout() {
         options={{
           tabBarIcon: ({ focused, color }) => (
             <Ionicons
-              name={focused ? "add-circle" : "add-circle-outline"}
+              name="add-circle-outline"
               size={40}
               color={"white"}
             />
