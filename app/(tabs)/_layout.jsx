@@ -48,20 +48,9 @@ export default function TabLayout() {
         name="create"
         options={{
           tabBarIcon: ({ focused, color }) => (
-            <Ionicons
-              name="add-circle-outline"
-              size={40}
-              color={"white"}
-            />
+            <Ionicons name="add-circle-outline" size={30} color={color} />
           ),
-          tabBarIconStyle: {
-            position: "absolute",
-            top: -15,
-            backgroundColor: "black",
-            borderRadius: "50%",
-            width: 40,
-            height: 40,
-          },
+          tabBarIconStyle: { marginTop: 3 },
         }}
       />
       <Tabs.Screen
