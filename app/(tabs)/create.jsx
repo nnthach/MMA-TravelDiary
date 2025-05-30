@@ -6,9 +6,11 @@ import {
   TouchableOpacity,
 } from "react-native";
 import React from "react";
+import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 
 export default function CreateScreen() {
+  const router = useRouter();
   const [createForm, setCreateForm] = React.useState({
     title: "",
     address: "",
@@ -85,7 +87,7 @@ export default function CreateScreen() {
               borderRadius: 10,
               marginTop: 20,
             }}
-            onPress={() => console.log("Navigate to login")}
+            onPress={() => router.push("/login")}
           >
             <Text
               style={{
