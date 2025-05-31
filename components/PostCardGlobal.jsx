@@ -1,14 +1,39 @@
 import { View, Text, Image, TouchableOpacity } from "react-native";
-import React from "react";
+import { useRouter } from "expo-router";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function PostCardGlobal({ item }) {
+  const router = useRouter();
   return (
-    <TouchableOpacity activeOpacity={0.8} style={styles.container}>
-      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-        <Text style={{ fontWeight: "bold", fontSize: 16 }}>{item.user}</Text>
-        <Text>{item.date}</Text>
-      </View>
+    <TouchableOpacity
+      activeOpacity={0.8}
+      style={styles.container}
+      onPress={() => {
+        router.push(`/post/${item.id}`);
+      }}
+    >
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <Text style={{ fontWeight: "bold", fontSize: 18 }}>{item.user}</Text>
 
+        {/*Action icon in post */}
+        <View
+          style={{
+            flexDirection: "row",
+            gap: 10,
+            alignItems: "center",
+          }}
+        >
+          <Ionicons name="bookmark-outline" size={20} color="black" />
+          <Ionicons name="alert-circle-outline" size={22} color="black" />
+        </View>
+      </View>
+      <Text style={{ color: "grey", fontSize: 12 }}>{item.date}</Text>
       <View
         style={{
           marginVertical: 5,
@@ -16,11 +41,8 @@ export default function PostCardGlobal({ item }) {
           overflow: "hidden",
         }}
       >
-        <Text>
-          {item.content}
-        </Text>
+        <Text>{item.content}</Text>
       </View>
-
       <View
         style={{
           flex: 1,
@@ -44,11 +66,10 @@ export default function PostCardGlobal({ item }) {
 const styles = {
   container: {
     width: "100%",
-    height: 250,
+    height: 300,
+    backgroundColor: "white",
     borderRadius: 10,
     overflow: "hidden",
     padding: 10,
-    borderWidth: 1,
-    borderColor: "#ccc",
   },
 };

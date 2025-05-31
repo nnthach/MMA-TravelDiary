@@ -69,9 +69,6 @@ export default function LocationScreen() {
       </View>
 
       {/*Content */}
-      {/* <View style={{ flex: 1, padding: 10 }}>
-        <PostCardGlobal />
-      </View> */}
       <FlatList
         data={postFakeData}
         keyExtractor={(item) => item.id.toString()}
