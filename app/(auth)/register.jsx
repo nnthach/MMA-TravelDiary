@@ -9,27 +9,35 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 
-export default function LoginScreen({ navigation }) {
-  const router = useRouter();
+export default function RegisterScreen({ navigation }) {
+    const router = useRouter();
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const onLoginPressed = () => {
-    console.log("Logging in with:", email, password);
+  const onSignUpPressed = () => {
+    console.log("Registering with:", { name, email, password });
     // navigation.reset({ index: 0, routes: [{ name: "Dashboard" }] });
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Welcome back.</Text>
+      <Text style={styles.title}>Create Account</Text>
+
+      <TextInput
+        placeholder="Name"
+        style={styles.input}
+        value={name}
+        onChangeText={(text) => setName(text)}
+      />
 
       <TextInput
         placeholder="Email"
         style={styles.input}
         value={email}
         onChangeText={(text) => setEmail(text)}
-        autoCapitalize="none"
         keyboardType="email-address"
+        autoCapitalize="none"
       />
 
       <TextInput
@@ -40,24 +48,16 @@ export default function LoginScreen({ navigation }) {
         secureTextEntry
       />
 
-      <TouchableOpacity
-        onPress={() => console.log("Forgot Password")}
-        style={styles.forgotPassword}
-      >
-        <Text style={styles.linkText}>Forgot your password?</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.button} onPress={onLoginPressed}>
-        <Text style={styles.buttonText}>Login</Text>
+      <TouchableOpacity style={styles.button} onPress={onSignUpPressed}>
+        <Text style={styles.buttonText}>Sign Up</Text>
       </TouchableOpacity>
 
       <View style={styles.row}>
-        <Text>Don’t have an account? </Text>
-        <TouchableOpacity onPress={() => router.push("/register")}>
-          <Text style={[styles.link, { marginLeft: 4 }]}>Sign up</Text>
+        <Text>Already have an account?</Text>
+        <TouchableOpacity onPress={() => router.push("/login")}>
+            <Text style={[styles.link, { marginLeft: 4 }]}>Login</Text>
         </TouchableOpacity>
-      </View>
-
+        </View>
     </SafeAreaView>
   );
 }
@@ -82,13 +82,6 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 16,
   },
-  forgotPassword: {
-    alignSelf: "flex-end",
-    marginBottom: 24,
-  },
-  linkText: {
-    color: "#007BFF",
-  },
   button: {
     backgroundColor: "#ff7733",
     paddingVertical: 12,
@@ -103,5 +96,9 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     justifyContent: "center",
+  },
+  link: {
+    color: "#007BFF",
+    fontWeight: "bold",
   },
 });
