@@ -3,7 +3,8 @@ import { Redirect, useRouter } from "expo-router";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function Index() {
-  // return <Redirect href={"/(auth)"} />;
+ return <Redirect href={"/(admin)"} />;
+
 
   const router = useRouter();
 
