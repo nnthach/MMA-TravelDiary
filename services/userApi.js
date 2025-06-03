@@ -8,6 +8,7 @@ const userApi = {
   delete: (id) => axiosClient.delete(`/users/${id}`), // DELETE /v1/users/:id
 
   login: (data) => axiosClient.post("/users/login", data),
+  register: (data) => axiosClient.post("/users/register", data),
 };
 
 export default userApi;

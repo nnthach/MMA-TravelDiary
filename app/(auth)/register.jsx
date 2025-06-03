@@ -8,16 +8,39 @@ import {
   SafeAreaView,
 } from "react-native";
 import { useRouter } from "expo-router";
+import userApi from "../../services/userApi";
 
 export default function RegisterScreen({ navigation }) {
-    const router = useRouter();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const router = useRouter();
 
-  const onSignUpPressed = () => {
-    console.log("Registering with:", { name, email, password });
-    // navigation.reset({ index: 0, routes: [{ name: "Dashboard" }] });
+  const [registerForm, setLoginForm] = useState({
+    username: "",
+    password: "",
+    email: "",
+    confirm_password: "",
+  });
+
+  const handleChange = (value, name) => {
+    setLoginForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleRegister = async () => {
+    try {
+      const res = await userApi.register(registerForm);
+      console.log("res", res);
+
+      alert("Register success");
+
+      setTimeout(() => {
+        router.push("/(auth)/login");
+      }, 3000);
+    } catch (error) {
+      console.log(error);
+      alert("fail to register");
+    }
   };
 
   return (
@@ -25,17 +48,17 @@ export default function RegisterScreen({ navigation }) {
       <Text style={styles.title}>Create Account</Text>
 
       <TextInput
-        placeholder="Name"
+        placeholder="Username"
         style={styles.input}
-        value={name}
-        onChangeText={(text) => setName(text)}
+        value={registerForm.username}
+        onChangeText={(text) => handleChange(text, "username")}
       />
 
       <TextInput
         placeholder="Email"
         style={styles.input}
-        value={email}
-        onChangeText={(text) => setEmail(text)}
+        value={registerForm.email}
+        onChangeText={(text) => handleChange(text, "email")}
         keyboardType="email-address"
         autoCapitalize="none"
       />
@@ -43,21 +66,29 @@ export default function RegisterScreen({ navigation }) {
       <TextInput
         placeholder="Password"
         style={styles.input}
-        value={password}
-        onChangeText={(text) => setPassword(text)}
+        value={registerForm.password}
+        onChangeText={(text) => handleChange(text, "password")}
         secureTextEntry
       />
 
-      <TouchableOpacity style={styles.button} onPress={onSignUpPressed}>
+      <TextInput
+        placeholder="Confirm Password"
+        style={styles.input}
+        value={registerForm.confirm_password}
+        onChangeText={(text) => handleChange(text, "confirm_password")}
+        secureTextEntry
+      />
+
+      <TouchableOpacity style={styles.button} onPress={handleRegister}>
         <Text style={styles.buttonText}>Sign Up</Text>
       </TouchableOpacity>
 
       <View style={styles.row}>
         <Text>Already have an account?</Text>
         <TouchableOpacity onPress={() => router.push("/login")}>
-            <Text style={[styles.link, { marginLeft: 4 }]}>Login</Text>
+          <Text style={[styles.link, { marginLeft: 4 }]}>Login</Text>
         </TouchableOpacity>
-        </View>
+      </View>
     </SafeAreaView>
   );
 }
