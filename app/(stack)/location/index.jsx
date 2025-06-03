@@ -1,47 +1,44 @@
-import { View, Text, StyleSheet, FlatList } from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  ActivityIndicator,
+} from "react-native";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import PostCardGlobal from "../../../components/PostCardGlobal";
+import { useCallback, useState } from "react";
+import postAPIs from "../../../services/postAPIs";
 
 export default function LocationScreen() {
   const { city, country } = useLocalSearchParams();
+  const [postListData, setPostListData] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const route = useRouter();
 
-  const postFakeData = [
-    {
-      id: 1,
-      user: "Minh",
-      date: "Mar 25, 2025",
-      content:
-        "Private pools & sea views stretch out amid the coastal enclave of Amanoi – an away-from-it-all escape on Vietnam's Vinh Hy Bay.Private pools & sea views stretch out amid the coastal enclave of Amanoi – an away-from-it-all escape on Vietnam's Vinh Hy Bay.",
-      img: "https://twistedsifter.com/wp-content/uploads/2014/06/selfie-from-the-top-of-christ-the-redeemer-rio-de-janeiro-brazil.jpg",
-    },
-    {
-      id: 2,
-      user: "Minh",
-      date: "Mar 25, 2025",
-      content:
-        "Private pools & sea views stretch out amid the coastal enclave of Amanoi – an away-from-it-all escape on Vietnam's Vinh Hy Bay.Private pools & sea views stretch out amid the coastal enclave of Amanoi – an away-from-it-all escape on Vietnam's Vinh Hy Bay.",
-      img: "https://twistedsifter.com/wp-content/uploads/2014/06/selfie-from-the-top-of-christ-the-redeemer-rio-de-janeiro-brazil.jpg",
-    },
-    {
-      id: 3,
-      user: "Minh",
-      date: "Mar 25, 2025",
-      content:
-        "Private pools & sea views stretch out amid the coastal enclave of Amanoi – an away-from-it-all escape on Vietnam's Vinh Hy Bay.Private pools & sea views stretch out amid the coastal enclave of Amanoi – an away-from-it-all escape on Vietnam's Vinh Hy Bay.",
-      img: "https://twistedsifter.com/wp-content/uploads/2014/06/selfie-from-the-top-of-christ-the-redeemer-rio-de-janeiro-brazil.jpg",
-    },
-    {
-      id: 4,
-      user: "Minh",
-      date: "Mar 25, 2025",
-      content:
-        "Private pools & sea views stretch out amid the coastal enclave of Amanoi – an away-from-it-all escape on Vietnam's Vinh Hy Bay.Private pools & sea views stretch out amid the coastal enclave of Amanoi – an away-from-it-all escape on Vietnam's Vinh Hy Bay.",
-      img: "https://twistedsifter.com/wp-content/uploads/2014/06/selfie-from-the-top-of-christ-the-redeemer-rio-de-janeiro-brazil.jpg",
-    },
-  ];
+  useFocusEffect(
+    useCallback(() => {
+      console.log("callai");
+      const getAllPost = async () => {
+        setIsLoading(true);
+        console.log("calling");
+        try {
+          console.log("call 2", isLoading);
+          const res = await postAPIs.getAllPost();
+          console.log("res", isLoading);
+          console.log("res", res);
+          setPostListData(res);
+          setIsLoading(false);
+        } catch (error) {
+          console.log("error", error);
+          setIsLoading(false);
+        }
+      };
+      getAllPost();
+    }, [])
+  );
   return (
     <>
       {/*Header */}
@@ -68,17 +65,26 @@ export default function LocationScreen() {
         </Text>
       </View>
 
-      {/*Content */}
-      <FlatList
-        data={postFakeData}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => <PostCardGlobal item={item} />}
-        ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
-        contentContainerStyle={{ padding: 10 }}
-      />
+      {isLoading ? (
+        <View
+          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+        >
+          <ActivityIndicator size="large" color="black" />
+          <Text>Loading</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={postListData}
+          keyExtractor={(item) => item._id.toString()}
+          renderItem={({ item }) => <PostCardGlobal item={item} />}
+          ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+          contentContainerStyle={{ padding: 10 }}
+        />
+      )}
     </>
   );
 }
+
 const styles = StyleSheet.create({
   header: {
     height: 50,

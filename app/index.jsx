@@ -1,10 +1,11 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { Redirect, useRouter } from "expo-router";
+import { useContext, useEffect } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { AuthContext } from "../context/AuthContext";
 
 export default function Index() {
- return <Redirect href={"/(admin)"} />;
-
+  //  return <Redirect href={"/(admin)"} />;
 
   const router = useRouter();
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   View,
   Text,
@@ -8,15 +8,48 @@ import {
   SafeAreaView,
 } from "react-native";
 import { useRouter } from "expo-router";
+import userApi from "../../services/userApi";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AuthContext } from "../../context/AuthContext";
 
 export default function LoginScreen({ navigation }) {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [loginForm, setLoginForm] = useState({
+    account: "",
+    password: "",
+  });
+  const { setUserId, userId } = useContext(AuthContext);
 
-  const onLoginPressed = () => {
-    console.log("Logging in with:", email, password);
-    // navigation.reset({ index: 0, routes: [{ name: "Dashboard" }] });
+  const handleChange = (value, name) => {
+    setLoginForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleLogin = async () => {
+    try {
+      const res = await userApi.login(loginForm);
+      console.log("res", res);
+      const { accessToken, refreshToken } = res;
+
+      console.log("userId before set", userId);
+      setUserId(res.userId);
+      console.log("userId after set", userId);
+
+      AsyncStorage.setItem("accessToken", accessToken);
+      AsyncStorage.setItem("refreshToken", refreshToken);
+      AsyncStorage.setItem("userId", res.userId);
+
+      alert("login success");
+
+      setTimeout(() => {
+        router.replace("/(tabs)");
+      }, 3000);
+    } catch (error) {
+      console.log(error);
+      alert("fail to login");
+    }
   };
 
   return (
@@ -24,10 +57,10 @@ export default function LoginScreen({ navigation }) {
       <Text style={styles.title}>Welcome back.</Text>
 
       <TextInput
-        placeholder="Email"
+        placeholder="Email or username"
         style={styles.input}
-        value={email}
-        onChangeText={(text) => setEmail(text)}
+        value={loginForm.account}
+        onChangeText={(text) => handleChange(text, "account")}
         autoCapitalize="none"
         keyboardType="email-address"
       />
@@ -35,8 +68,8 @@ export default function LoginScreen({ navigation }) {
       <TextInput
         placeholder="Password"
         style={styles.input}
-        value={password}
-        onChangeText={(text) => setPassword(text)}
+        value={loginForm.password}
+        onChangeText={(text) => handleChange(text, "password")}
         secureTextEntry
       />
 
@@ -47,7 +80,7 @@ export default function LoginScreen({ navigation }) {
         <Text style={styles.linkText}>Forgot your password?</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.button} onPress={onLoginPressed}>
+      <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
 
@@ -57,7 +90,6 @@ export default function LoginScreen({ navigation }) {
           <Text style={[styles.link, { marginLeft: 4 }]}>Sign up</Text>
         </TouchableOpacity>
       </View>
-
     </SafeAreaView>
   );
 }

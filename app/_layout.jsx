@@ -1,18 +1,21 @@
 import { Stack } from "expo-router";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { AuthProvider } from "../context/AuthContext";
 
 const RootLayout = () => {
   return (
-    <SafeAreaProvider>
-      <SafeAreaView style={{ flex: 1, backgroundColor: "black" }}>
-        <Stack
-          screenOptions={{
-            headerTitleAlign: "center",
-            headerShown: false,
-          }}
-        />
-      </SafeAreaView>
-    </SafeAreaProvider>
+    <AuthProvider>
+      <SafeAreaProvider>
+        <SafeAreaView style={{ flex: 1, backgroundColor: "black" }}>
+          <Stack
+            screenOptions={{
+              headerTitleAlign: "center",
+              headerShown: false,
+            }}
+          />
+        </SafeAreaView>
+      </SafeAreaProvider>
+    </AuthProvider>
   );
 };
 

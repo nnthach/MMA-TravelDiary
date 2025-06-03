@@ -9,7 +9,7 @@ export default function PostCardGlobal({ item }) {
       activeOpacity={0.8}
       style={styles.container}
       onPress={() => {
-        router.push(`/post/${item.id}`);
+        router.push(`/post/${item._id}`);
       }}
     >
       <View
@@ -19,7 +19,9 @@ export default function PostCardGlobal({ item }) {
           alignItems: "center",
         }}
       >
-        <Text style={{ fontWeight: "bold", fontSize: 18 }}>{item.user}</Text>
+        <Text style={{ fontWeight: "bold", fontSize: 18 }}>
+          {item.username}
+        </Text>
 
         {/*Action icon in post */}
         <View
@@ -33,7 +35,7 @@ export default function PostCardGlobal({ item }) {
           <Ionicons name="alert-circle-outline" size={22} color="black" />
         </View>
       </View>
-      <Text style={{ color: "grey", fontSize: 12 }}>{item.date}</Text>
+      <Text style={{ color: "grey", fontSize: 12 }}>{item.createdAt}</Text>
       <View
         style={{
           marginVertical: 5,
@@ -41,6 +43,7 @@ export default function PostCardGlobal({ item }) {
           overflow: "hidden",
         }}
       >
+        <Text style={{ fontWeight: 600 }}>{item.title}</Text>
         <Text>{item.content}</Text>
       </View>
       <View
@@ -53,7 +56,7 @@ export default function PostCardGlobal({ item }) {
       >
         <Image
           source={{
-            uri: item.img,
+            uri: item?.images[0],
           }}
           style={{ width: "100%", height: "100%" }}
           resizeMode="cover"

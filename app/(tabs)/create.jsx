@@ -5,17 +5,20 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
-import React from "react";
+import React, { useContext, useState } from "react";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
+import { AuthContext } from "../../context/AuthContext";
 
 export default function CreateScreen() {
   const router = useRouter();
-  const [createForm, setCreateForm] = React.useState({
+  const [createForm, setCreateForm] = useState({
     title: "",
     address: "",
     note: "",
   });
+
+  const { userInfo } = useContext(AuthContext);
 
   const handleChange = (value, name) => {
     setCreateForm((prev) => ({
@@ -25,6 +28,8 @@ export default function CreateScreen() {
   };
   const handleSubmit = () => {
     console.log(createForm);
+    try {
+    } catch (error) {}
   };
   return (
     <>
@@ -76,32 +81,34 @@ export default function CreateScreen() {
       </View>
 
       {/*Modal require login before use */}
-      <View style={styles.overlay}>
-        <View style={styles.modalWrap}>
-          <Text>You need to login before you can create a diary entry.</Text>
-          <TouchableOpacity
-            style={{
-              backgroundColor: "orange",
-              width: "40%",
-              alignSelf: "flex-end",
-              borderRadius: 10,
-              marginTop: 20,
-            }}
-            onPress={() => router.push("/login")}
-          >
-            <Text
+      {!userInfo && (
+        <View style={styles.overlay}>
+          <View style={styles.modalWrap}>
+            <Text>You need to login before you can create a diary entry.</Text>
+            <TouchableOpacity
               style={{
-                color: "white",
-                textAlign: "center",
-                fontWeight: "bold",
-                paddingVertical: 5,
+                backgroundColor: "orange",
+                width: "40%",
+                alignSelf: "flex-end",
+                borderRadius: 10,
+                marginTop: 20,
               }}
+              onPress={() => router.push("/login")}
             >
-              Let's login
-            </Text>
-          </TouchableOpacity>
+              <Text
+                style={{
+                  color: "white",
+                  textAlign: "center",
+                  fontWeight: "bold",
+                  paddingVertical: 5,
+                }}
+              >
+                Let's login
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
+      )}
     </>
   );
 }
