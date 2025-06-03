@@ -66,7 +66,7 @@ export default function PostCardGlobal({ item }) {
 const styles = {
   container: {
     width: "100%",
-    height: 300,
+    height: 400,
     backgroundColor: "white",
     borderRadius: 10,
     overflow: "hidden",

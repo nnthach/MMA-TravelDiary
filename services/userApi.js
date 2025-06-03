@@ -1,4 +1,4 @@
-import axiosClient from "./axiosClient";
+import axiosClient from "../config/axiosClient";
 
 const userApi = {
   getAll: () => axiosClient.get("/users"),               // GET /v1/users

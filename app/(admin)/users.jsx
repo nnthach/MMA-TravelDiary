@@ -10,7 +10,7 @@ import {
   TextInput,
   Modal,
 } from "react-native";
-import userApi from "../../apis/userApi"; // Đảm bảo đường dẫn đúng
+import userApi from "../../services/userApi"; // Đảm bảo đường dẫn đúng
 
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);
@@ -42,14 +42,15 @@ export default function AdminUsers() {
       password: "password123", // Thêm password giả sử
     };
 
-    userApi.create(newUser)
-      .then(response => {
-        setUsers(prevUsers => [response, ...prevUsers]);
+    userApi
+      .create(newUser)
+      .then((response) => {
+        setUsers((prevUsers) => [response, ...prevUsers]);
         Alert.alert("Thành công", "Người dùng đã được thêm");
         setUserData({ username: "", email: "" });
         setShowModal(false);
       })
-      .catch(error => {
+      .catch((error) => {
         Alert.alert("Lỗi", "Không thể thêm người dùng");
         console.error(error);
       });
@@ -62,16 +63,19 @@ export default function AdminUsers() {
       email: userData.email,
     };
 
-    userApi.update(currentUser._id, updatedUser)
-      .then(response => {
-        setUsers(prevUsers => prevUsers.map(user =>
-          user._id === currentUser._id ? { ...user, ...updatedUser } : user
-        ));
+    userApi
+      .update(currentUser._id, updatedUser)
+      .then((response) => {
+        setUsers((prevUsers) =>
+          prevUsers.map((user) =>
+            user._id === currentUser._id ? { ...user, ...updatedUser } : user
+          )
+        );
         Alert.alert("Thành công", "Thông tin người dùng đã được cập nhật");
         setUserData({ username: "", email: "" });
         setShowModal(false);
       })
-      .catch(error => {
+      .catch((error) => {
         Alert.alert("Lỗi", "Không thể cập nhật thông tin người dùng");
         console.error(error);
       });
@@ -79,12 +83,15 @@ export default function AdminUsers() {
 
   // Hàm xóa người dùng
   const handleDeleteUser = (userId) => {
-    userApi.delete(userId)
+    userApi
+      .delete(userId)
       .then(() => {
-        setUsers(prevUsers => prevUsers.filter(user => user._id !== userId));
+        setUsers((prevUsers) =>
+          prevUsers.filter((user) => user._id !== userId)
+        );
         Alert.alert("Thành công", "Người dùng đã được xóa");
       })
-      .catch(error => {
+      .catch((error) => {
         Alert.alert("Lỗi", "Không thể xóa người dùng");
         console.error(error);
       });
@@ -96,7 +103,12 @@ export default function AdminUsers() {
 
   if (loading) {
     return (
-      <View style={[styles.container, { justifyContent: "center", alignItems: "center" }]}>
+      <View
+        style={[
+          styles.container,
+          { justifyContent: "center", alignItems: "center" },
+        ]}
+      >
         <ActivityIndicator size="large" color="#007bff" />
       </View>
     );
@@ -106,13 +118,16 @@ export default function AdminUsers() {
     <View style={styles.container}>
       <Text style={styles.title}>👥 Danh sách người dùng</Text>
 
-      <TouchableOpacity style={styles.addButton} onPress={() => setShowModal(true)}>
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress={() => setShowModal(true)}
+      >
         <Text style={styles.addButtonText}>➕ Thêm người dùng</Text>
       </TouchableOpacity>
 
       <FlatList
         data={users}
-        keyExtractor={(item) => item._id.toString()}  // Dùng _id để đảm bảo unique
+        keyExtractor={(item) => item._id.toString()} // Dùng _id để đảm bảo unique
         renderItem={({ item }) => (
           <View style={styles.userItem}>
             <View style={styles.info}>
@@ -120,7 +135,13 @@ export default function AdminUsers() {
               <Text style={styles.email}>{item.email}</Text>
             </View>
             <View style={styles.actions}>
-              <TouchableOpacity onPress={() => { setCurrentUser(item); setUserData({ username: item.username, email: item.email }); setShowModal(true); }}>
+              <TouchableOpacity
+                onPress={() => {
+                  setCurrentUser(item);
+                  setUserData({ username: item.username, email: item.email });
+                  setShowModal(true);
+                }}
+              >
                 <Text style={styles.editBtn}>✏️ Sửa</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => handleDeleteUser(item._id)}>
@@ -135,13 +156,17 @@ export default function AdminUsers() {
       <Modal visible={showModal} animationType="slide" transparent={true}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>{currentUser ? "Chỉnh sửa người dùng" : "Thêm người dùng"}</Text>
+            <Text style={styles.modalTitle}>
+              {currentUser ? "Chỉnh sửa người dùng" : "Thêm người dùng"}
+            </Text>
 
             <TextInput
               style={styles.input}
               placeholder="Tên người dùng"
               value={userData.username}
-              onChangeText={(text) => setUserData({ ...userData, username: text })}
+              onChangeText={(text) =>
+                setUserData({ ...userData, username: text })
+              }
             />
             <TextInput
               style={styles.input}
@@ -151,14 +176,19 @@ export default function AdminUsers() {
             />
 
             <View style={styles.modalActions}>
-              <TouchableOpacity style={styles.cancelButton} onPress={() => setShowModal(false)}>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => setShowModal(false)}
+              >
                 <Text style={styles.cancelButtonText}>Hủy</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.saveButton}
                 onPress={currentUser ? handleEditUser : handleAddUser}
               >
-                <Text style={styles.saveButtonText}>{currentUser ? "Cập nhật" : "Thêm"}</Text>
+                <Text style={styles.saveButtonText}>
+                  {currentUser ? "Cập nhật" : "Thêm"}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
