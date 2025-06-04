@@ -28,6 +28,7 @@ export default function LoginScreen({ navigation }) {
   };
 
   const handleLogin = async () => {
+    console.log("run api");
     try {
       const res = await userApi.login(loginForm);
       console.log("res", res);

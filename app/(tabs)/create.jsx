@@ -9,27 +9,46 @@ import React, { useContext, useState } from "react";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { AuthContext } from "../../context/AuthContext";
+import postAPIs from "../../services/postAPIs";
 
 export default function CreateScreen() {
   const router = useRouter();
   const [createForm, setCreateForm] = useState({
     title: "",
-    address: "",
-    note: "",
+    content: "",
+    images: [],
   });
 
   const { userInfo } = useContext(AuthContext);
 
   const handleChange = (value, name) => {
-    setCreateForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    if(name == 'images'){
+      setCreateForm((prev) => ({
+        ...prev,
+        images: [...prev.images, value],
+      }));
+    }else{
+      setCreateForm((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
-  const handleSubmit = () => {
-    console.log(createForm);
+  const handleSubmit = async () => {
+    console.log("createform", createForm);
     try {
-    } catch (error) {}
+      const newCreateForm = {
+        ...createForm,
+        userId: userInfo._id,
+        username: userInfo.username,
+      };
+      console.log("new create form", newCreateForm);
+      const res = await postAPIs.create(newCreateForm);
+      console.log("res", res);
+      alert("Create success");
+    } catch (error) {
+      console.log("error create post", error);
+    }
   };
   return (
     <>
@@ -57,16 +76,16 @@ export default function CreateScreen() {
             />
             <TextInput
               style={styles.input}
-              placeholder="Address"
-              value={createForm.address}
-              onChangeText={(text) => handleChange(text, "address")}
+              placeholder="Images"
+              value={createForm.images}
+              onChangeText={(text) => handleChange(text, "images")}
             />
             <TextInput
               style={[styles.input, styles.textarea]}
-              placeholder="Note"
-              value={createForm.note}
+              placeholder="Content"
+              value={createForm.content}
               multiline
-              onChangeText={(text) => handleChange(text, "note")}
+              onChangeText={(text) => handleChange(text, "content")}
             />
 
             <TouchableOpacity style={styles.button} onPress={handleSubmit}>
