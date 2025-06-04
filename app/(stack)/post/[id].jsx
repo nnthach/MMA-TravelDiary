@@ -1,10 +1,44 @@
 import { View, Text, StyleSheet } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
+import { useCallback, useState } from "react";
+import postAPIs from "../../../services/postAPIs";
 
 export default function PostDetail() {
   const { id } = useLocalSearchParams();
+  const [isLoading, setIsLoading] = useState(false);
+  const [postDetail, setPostDetail] = useState(null);
   const route = useRouter();
+
+  useFocusEffect(
+    useCallback(() => {
+      console.log("call detail post------------------------------");
+      const getPostById = async () => {
+        setIsLoading(true);
+        try {
+          console.log("call 2", isLoading);
+          const res = await postAPIs.getById(id);
+          console.log("res", isLoading);
+          console.log("res", res);
+          setPostDetail(res);
+          setIsLoading(false);
+        } catch (error) {
+          console.log("error", error);
+          setPostDetail(null);
+          setIsLoading(false);
+        }
+      };
+      getPostById();
+    }, [])
+  );
+
+  if (isLoading) {
+    return (
+      <View>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
   return (
     <>
       {/*Header */}
@@ -25,9 +59,11 @@ export default function PostDetail() {
           style={{
             width: "100%",
             textAlign: "center",
+            fontWeight: 500,
+            fontSize: 16,
           }}
         >
-          Post detail
+          {postDetail?.title}
         </Text>
       </View>
 

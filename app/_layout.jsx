@@ -6,7 +6,7 @@ const RootLayout = () => {
   return (
     <AuthProvider>
       <SafeAreaProvider>
-        <SafeAreaView style={{ flex: 1, backgroundColor: "black" }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
           <Stack
             screenOptions={{
               headerTitleAlign: "center",

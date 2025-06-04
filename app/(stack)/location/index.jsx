@@ -20,15 +20,10 @@ export default function LocationScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      console.log("callai");
       const getAllPost = async () => {
         setIsLoading(true);
-        console.log("calling");
         try {
-          console.log("call 2", isLoading);
           const res = await postAPIs.getAllPost();
-          console.log("res", isLoading);
-          console.log("res", res);
           setPostListData(res);
           setIsLoading(false);
         } catch (error) {
