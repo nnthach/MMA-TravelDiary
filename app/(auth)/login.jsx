@@ -45,7 +45,12 @@ export default function LoginScreen({ navigation }) {
       alert("login success");
 
       setTimeout(() => {
-        router.replace("/(tabs)");
+
+      if (res.role =="Admin") {
+          router.replace("/(admin)");
+      } else {
+          router.replace("/(tabs)");
+      }
       }, 3000);
     } catch (error) {
       console.log(error);

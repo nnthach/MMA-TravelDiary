@@ -9,96 +9,111 @@ import {
   ActivityIndicator,
   TextInput,
   Modal,
+  Image,
 } from "react-native";
-import userApi from "../../services/userApi"; // Ensure the correct path
+import axiosClient from "../../config/axiosClient"; // Ensure correct path
 
-export default function AdminUsers() {
-  const [users, setUsers] = useState([]);
+export default function Post() {
+  const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
-  const [userData, setUserData] = useState({ username: "", email: "" });
+  const [postDetails, setPostDetails] = useState(null); // To store the details of the clicked post
 
-  // Fetch users from API
-  const fetchUsers = async () => {
+  // Fetch posts from API
+  const fetchPosts = async () => {
     try {
       setLoading(true);
-      const data = await userApi.getAll();
-      console.log("Fetched users:", data);
-      setUsers(data);
+      const data = await axiosClient.get("/post");
+      setPosts(data);
     } catch (error) {
-      Alert.alert("Error", "Unable to load user list");
+      Alert.alert("Error", "Unable to load posts");
       console.error(error);
     } finally {
       setLoading(false);
     }
   };
 
-  // Add user
-  const handleAddUser = () => {
-    const newUser = {
-      username: userData.username,
-      email: userData.email,
-      password: "password123", // Example password
+  // Open the details modal
+  const showPostDetails = (post) => {
+    setPostDetails(post);
+    setShowModal(true);
+  };
+
+  // Add post
+  const handleAddPost = () => {
+    const newPost = {
+      userId: postDetails.userId,
+      username: postDetails.username,
+      title: postDetails.title,
+      content: postDetails.content,
+      images: postDetails.images,
     };
 
-    userApi
-      .create(newUser)
+    axiosClient
+      .post("/post", newPost)
       .then((response) => {
-        setUsers((prevUsers) => [response, ...prevUsers]);
-        Alert.alert("Success", "User has been added");
-        setUserData({ username: "", email: "" });
+        setPosts((prevPosts) => [response.data, ...prevPosts]);
+        Alert.alert("Success", "Post has been added");
+        setPostDetails({
+          userId: "",
+          username: "",
+          title: "",
+          content: "",
+          images: [],
+        });
         setShowModal(false);
       })
       .catch((error) => {
-        Alert.alert("Error", "Unable to add user");
+        Alert.alert("Error", "Unable to add post");
         console.error(error);
       });
   };
 
-  // Edit user
-  const handleEditUser = () => {
-    const updatedUser = {
-      username: userData.username,
-      email: userData.email,
+  // Edit post
+  const handleEditPost = (id) => {
+    const updatedPost = {
+      userId: postDetails.userId,
+      username: postDetails.username,
+      title: postDetails.title,
+      content: postDetails.content,
+      images: postDetails.images,
     };
 
-    userApi
-      .update(currentUser._id, updatedUser)
+    axiosClient
+      .put(`/post/${id}`, updatedPost)
       .then((response) => {
-        setUsers((prevUsers) =>
-          prevUsers.map((user) =>
-            user._id === currentUser._id ? { ...user, ...updatedUser } : user
+        setPosts((prevPosts) =>
+          prevPosts.map((post) =>
+            post._id === id ? { ...post, ...updatedPost } : post
           )
         );
-        Alert.alert("Success", "User information updated");
-        setUserData({ username: "", email: "" });
+        Alert.alert("Success", "Post updated");
         setShowModal(false);
       })
       .catch((error) => {
-        Alert.alert("Error", "Unable to update user");
+        Alert.alert("Error", "Unable to update post");
         console.error(error);
       });
   };
 
-  // Delete user
-  const handleDeleteUser = (userId) => {
-    userApi
-      .delete(userId)
+  // Delete post
+  const handleDeletePost = (id) => {
+    axiosClient
+      .delete(`/post/${id}`)
       .then(() => {
-        setUsers((prevUsers) =>
-          prevUsers.filter((user) => user._id !== userId)
+        setPosts((prevPosts) =>
+          prevPosts.filter((post) => post._id !== id)
         );
-        Alert.alert("Success", "User has been deleted");
+        Alert.alert("Success", "Post has been deleted");
       })
       .catch((error) => {
-        Alert.alert("Error", "Unable to delete user");
+        Alert.alert("Error", "Unable to delete post");
         console.error(error);
       });
   };
 
   useEffect(() => {
-    fetchUsers();
+    fetchPosts();
   }, []);
 
   if (loading) {
@@ -111,40 +126,45 @@ export default function AdminUsers() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>👥 User List</Text>
+      <Text style={styles.title}>📑 Post List</Text>
 
       <TouchableOpacity
         style={styles.addButton}
         onPress={() => setShowModal(true)}
       >
-        <Text style={styles.addButtonText}>➕ Add User</Text>
+        <Text style={styles.addButtonText}>➕ Add Post</Text>
       </TouchableOpacity>
 
       <View style={styles.table}>
         <View style={styles.tableHeader}>
           <Text style={styles.tableHeaderText}>Username</Text>
-          <Text style={styles.tableHeaderText}>Email</Text>
+          <Text style={styles.tableHeaderText}>Title</Text>
           <Text style={styles.tableHeaderText}>Actions</Text>
         </View>
 
         <FlatList
-          data={users}
+          data={posts}
           keyExtractor={(item) => item._id.toString()}
           renderItem={({ item }) => (
             <View style={styles.tableRow}>
               <Text style={styles.tableCell}>{item.username}</Text>
-              <Text style={styles.tableCell}>{item.email}</Text>
+              <Text style={styles.tableCell}>{item.title}</Text>
+
+              {/* Actions */}
               <View style={styles.tableActions}>
                 <TouchableOpacity
-                  onPress={() => {
-                    setCurrentUser(item);
-                    setUserData({ username: item.username, email: item.email });
-                    setShowModal(true);
-                  }}
+                  onPress={() => showPostDetails(item)} // Show details when clicked
+                >
+                  <Text style={styles.detailBtn}>🔍 Details</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => handleEditPost(item._id)}
                 >
                   <Text style={styles.editBtn}>✏️ Edit</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleDeleteUser(item._id)}>
+                <TouchableOpacity
+                  onPress={() => handleDeletePost(item._id)}
+                >
                   <Text style={styles.deleteBtn}>🗑️ Delete</Text>
                 </TouchableOpacity>
               </View>
@@ -153,43 +173,36 @@ export default function AdminUsers() {
         />
       </View>
 
-      {/* Modal for Add/Edit User */}
+      {/* Modal for viewing post details */}
       <Modal visible={showModal} animationType="slide" transparent={true}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>
-              {currentUser ? "Edit User" : "Add User"}
-            </Text>
+            <Text style={styles.modalTitle}>Post Details</Text>
 
-            <TextInput
-              style={styles.input}
-              placeholder="Username"
-              value={userData.username}
-              onChangeText={(text) =>
-                setUserData({ ...userData, username: text })
-              }
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Email"
-              value={userData.email}
-              onChangeText={(text) => setUserData({ ...userData, email: text })}
-            />
+            {postDetails && (
+              <>
+                <Text style={styles.detailsText}>User ID: {postDetails.userId}</Text>
+                <Text style={styles.detailsText}>Username: {postDetails.username}</Text>
+                <Text style={styles.detailsText}>Title: {postDetails.title}</Text>
+                <Text style={styles.detailsText}>Content: {postDetails.content}</Text>
+                <View style={styles.imageContainer}>
+                  {postDetails.images && postDetails.images.length > 0 ? (
+                    postDetails.images.map((img, index) => (
+                      <Image key={index} source={{ uri: img }} style={styles.image} />
+                    ))
+                  ) : (
+                    <Text>No images</Text>
+                  )}
+                </View>
+              </>
+            )}
 
             <View style={styles.modalActions}>
               <TouchableOpacity
                 style={styles.cancelButton}
                 onPress={() => setShowModal(false)}
               >
-                <Text style={styles.cancelButtonText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.saveButton}
-                onPress={currentUser ? handleEditUser : handleAddUser}
-              >
-                <Text style={styles.saveButtonText}>
-                  {currentUser ? "Update" : "Add"}
-                </Text>
+                <Text style={styles.cancelButtonText}>Close</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -240,6 +253,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "600",
     textAlign: "center",
+    paddingRight: 10,
   },
   tableRow: {
     flexDirection: "row",
@@ -247,17 +261,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     borderBottomWidth: 1,
     borderBottomColor: "#ddd",
+    flexWrap: "wrap",
   },
   tableCell: {
     flex: 1,
     textAlign: "center",
     fontSize: 16,
     color: "#333",
+    paddingRight: 10,
+    paddingLeft: 10,
   },
   tableActions: {
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
+  },
+  detailBtn: {
+    color: "#007bff",
+    fontWeight: "bold",
   },
   editBtn: {
     color: "#4CAF50",
@@ -284,18 +305,26 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginBottom: 15,
   },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
+  detailsText: {
+    fontSize: 14,
+    color: "#555",
+    marginVertical: 5,
+  },
+  imageContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    marginTop: 10,
+  },
+  image: {
+    width: 100,
+    height: 100,
+    margin: 5,
     borderRadius: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    marginBottom: 10,
-    fontSize: 16,
   },
   modalActions: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "center",
   },
   cancelButton: {
     backgroundColor: "#ccc",
@@ -307,15 +336,4 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
   },
-  saveButton: {
-    backgroundColor: "#007bff",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-  },
-  saveButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
 });
-

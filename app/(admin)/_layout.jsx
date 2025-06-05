@@ -38,6 +38,17 @@ export default function AdminLayout() {
               Users
             </Text>
           </Link>
+
+                <Link href="/(admin)/post">
+            <Text
+              style={[
+                styles.link,
+                pathname === "/(admin)/post" && styles.activeLink,
+              ]}
+            >
+              Post
+            </Text>
+          </Link>
         </View>
       )}
 
