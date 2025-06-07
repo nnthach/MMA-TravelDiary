@@ -8,13 +8,15 @@ import {
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import PostCardGlobal from "../../../components/PostCardGlobal";
-import { useCallback, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import postAPIs from "../../../services/postAPIs";
+import { SavedPostContext } from "../../../context/SavedPostContext";
 
 export default function LocationScreen() {
   const { city, country } = useLocalSearchParams();
   const [postListData, setPostListData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const { savedPostData } = useContext(SavedPostContext);
 
   const route = useRouter();
 
@@ -71,7 +73,14 @@ export default function LocationScreen() {
         <FlatList
           data={postListData}
           keyExtractor={(item) => item._id.toString()}
-          renderItem={({ item }) => <PostCardGlobal item={item} />}
+          renderItem={({ item }) => (
+            <PostCardGlobal
+              item={item}
+              // b1: convert mảng object của savedPostData => mảng string chứa các id
+              // b2: so sánh các id đó với id của fetchAllPost xem có trùng thì trả về true
+              isSaved={savedPostData.map((p) => p._id).includes(item._id)}
+            />
+          )}
           ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
           contentContainerStyle={{ padding: 10 }}
         />

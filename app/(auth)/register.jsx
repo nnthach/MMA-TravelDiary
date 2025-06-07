@@ -90,12 +90,11 @@ export default function RegisterScreen({ navigation }) {
         </TouchableOpacity>
       </View>
 
-      <Text
-        style={{ textAlign: "center", marginTop: 5 }}
-        onPress={() => router.back()}
-      >
-        Back
-      </Text>
+      <TouchableOpacity onPress={() => router.replace("/(tabs)")}>
+        <Text style={{ fontSize: 14, color: "black", textAlign: "center" }}>
+          Continue as Guest
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 }

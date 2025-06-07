@@ -4,24 +4,33 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import storageAPIs from "../services/storageAPIs";
+import { SavedPostContext } from "../context/SavedPostContext";
 
-export default function PostCardGlobal({ item }) {
+export default function PostCardGlobal({ item, isSaved = false }) {
   const { userId } = useContext(AuthContext);
   const router = useRouter();
+  const { fetchStorageOfUser } = useContext(SavedPostContext);
 
   const handleAddPostToStorage = async (postId) => {
     try {
-      const data = {
-        userId,
-        posts: [{ postId }],
-      };
-      const result = await storageAPIs.create(data);
-      console.log("result", result);
+      const result = await storageAPIs.create(userId, { postId });
       alert(result.message);
+      fetchStorageOfUser();
     } catch (error) {
       console.log("add post to storage err", error);
     }
   };
+
+  const handleRemovePostOutOfStorage = async (postId) => {
+    try {
+      const result = await storageAPIs.delete(userId, postId);
+      alert(result.message);
+      fetchStorageOfUser();
+    } catch (error) {
+      console.log("remove post form storage err", error);
+    }
+  };
+
   return (
     <TouchableOpacity
       activeOpacity={0.8}
@@ -49,12 +58,22 @@ export default function PostCardGlobal({ item }) {
             alignItems: "center",
           }}
         >
-          <Ionicons
-            name="bookmark-outline"
-            size={20}
-            color="black"
-            onPress={() => handleAddPostToStorage(item._id)}
-          />
+          {isSaved ? (
+            <Ionicons
+              name="bookmark"
+              size={20}
+              color="black"
+              onPress={() => handleRemovePostOutOfStorage(item._id)}
+            />
+          ) : (
+            <Ionicons
+              name="bookmark-outline"
+              size={20}
+              color="black"
+              onPress={() => handleAddPostToStorage(item._id)}
+            />
+          )}
+
           <Ionicons name="alert-circle-outline" size={22} color="black" />
         </View>
       </View>

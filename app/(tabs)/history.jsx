@@ -1,29 +1,18 @@
-import { useFocusEffect } from "expo-router";
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useContext } from "react";
 import { ActivityIndicator, FlatList, Text, View } from "react-native";
-import storageAPIs from "../../services/storageAPIs";
 import { AuthContext } from "../../context/AuthContext";
 import PostCardGlobal from "../../components/PostCardGlobal";
+import { SavedPostContext } from "../../context/SavedPostContext";
+import { useFocusEffect } from "expo-router";
 
 export default function HistoryScreen() {
   const { userId } = useContext(AuthContext);
-  const [postListData, setPostListData] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const { savedPostData, isLoading, fetchStorageOfUser } =
+    useContext(SavedPostContext);
 
   useFocusEffect(
     useCallback(() => {
-      const getStorageOfUser = async () => {
-        setIsLoading(true);
-        try {
-          const res = await storageAPIs.getStorageOfUser(userId);
-          setPostListData(res);
-          setIsLoading(false);
-        } catch (error) {
-          console.log("error", error);
-          setIsLoading(false);
-        }
-      };
-      getStorageOfUser();
+      fetchStorageOfUser();
     }, [])
   );
 
@@ -50,7 +39,7 @@ export default function HistoryScreen() {
         <Text style={{}}>Saved Posts</Text>
       </View>
 
-      {!postListData.length || !userId ? (
+      {!savedPostData.length || !userId ? (
         <View
           style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
         >
@@ -58,9 +47,11 @@ export default function HistoryScreen() {
         </View>
       ) : (
         <FlatList
-          data={postListData}
+          data={savedPostData}
           keyExtractor={(item) => item._id.toString()}
-          renderItem={({ item }) => <PostCardGlobal item={item} />}
+          renderItem={({ item }) => (
+            <PostCardGlobal item={item} isSaved={true} />
+          )}
           ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
           contentContainerStyle={{ padding: 10 }}
         />
