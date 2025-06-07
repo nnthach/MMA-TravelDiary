@@ -13,21 +13,22 @@ import postAPIs from "../../services/postAPIs";
 
 export default function CreateScreen() {
   const router = useRouter();
-  const [createForm, setCreateForm] = useState({
+  const initialForm = {
     title: "",
     content: "",
     images: [],
-  });
+  };
+  const [createForm, setCreateForm] = useState(initialForm);
 
   const { userInfo } = useContext(AuthContext);
 
   const handleChange = (value, name) => {
-    if(name == 'images'){
+    if (name == "images") {
       setCreateForm((prev) => ({
         ...prev,
         images: [...prev.images, value],
       }));
-    }else{
+    } else {
       setCreateForm((prev) => ({
         ...prev,
         [name]: value,
@@ -46,6 +47,7 @@ export default function CreateScreen() {
       const res = await postAPIs.create(newCreateForm);
       console.log("res", res);
       alert("Create success");
+      setCreateForm(initialForm);
     } catch (error) {
       console.log("error create post", error);
     }

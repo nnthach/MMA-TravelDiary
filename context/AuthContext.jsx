@@ -11,6 +11,7 @@ export const AuthProvider = ({ children }) => {
   const router = useRouter();
 
   const handleLogout = async () => {
+    console.log("run logout");
     await AsyncStorage.multiRemove(["accessToken", "refreshToken", "userId"]);
     setUserInfo(null);
     router.replace("/");

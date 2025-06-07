@@ -44,7 +44,7 @@ export default function RegisterScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <Text style={styles.title}>Create Account</Text>
 
       <TextInput
@@ -89,7 +89,14 @@ export default function RegisterScreen({ navigation }) {
           <Text style={[styles.link, { marginLeft: 4 }]}>Login</Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+
+      <Text
+        style={{ textAlign: "center", marginTop: 5 }}
+        onPress={() => router.back()}
+      >
+        Back
+      </Text>
+    </View>
   );
 }
 
@@ -98,7 +105,6 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 24,
     justifyContent: "center",
-    backgroundColor: "#fff",
   },
   title: {
     fontSize: 28,

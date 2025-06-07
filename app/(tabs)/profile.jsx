@@ -33,7 +33,7 @@ export default function ProfileScreen() {
         <TouchableOpacity
           onPress={() => {
             console.log("logout");
-            handleLogout;
+            handleLogout();
           }}
         >
           <Text>Sign Out</Text>

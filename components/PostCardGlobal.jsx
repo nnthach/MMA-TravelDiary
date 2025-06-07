@@ -1,9 +1,27 @@
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
+import storageAPIs from "../services/storageAPIs";
 
 export default function PostCardGlobal({ item }) {
+  const { userId } = useContext(AuthContext);
   const router = useRouter();
+
+  const handleAddPostToStorage = async (postId) => {
+    try {
+      const data = {
+        userId,
+        posts: [{ postId }],
+      };
+      const result = await storageAPIs.create(data);
+      console.log("result", result);
+      alert(result.message);
+    } catch (error) {
+      console.log("add post to storage err", error);
+    }
+  };
   return (
     <TouchableOpacity
       activeOpacity={0.8}
@@ -31,7 +49,12 @@ export default function PostCardGlobal({ item }) {
             alignItems: "center",
           }}
         >
-          <Ionicons name="bookmark-outline" size={20} color="black" />
+          <Ionicons
+            name="bookmark-outline"
+            size={20}
+            color="black"
+            onPress={() => handleAddPostToStorage(item._id)}
+          />
           <Ionicons name="alert-circle-outline" size={22} color="black" />
         </View>
       </View>
