@@ -45,11 +45,12 @@ export default function LoginScreen({ navigation }) {
       alert("login success");
 
       setTimeout(() => {
-        if (res.role == "Admin") {
+
+      if (res.role =="Admin") {
           router.replace("/(admin)");
-        } else {
+      } else {
           router.replace("/(tabs)");
-        }
+      }
       }, 3000);
     } catch (error) {
       console.log(error);
@@ -95,12 +96,6 @@ export default function LoginScreen({ navigation }) {
           <Text style={[styles.link, { marginLeft: 4 }]}>Sign up</Text>
         </TouchableOpacity>
       </View>
-
-      <TouchableOpacity onPress={() => router.replace("/(tabs)")}>
-        <Text style={{ fontSize: 14, color: "black", textAlign: "center" }}>
-          Continue as Guest
-        </Text>
-      </TouchableOpacity>
     </SafeAreaView>
   );
 }

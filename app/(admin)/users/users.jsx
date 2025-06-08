@@ -10,7 +10,7 @@ import {
   TextInput,
   Modal,
 } from "react-native";
-import userApi from "../../services/userApi"; // Ensure the correct path
+import userApi from "../../../services/userApi"; // Ensure the correct path
 
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);
@@ -111,7 +111,7 @@ export default function AdminUsers() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>👥 User List</Text>
+      <Text style={styles.title}> User List</Text>
 
       <TouchableOpacity
         style={styles.addButton}
@@ -142,10 +142,10 @@ export default function AdminUsers() {
                     setShowModal(true);
                   }}
                 >
-                  <Text style={styles.editBtn}>✏️ Edit</Text>
+                  <Text style={styles.editBtn}> Edit</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => handleDeleteUser(item._id)}>
-                  <Text style={styles.deleteBtn}>🗑️ Delete</Text>
+                  <Text style={styles.deleteBtn}> Delete</Text>
                 </TouchableOpacity>
               </View>
             </View>
