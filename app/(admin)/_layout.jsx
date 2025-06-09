@@ -28,22 +28,22 @@ export default function AdminLayout() {
             </Text>
           </Link>
 
-          <Link href="/(admin)/users">
+          <Link href="/(admin)/users/users">
             <Text
               style={[
                 styles.link,
-                pathname === "/(admin)/users" && styles.activeLink,
+                pathname === "/(admin)/users/users" && styles.activeLink,
               ]}
             >
               Users
             </Text>
           </Link>
 
-                <Link href="/(admin)/post">
+                <Link href="/(admin)/post/post">
             <Text
               style={[
                 styles.link,
-                pathname === "/(admin)/post" && styles.activeLink,
+                pathname === "/(admin)/post/post" && styles.activeLink,
               ]}
             >
               Post
