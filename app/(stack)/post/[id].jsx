@@ -10,7 +10,7 @@ export default function PostDetail() {
   const [postDetail, setPostDetail] = useState(null);
   const route = useRouter();
   console.log("post detail", postDetail);
-  console.log('post img',postDetail?.images[0])
+  console.log("post img", postDetail?.images[0]);
 
   useFocusEffect(
     useCallback(() => {
@@ -18,7 +18,7 @@ export default function PostDetail() {
         setIsLoading(true);
         try {
           const res = await postAPIs.getById(id);
-          setPostDetail(res);
+          setPostDetail(res.data);
           setIsLoading(false);
         } catch (error) {
           console.log("error", error);
@@ -93,9 +93,9 @@ export default function PostDetail() {
             }}
           >
             <Image
-              source={{uri: `${postDetail?.images[0]}`}}
-                style={{ width: '100%', height: '100%' }}
-resizeMode="cover"
+              source={{ uri: `${postDetail?.images[0]}` }}
+              style={{ width: "100%", height: "100%" }}
+              resizeMode="cover"
             />
           </View>
         </View>

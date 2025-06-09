@@ -22,14 +22,16 @@ export default function LocationScreen() {
 
   useFocusEffect(
     useCallback(() => {
+      console.log("run get all post");
       const getAllPost = async () => {
         setIsLoading(true);
         try {
           const res = await postAPIs.getAllPost();
-          setPostListData(res);
+          console.log("res get all post", res.data);
+          setPostListData(res.data);
           setIsLoading(false);
         } catch (error) {
-          console.log("error", error);
+          console.log("error get all post", error);
           setIsLoading(false);
         }
       };

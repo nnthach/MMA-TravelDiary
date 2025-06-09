@@ -8,14 +8,13 @@ export const SavedPostProvider = ({ children }) => {
   const { userId } = useContext(AuthContext);
   const [savedPostData, setSavedPostData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  console.log("savedpostdata", savedPostData);
 
   const fetchStorageOfUser = async () => {
     if (!userId) return;
     console.log("id before get user", userId);
     try {
       const res = await storageAPIs.getStorageOfUser(userId);
-      setSavedPostData(res);
+      setSavedPostData(res.data);
       setIsLoading(false);
     } catch (error) {
       console.log("error", error);
