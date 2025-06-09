@@ -11,8 +11,8 @@ import {
   Modal,
   Image,
 } from "react-native";
-import axiosClient from "../../../config/axiosClient"; // Ensure correct path
 import { AuthContext } from "../../../context/AuthContext"; // Assuming you have AuthContext
+import postAPIs from "../../../services/postAPIs"; // Import the postAPIs
 
 export default function Post() {
   const [posts, setPosts] = useState([]);
@@ -31,18 +31,20 @@ export default function Post() {
   const { userId, username } = useContext(AuthContext);
 
   // Fetch posts from API
-  const fetchPosts = async () => {
-    try {
-      setLoading(true);
-      const data = await axiosClient.get("/post");
-      setPosts(data);
-    } catch (error) {
-      Alert.alert("Error", "Unable to load posts");
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+const fetchPosts = async () => {
+  try {
+    setLoading(true);
+    const response = await postAPIs.getAllPost(); // Using postAPIs here
+    setPosts(response.data);
+  } catch (error) {
+    // Log error details to the console for debugging
+    console.error('Error fetching posts:', error.response || error.message);
+    Alert.alert('Error', 'Unable to load posts');
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   // Open the details modal
   const showPostDetails = (post) => {
@@ -69,32 +71,30 @@ export default function Post() {
     }));
   };
 
-  // Create Post (Admin uses their userId and username)
-  const handleCreatePost = () => {
+  // Create Post
+  const handleCreatePost = async () => {
     const postToCreate = {
-      userId: userId, // Use the logged-in admin's userId
-      username: username, // Use the logged-in admin's username
+      userId: userId,
+      username: username,
       title: newPost.title,
       content: newPost.content,
       images: newPost.images,
     };
 
-    axiosClient
-      .post("/post", postToCreate)
-      .then((response) => {
-        setPosts((prevPosts) => [response.data, ...prevPosts]);
-        Alert.alert("Success", "Post has been added");
-        setShowAddModal(false);
-        setNewPost({ title: "", content: "", images: [] });
-      })
-      .catch((error) => {
-        Alert.alert("Error", "Unable to add post");
-        console.error(error);
-      });
+    try {
+      const { data } = await postAPIs.create(postToCreate); // Using postAPIs here
+      setPosts((prevPosts) => [data, ...prevPosts]);
+      Alert.alert("Success", "Post has been added");
+      setShowAddModal(false);
+      setNewPost({ title: "", content: "", images: [] });
+    } catch (error) {
+      Alert.alert("Error", "Unable to add post");
+      console.error("Error creating post:", error.response || error.message || error);
+    }
   };
 
-  // Edit Post (Admin can edit any post)
-  const handleEditPost = (id) => {
+  // Edit Post
+  const handleEditPost = async (id) => {
     const updatedPost = {
       userId: postDetails.userId,
       username: postDetails.username,
@@ -103,37 +103,31 @@ export default function Post() {
       images: newPost.images,
     };
 
-    axiosClient
-      .put(`/post/${id}`, updatedPost)
-      .then((response) => {
-        setPosts((prevPosts) =>
-          prevPosts.map((post) =>
-            post._id === id ? { ...post, ...updatedPost } : post
-          )
-        );
-        Alert.alert("Success", "Post updated");
-        setShowEditModal(false);
-      })
-      .catch((error) => {
-        Alert.alert("Error", "Unable to update post");
-        console.error(error);
-      });
+    try {
+      const { data } = await postAPIs.update(id, updatedPost); // Using postAPIs here
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post._id === id ? { ...post, ...updatedPost } : post
+        )
+      );
+      Alert.alert("Success", "Post updated");
+      setShowEditModal(false);
+    } catch (error) {
+      Alert.alert("Error", "Unable to update post");
+      console.error("Error updating post:", error.response || error.message || error);
+    }
   };
 
-  // Delete Post (Admin can delete any post)
-  const handleDeletePost = (id) => {
-    axiosClient
-      .delete(`/post/${id}`)
-      .then(() => {
-        setPosts((prevPosts) =>
-          prevPosts.filter((post) => post._id !== id)
-        );
-        Alert.alert("Success", "Post has been deleted");
-      })
-      .catch((error) => {
-        Alert.alert("Error", "Unable to delete post");
-        console.error(error);
-      });
+  // Delete Post
+  const handleDeletePost = async (id) => {
+    try {
+      await postAPIs.delete(id); // Using postAPIs here
+      setPosts((prevPosts) => prevPosts.filter((post) => post._id !== id));
+      Alert.alert("Success", "Post has been deleted");
+    } catch (error) {
+      Alert.alert("Error", "Unable to delete post");
+      console.error(error);
+    }
   };
 
   useEffect(() => {
@@ -213,13 +207,12 @@ export default function Post() {
               multiline
             />
 
-           <TextInput
-  style={styles.input}
-  placeholder="Images (comma separated)"
-  value={newPost.images.join(", ")}
-  onChangeText={(text) => handleChange("images", text.split(", "))}
-/>
-
+            <TextInput
+              style={styles.input}
+              placeholder="Images (comma separated)"
+              value={newPost.images.join(", ")}
+              onChangeText={(text) => handleChange("images", text.split(", "))}
+            />
 
             <View style={styles.modalActions}>
               <TouchableOpacity
@@ -265,7 +258,7 @@ export default function Post() {
               style={styles.input}
               placeholder="Images (comma separated)"
               value={newPost.images.join(", ")}
-              onChangeText={(text) => handleChange("images", text.split(", "))} 
+              onChangeText={(text) => handleChange("images", text.split(", "))}
             />
 
             <View style={styles.modalActions}>
@@ -291,7 +284,7 @@ export default function Post() {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Post Details</Text>
-<Text style={styles.detailsText}>Username: {postDetails?.username}</Text>
+            <Text style={styles.detailsText}>Username: {postDetails?.username}</Text>
             <Text style={styles.detailsText}>Title: {postDetails?.title}</Text>
             <Text style={styles.detailsText}>Content: {postDetails?.content}</Text>
 
@@ -324,9 +317,6 @@ export default function Post() {
 }
 
 // Styles go here...
-
-
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
