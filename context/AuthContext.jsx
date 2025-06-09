@@ -10,8 +10,6 @@ export const AuthProvider = ({ children }) => {
   const [userId, setUserId] = useState(null);
   const router = useRouter();
 
-  console.log("userid glo", userId);
-
   const handleLogout = async () => {
     console.log("run logout");
     await AsyncStorage.multiRemove(["accessToken", "refreshToken", "userId"]);
@@ -26,8 +24,8 @@ export const AuthProvider = ({ children }) => {
       console.log("id before get user", userId);
       try {
         const user = await userApi.getById(userId);
-        console.log("user all", user);
-        setUserInfo(user);
+        console.log("user by id", user);
+        setUserInfo(user.data);
       } catch (error) {
         console.error("Error take user", error);
       }
