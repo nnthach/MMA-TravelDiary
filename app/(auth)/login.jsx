@@ -46,7 +46,7 @@ export default function LoginScreen({ navigation }) {
 
       setTimeout(() => {
 
-      if (res.role =="Admin") {
+      if (res.data.role =="Admin") {
           router.replace("/(admin)");
       } else {
           router.replace("/(tabs)");

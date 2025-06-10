@@ -65,7 +65,7 @@ export default function ProfileScreen() {
         numColumns={3}
         renderItem={({ item, index }) => (
           <Image 
-            source={require("../assets/icon.png")} 
+            source={require("../../assets/icon.png")} 
             style={styles.gridImage} 
           />
         )}

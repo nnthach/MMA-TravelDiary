@@ -146,12 +146,12 @@ const fetchPosts = async () => {
     <View style={styles.container}>
       <Text style={styles.title}> Post List</Text>
 
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={styles.addButton}
         onPress={() => setShowAddModal(true)}
       >
         <Text style={styles.addButtonText}>➕ Add Post</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       <View style={styles.table}>
         <View style={styles.tableHeader}>
@@ -173,9 +173,9 @@ const fetchPosts = async () => {
                 <TouchableOpacity onPress={() => showPostDetails(item)}>
                   <Text style={styles.detailBtn}>Details</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => showPostEdit(item)}>
+                {/* <TouchableOpacity onPress={() => showPostEdit(item)}>
                   <Text style={styles.editBtn}> Edit</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
                 <TouchableOpacity onPress={() => handleDeletePost(item._id)}>
                   <Text style={styles.deleteBtn}> Delete</Text>
                 </TouchableOpacity>
@@ -280,7 +280,7 @@ const fetchPosts = async () => {
       </Modal>
 
       {/* Details Post Modal */}
-      <Modal visible={showDetailsModal} animationType="slide" transparent={false}>
+      <Modal visible={showDetailsModal} animationType="slide" transparent={true}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Post Details</Text>

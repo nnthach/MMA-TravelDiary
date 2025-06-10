@@ -10,14 +10,15 @@ import {
   TextInput,
   Modal,
 } from "react-native";
-import userApi from "../../../services/userApi"; // Ensure the correct path
+import { Picker } from "@react-native-picker/picker"; 
+import userApi from "../../../services/userApi"; 
 
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
-  const [userData, setUserData] = useState({ username: "", email: "" });
+  const [userData, setUserData] = useState({ username: "", email: "", role: "User" });
 
   // Fetch users from API
   const fetchUsers = async () => {
@@ -25,7 +26,7 @@ export default function AdminUsers() {
       setLoading(true);
       const data = await userApi.getAll();
       console.log("Fetched users:", data);
-      setUsers(data);
+      setUsers(data.data);
     } catch (error) {
       Alert.alert("Error", "Unable to load user list");
       console.error(error);
@@ -39,7 +40,8 @@ export default function AdminUsers() {
     const newUser = {
       username: userData.username,
       email: userData.email,
-      password: "password123", // Example password
+      password: "password123", // Mật khẩu mặc định
+      role: userData.role,
     };
 
     userApi
@@ -47,7 +49,7 @@ export default function AdminUsers() {
       .then((response) => {
         setUsers((prevUsers) => [response, ...prevUsers]);
         Alert.alert("Success", "User has been added");
-        setUserData({ username: "", email: "" });
+        setUserData({ username: "", email: "", role: "User" });
         setShowModal(false);
       })
       .catch((error) => {
@@ -61,6 +63,7 @@ export default function AdminUsers() {
     const updatedUser = {
       username: userData.username,
       email: userData.email,
+      role: userData.role,
     };
 
     userApi
@@ -72,7 +75,7 @@ export default function AdminUsers() {
           )
         );
         Alert.alert("Success", "User information updated");
-        setUserData({ username: "", email: "" });
+        setUserData({ username: "", email: "", role: "User" });
         setShowModal(false);
       })
       .catch((error) => {
@@ -113,17 +116,18 @@ export default function AdminUsers() {
     <View style={styles.container}>
       <Text style={styles.title}> User List</Text>
 
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={styles.addButton}
         onPress={() => setShowModal(true)}
       >
-        <Text style={styles.addButtonText}>➕ Add User</Text>
-      </TouchableOpacity>
+        <Text style={styles.addButtonText}> Add User</Text>
+      </TouchableOpacity> */}
 
       <View style={styles.table}>
         <View style={styles.tableHeader}>
           <Text style={styles.tableHeaderText}>Username</Text>
           <Text style={styles.tableHeaderText}>Email</Text>
+          <Text style={styles.tableHeaderText}>Role</Text>
           <Text style={styles.tableHeaderText}>Actions</Text>
         </View>
 
@@ -134,11 +138,12 @@ export default function AdminUsers() {
             <View style={styles.tableRow}>
               <Text style={styles.tableCell}>{item.username}</Text>
               <Text style={styles.tableCell}>{item.email}</Text>
+              <Text style={styles.tableCell}>{item.role}</Text>
               <View style={styles.tableActions}>
                 <TouchableOpacity
                   onPress={() => {
                     setCurrentUser(item);
-                    setUserData({ username: item.username, email: item.email });
+                    setUserData({ username: item.username, email: item.email, role: item.role });
                     setShowModal(true);
                   }}
                 >
@@ -175,6 +180,15 @@ export default function AdminUsers() {
               value={userData.email}
               onChangeText={(text) => setUserData({ ...userData, email: text })}
             />
+
+            <Picker
+              selectedValue={userData.role}
+              onValueChange={(value) => setUserData({ ...userData, role: value })}
+              style={styles.input}
+            >
+              <Picker.Item label="User" value="User" />
+              <Picker.Item label="Admin" value="Admin" />
+            </Picker>
 
             <View style={styles.modalActions}>
               <TouchableOpacity
@@ -318,4 +332,3 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
-
