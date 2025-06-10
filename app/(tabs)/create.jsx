@@ -36,16 +36,13 @@ export default function CreateScreen() {
     }
   };
   const handleSubmit = async () => {
-    console.log("createform", createForm);
     try {
       const newCreateForm = {
         ...createForm,
         userId: userInfo._id,
         username: userInfo.username,
       };
-      console.log("new create form", newCreateForm);
       const res = await postAPIs.create(newCreateForm);
-      console.log("res", res);
       alert("Create success");
       setCreateForm(initialForm);
     } catch (error) {

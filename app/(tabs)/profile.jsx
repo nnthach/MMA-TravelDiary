@@ -31,6 +31,17 @@ export default function ProfileScreen() {
 
   return (
     <View style={styles.container}>
+      <View>
+        <TouchableOpacity
+          onPress={() => {
+            console.log("logout");
+            handleLogout();
+          }}
+        >
+          <Text>Sign Out</Text>
+        </TouchableOpacity>
+      </View>
+
       {/* Profile Header */}
       <View style={styles.profileHeader}>
         <Image

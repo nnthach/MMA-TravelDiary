@@ -11,7 +11,6 @@ export const AuthProvider = ({ children }) => {
   const router = useRouter();
 
   const handleLogout = async () => {
-    console.log("run logout");
     await AsyncStorage.multiRemove(["accessToken", "refreshToken", "userId"]);
     setUserInfo(null);
     setUserId(null);
@@ -21,10 +20,8 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const fetchUser = async () => {
       if (!userId) return;
-      console.log("id before get user", userId);
       try {
         const user = await userApi.getById(userId);
-        console.log("user by id", user);
         setUserInfo(user.data);
       } catch (error) {
         console.error("Error take user", error);

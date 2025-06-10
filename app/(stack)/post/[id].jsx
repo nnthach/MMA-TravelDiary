@@ -9,8 +9,6 @@ export default function PostDetail() {
   const [isLoading, setIsLoading] = useState(false);
   const [postDetail, setPostDetail] = useState(null);
   const route = useRouter();
-  console.log("post detail", postDetail);
-  console.log("post img", postDetail?.images[0]);
 
   useFocusEffect(
     useCallback(() => {

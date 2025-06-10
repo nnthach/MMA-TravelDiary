@@ -9,7 +9,6 @@ import {
   FlatList,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import BookCard from "../../components/BookCard";
 import LocationHomeCard from "../../components/LocationHomeCard";
 
 export default function HomeScreen() {
