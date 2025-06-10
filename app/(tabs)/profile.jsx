@@ -1,11 +1,18 @@
 import { useContext } from "react";
-import { StyleSheet, Text, TouchableOpacity, View, Image, FlatList } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  Image,
+  FlatList,
+} from "react-native";
 import { AuthContext } from "../../context/AuthContext";
 import { useRouter } from "expo-router";
 import { Dimensions } from "react-native";
 
 const screenWidth = Dimensions.get("window").width;
-const imageSize = screenWidth / 3 - 2; 
+const imageSize = screenWidth / 3 - 2;
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -50,10 +57,20 @@ export default function ProfileScreen() {
 
       {/* Edit Profile / Sign Out */}
       <View style={styles.buttonRow}>
-        <TouchableOpacity style={styles.editButton} onPress={() => {/* navigate or open modal */}}>
+        <TouchableOpacity
+          style={styles.editButton}
+          onPress={() => {
+            /* navigate or open modal */
+          }}
+        >
           <Text style={styles.buttonText}>Edit Profile</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.shareButton} onPress={() => {/* navigate or open modal */}}>
+        <TouchableOpacity
+          style={styles.shareButton}
+          onPress={() => {
+            /* navigate or open modal */
+          }}
+        >
           <Text style={styles.buttonText}>Share Profile</Text>
         </TouchableOpacity>
       </View>
@@ -64,9 +81,9 @@ export default function ProfileScreen() {
         keyExtractor={(_, index) => index.toString()}
         numColumns={3}
         renderItem={({ item, index }) => (
-          <Image 
-            source={require("../assets/icon.png")} 
-            style={styles.gridImage} 
+          <Image
+            source={require("../../assets/icon.png")}
+            style={styles.gridImage}
           />
         )}
         contentContainerStyle={styles.grid}
@@ -76,78 +93,78 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: "#fff", 
-    padding: 16 
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    padding: 16,
   },
 
-  centered: { 
-    flex: 1, 
-    justifyContent: "center", 
-    alignItems: "center" 
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 
-  message: { 
-    fontSize: 16, 
-    marginBottom: 12 
+  message: {
+    fontSize: 16,
+    marginBottom: 12,
   },
 
-  link: { 
-    color: "#007AFF", 
-    fontWeight: "bold" 
+  link: {
+    color: "#007AFF",
+    fontWeight: "bold",
   },
 
-  profileHeader: { 
-    flexDirection: "row", 
-    alignItems: "center", 
-    marginBottom: 16 
+  profileHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
   },
 
-  avatar: { 
-    width: 80, 
-    height: 80, 
-    borderRadius: 40, 
-    marginRight: 16 
+  avatar: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginRight: 16,
   },
 
-  stats: { 
-    flexDirection: "row", 
-    justifyContent: "space-between", 
-    flex: 1 
+  stats: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    flex: 1,
   },
 
-  statItem: { 
-    alignItems: "center" 
+  statItem: {
+    alignItems: "center",
   },
 
-  statNumber: { 
-    fontWeight: "bold", 
-    fontSize: 16 
+  statNumber: {
+    fontWeight: "bold",
+    fontSize: 16,
   },
 
-  statLabel: { 
-    color: "gray" 
+  statLabel: {
+    color: "gray",
   },
 
-  userInfo: { 
-    marginBottom: 12 
+  userInfo: {
+    marginBottom: 12,
   },
 
-  username: { 
-    fontWeight: "bold", 
-    fontSize: 18 
+  username: {
+    fontWeight: "bold",
+    fontSize: 18,
   },
 
-  bio: { 
-    color: "gray", 
-    marginTop: 4 
+  bio: {
+    color: "gray",
+    marginTop: 4,
   },
 
-  buttonRow: { 
-    flexDirection: "row", 
-    justifyContent: "space-between", 
-    marginBottom: 12 
+  buttonRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 12,
   },
 
   editButton: {
@@ -168,13 +185,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-  buttonText: { 
-    color: "#000", 
-    fontWeight: "bold" 
+  buttonText: {
+    color: "#000",
+    fontWeight: "bold",
   },
 
-  grid: { 
-    paddingVertical: 10 
+  grid: {
+    paddingVertical: 10,
   },
 
   gridImage: {
