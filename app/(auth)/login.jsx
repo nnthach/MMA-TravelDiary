@@ -28,15 +28,11 @@ export default function LoginScreen({ navigation }) {
   };
 
   const handleLogin = async () => {
-    console.log("run api");
     try {
       const res = await userApi.login(loginForm);
-      console.log("res login", res.data);
       const { accessToken, refreshToken } = res.data;
 
-      console.log("userId before set", userId);
       setUserId(res.data.userId);
-      console.log("userId after set", userId);
 
       AsyncStorage.setItem("accessToken", accessToken);
       AsyncStorage.setItem("refreshToken", refreshToken);
@@ -45,15 +41,14 @@ export default function LoginScreen({ navigation }) {
       alert("login success");
 
       setTimeout(() => {
-
-      if (res.data.role =="Admin") {
+        if (res.data.role == "Admin") {
           router.replace("/(admin)");
-      } else {
+        } else {
           router.replace("/(tabs)");
-      }
+        }
       }, 3000);
     } catch (error) {
-      console.log('login error',error);
+      console.log("login error", error);
       alert("fail to login");
     }
   };

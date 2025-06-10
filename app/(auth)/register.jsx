@@ -30,7 +30,6 @@ export default function RegisterScreen({ navigation }) {
   const handleRegister = async () => {
     try {
       const res = await userApi.register(registerForm);
-      console.log("res", res);
 
       alert("Register success");
 

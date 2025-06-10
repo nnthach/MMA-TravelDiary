@@ -11,7 +11,6 @@ export const SavedPostProvider = ({ children }) => {
 
   const fetchStorageOfUser = async () => {
     if (!userId) return;
-    console.log("id before get user", userId);
     try {
       const res = await storageAPIs.getStorageOfUser(userId);
       setSavedPostData(res.data);

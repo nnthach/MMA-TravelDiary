@@ -40,7 +40,7 @@ axiosClient.interceptors.request.use(
 // Add a response interceptor
 axiosClient.interceptors.response.use(
   function (response) {
-    console.log("axios res", response);
+    console.log("axios res", response.data);
     return response;
   },
   async function (error) {
