@@ -16,8 +16,8 @@ export default function PostCardGlobal({
   const { fetchStorageOfUser } = useContext(SavedPostContext);
 
   const handleAddPostToStorage = async (postId) => {
-    if(!userInfo){
-      alert('You need to login')
+    if (!userInfo) {
+      alert("You need to login");
     }
     try {
       const result = await storageAPIs.create(userId, { postId });
@@ -66,7 +66,16 @@ export default function PostCardGlobal({
           }}
         >
           {isOwner ? (
-            <Ionicons name="build-outline" size={22} color="black" />
+            <Ionicons
+              name="build-outline"
+              size={22}
+              color="black"
+              onPress={(e) => {
+                e.stopPropagation();
+                console.log("edit icon");
+                router.push(`/post/edit/${item._id}`);
+              }}
+            />
           ) : (
             <>
               {isSaved ? (

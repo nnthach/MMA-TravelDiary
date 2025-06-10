@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import userApi from "../services/userApi";
 
 const axiosClient = axios.create({
   baseURL: "http://10.0.2.2:3000/v1", // Thay đổi URL thành 10.0.2.2 cho Android Emulator
@@ -56,7 +57,9 @@ axiosClient.interceptors.response.use(
       if (!refreshToken) return Promise.reject(error);
 
       try {
-        const res = await refreshTokenAPI({ refreshToken });
+        console.log("start refresh token");
+        const res = await userApi.refreshToken({ refreshToken });
+        console.log("refreshtoken called res", res);
 
         const newAccessToken = res.data.accessToken;
 

@@ -9,6 +9,7 @@ const userApi = {
 
   login: (data) => axiosClient.post("/users/login", data),
   register: (data) => axiosClient.post("/users/register", data),
+  refreshToken:(data)=>axiosClient.post("/users/refresh-token", data)
 };
 
 export default userApi;
