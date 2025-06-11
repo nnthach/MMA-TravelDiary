@@ -21,12 +21,23 @@
         "foregroundImage": "./assets/adaptive-logo.png",
         "backgroundColor": "#ffffff"
       },
+      "package": "com.mmproject.traveldiary",
       "edgeToEdgeEnabled": true
     },
     "web": {
       "favicon": "./assets/favicon.png",
       "bundler": "metro"
     },
-    "plugins": ["expo-router"]
+    "plugins": [
+      "expo-router",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Accept to access photo",
+          "cameraPermission": false,
+          "microphonePermission": false
+        }
+      ]
+    ]
   }
 }

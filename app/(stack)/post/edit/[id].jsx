@@ -61,14 +61,11 @@ export default function EditPost() {
 
   const handleUpdate = async () => {
     try {
-      console.log("editdata", editData);
-      console.log("id send", id);
       const newEditData = {
         ...editData,
         userId,
       };
       const res = await postAPIs.update(id, newEditData);
-      console.log("update post res", res);
       alert("Update successfully");
       setTimeout(() => {
         router.back();
