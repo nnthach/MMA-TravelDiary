@@ -17,6 +17,7 @@ const imageSize = screenWidth / 3 - 2;
 export default function ProfileScreen() {
   const router = useRouter();
   const { userInfo, handleLogout } = useContext(AuthContext);
+  console.log(userInfo?.role);  // Kiểm tra giá trị role
 
   if (!userInfo) {
     return (
@@ -66,7 +67,7 @@ export default function ProfileScreen() {
         <Text style={styles.bio}>These are the places I have been to!</Text>
       </View>
 
-      {/* Edit Profile / Sign Out */}
+      {/* Edit Profile / Share Profile */}
       <View style={styles.buttonRow}>
         <TouchableOpacity
           style={styles.editButton}
@@ -85,6 +86,20 @@ export default function ProfileScreen() {
           <Text style={styles.buttonText}>Share Profile</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Admin management button */}
+      {userInfo.role === 'Admin' && (
+        <View style={styles.buttonRow}>
+          <TouchableOpacity
+            style={styles.managementButton}
+            onPress={() => {
+              router.replace("/(admin)");
+            }}
+          >
+            <Text style={styles.buttonText}>Back to Management</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       {/* Post grid (placeholder) */}
       <FlatList
@@ -193,6 +208,14 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 8,
     marginRight: 8,
+    alignItems: "center",
+  },
+
+  managementButton: {
+    flex: 1,
+    backgroundColor: "#ffcc00", // Highlight color for admin button
+    padding: 10,
+    borderRadius: 8,
     alignItems: "center",
   },
 
