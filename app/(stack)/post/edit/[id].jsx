@@ -6,14 +6,21 @@ import {
   TouchableOpacity,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+import {
+  router,
+  useFocusEffect,
+  useLocalSearchParams,
+  useRouter,
+} from "expo-router";
+import { useCallback, useContext, useState } from "react";
 import postAPIs from "../../../../services/postAPIs";
+import { AuthContext } from "../../../../context/AuthContext";
 
 export default function EditPost() {
   const { id } = useLocalSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [postDetail, setPostDetail] = useState(null);
+  const { userId } = useContext(AuthContext);
   const route = useRouter();
   const initialForm = {
     title: "",
@@ -56,9 +63,16 @@ export default function EditPost() {
     try {
       console.log("editdata", editData);
       console.log("id send", id);
-      const res = await postAPIs.update(id, editData);
+      const newEditData = {
+        ...editData,
+        userId,
+      };
+      const res = await postAPIs.update(id, newEditData);
       console.log("update post res", res);
       alert("Update successfully");
+      setTimeout(() => {
+        router.back();
+      }, 3000);
     } catch (error) {
       console.log("update error", error);
     }
