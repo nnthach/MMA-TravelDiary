@@ -1,10 +1,13 @@
-import { useState } from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
-import { Slot, Link, usePathname } from "expo-router";
-
+import { useContext, useState } from "react";
+import { View, Text, StyleSheet, Pressable, TouchableOpacity } from "react-native";
+import { Slot, Link, usePathname, router } from "expo-router";
+import { AuthContext } from "../../context/AuthContext";
+ 
 export default function AdminLayout() {
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const { userInfo, handleLogout } = useContext(AuthContext);
+
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -49,6 +52,23 @@ export default function AdminLayout() {
               Post
             </Text>
           </Link>
+            <TouchableOpacity
+                    onPress={() => {
+                      console.log("logout");
+                      handleLogout();
+                      router.replace("/(auth)/login")
+                    }}
+                  >
+                    <Text >Sign Out</Text>
+                  </TouchableOpacity>
+
+                      <TouchableOpacity
+                    onPress={() => {
+                      router.replace("/(tabs)")
+                    }}
+                  >
+                    <Text >Go to HomeScreen</Text>
+                  </TouchableOpacity>
         </View>
       )}
 
@@ -109,4 +129,5 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
+
 });
