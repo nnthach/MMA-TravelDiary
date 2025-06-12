@@ -4,6 +4,7 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  Image,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {
@@ -15,20 +16,26 @@ import {
 import { useCallback, useContext, useState } from "react";
 import postAPIs from "../../../../services/postAPIs";
 import { AuthContext } from "../../../../context/AuthContext";
+import { changeInputUtils } from "../../../../utils/formUtils";
+import { pickImage, removeImage } from "../../../../utils/imagePickerUtils";
+import uploadImage from "../../../../utils/uploadImage";
 
 export default function EditPost() {
-  const { id } = useLocalSearchParams();
-  const [isLoading, setIsLoading] = useState(false);
-  const [postDetail, setPostDetail] = useState(null);
-  const { userId } = useContext(AuthContext);
   const route = useRouter();
+  const { id } = useLocalSearchParams();
+  const { userId } = useContext(AuthContext);
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [images, setImages] = useState([]);
+  const [newImages, setNewImages] = useState([]);
+  console.log("old img", images);
+  console.log("new img", newImages);
+
   const initialForm = {
     title: "",
     content: "",
   };
   const [editData, setEditData] = useState(initialForm);
-
-  console.log("post detail", postDetail);
 
   useFocusEffect(
     useCallback(() => {
@@ -36,11 +43,11 @@ export default function EditPost() {
         setIsLoading(true);
         try {
           const res = await postAPIs.getById(id);
-          setPostDetail(res.data);
           setEditData({
             title: res.data.title,
             content: res.data.content,
           });
+          setImages(res.data.images);
           setIsLoading(false);
         } catch (error) {
           console.log("error", error);
@@ -52,20 +59,39 @@ export default function EditPost() {
     }, [])
   );
 
-  const handleChange = (value, name) => {
-    setEditData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  const handleChange = changeInputUtils(setEditData);
+
+  const handlePickImage = async () => {
+    const newAssets = await pickImage();
+    setNewImages((prev) => [...prev, ...newAssets]);
+  };
+
+  const handleRemoveImage = (index, type = "old") => {
+    if (type == "old") {
+      setImages((prev) => removeImage(prev, index));
+    } else {
+      setNewImages((prev) => removeImage(prev, index));
+    }
   };
 
   const handleUpdate = async () => {
     try {
+      const imageUrlList = [];
+
+      for (const img of newImages) {
+        const url = await uploadImage(img); // upload tung anh len firebase
+        imageUrlList.push(url);
+      }
+
+      // anh cu va moi
+      const allImages = [...images, ...imageUrlList];
+
       const newEditData = {
         ...editData,
+        images: allImages,
         userId,
       };
-      const res = await postAPIs.update(id, newEditData);
+      await postAPIs.update(id, newEditData);
       alert("Update successfully");
       setTimeout(() => {
         router.back();
@@ -92,23 +118,10 @@ export default function EditPost() {
           size={24}
           color="black"
           onPress={() => route.back()}
-          style={{
-            position: "absolute",
-            left: 10,
-            zIndex: 1,
-          }}
+          style={styles.headerIconBack}
         />
 
-        <Text
-          style={{
-            width: "100%",
-            textAlign: "center",
-            fontWeight: 500,
-            fontSize: 16,
-          }}
-        >
-          Edit Post
-        </Text>
+        <Text style={styles.headerTitle}>Edit Post</Text>
       </View>
 
       {/*Body */}
@@ -133,6 +146,48 @@ export default function EditPost() {
           onChangeText={(text) => handleChange(text, "content")}
         />
 
+        {/*Add img */}
+        <TouchableOpacity style={{ backgroundColor: "red" }}>
+          <Text onPress={handlePickImage}>Add an image from camera</Text>
+        </TouchableOpacity>
+        <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+          {images.map((img, index) => (
+            <View key={index} style={styles.imageWrap}>
+              <TouchableOpacity onPress={() => console.log("img open")}>
+                <Image
+                  source={{ uri: img }}
+                  style={{ width: "100%", height: "100%" }}
+                />
+              </TouchableOpacity>
+              <Ionicons
+                name="close-sharp"
+                size={24}
+                color="black"
+                style={{ position: "absolute", top: 0, right: 0 }}
+                onPress={() => handleRemoveImage(index, "old")}
+              />
+            </View>
+          ))}
+
+          {newImages.map((img, index) => (
+            <View key={index} style={styles.imageWrap}>
+              <TouchableOpacity onPress={() => console.log("img open")}>
+                <Image
+                  source={{ uri: img.uri }}
+                  style={{ width: "100%", height: "100%" }}
+                />
+              </TouchableOpacity>
+              <Ionicons
+                name="close-sharp"
+                size={24}
+                color="black"
+                style={{ position: "absolute", top: 0, right: 0 }}
+                onPress={() => handleRemoveImage(index, "new")}
+              />
+            </View>
+          ))}
+        </View>
+
         <TouchableOpacity style={styles.button} onPress={handleUpdate}>
           <Text style={styles.buttonText}>Update</Text>
         </TouchableOpacity>
@@ -150,6 +205,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 10,
     position: "relative",
+  },
+  headerIconBack: {
+    position: "absolute",
+    left: 10,
+    zIndex: 1,
+  },
+  headerTitle: {
+    width: "100%",
+    textAlign: "center",
+    fontWeight: 500,
+    fontSize: 16,
   },
   input: {
     width: "80%",
@@ -171,5 +237,13 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: "center",
     width: "80%",
+  },
+
+  imageWrap: {
+    position: "relative",
+    width: 100,
+    height: 100,
+    margin: 5,
+    backgroundColor: "lightgrey",
   },
 });

@@ -13,9 +13,11 @@ import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { AuthContext } from "../../context/AuthContext";
 import postAPIs from "../../services/postAPIs";
-import * as ImagePicker from "expo-image-picker";
 import uploadImage from "../../utils/uploadImage";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { pickImage, removeImage } from "../../utils/imagePickerUtils";
+import { changeInputUtils } from "../../utils/formUtils";
+import ModalAlert from "../../components/ModalAlert";
 
 export default function CreateScreen() {
   const router = useRouter();
@@ -27,29 +29,15 @@ export default function CreateScreen() {
   const [createForm, setCreateForm] = useState(initialForm);
   const [images, setImages] = useState([]);
 
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images", "videos"],
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-      allowsMultipleSelection: true,
-    });
+  const handleChange = changeInputUtils(setCreateForm);
 
-    if (!result.canceled) {
-      setImages((prev) => [...prev, ...result.assets]);
-    }
+  const handlePickImage = async () => {
+    const newAssets = await pickImage();
+    setImages((prev) => [...prev, ...newAssets]);
   };
 
-  const handleRemoveImage = (imgIndex) => {
-    setImages((prev) => prev.filter((_, index) => index !== imgIndex));
-  };
-
-  const handleChange = (value, name) => {
-    setCreateForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  const handleRemoveImage = (index) => {
+    setImages((prev) => removeImage(prev, index));
   };
 
   const handleSubmit = async () => {
@@ -67,7 +55,7 @@ export default function CreateScreen() {
         username: userInfo.username,
       };
 
-      const res = await postAPIs.create(newCreateForm);
+      await postAPIs.create(newCreateForm);
       alert("Create success");
       setCreateForm(initialForm);
       setImages([]);
@@ -110,7 +98,7 @@ export default function CreateScreen() {
 
               {/*Add img */}
               <TouchableOpacity style={{ backgroundColor: "red" }}>
-                <Text onPress={pickImage}>Add an image from camera</Text>
+                <Text onPress={handlePickImage}>Add an image from camera</Text>
               </TouchableOpacity>
               <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
                 {images.map((img, index) => (
@@ -123,10 +111,12 @@ export default function CreateScreen() {
                       margin: 5,
                     }}
                   >
-                    <Image
-                      source={{ uri: img.uri }}
-                      style={{ width: "100%", height: "100%" }}
-                    />
+                    <TouchableOpacity onPress={() => console.log("img open")}>
+                      <Image
+                        source={{ uri: img }}
+                        style={{ width: "100%", height: "100%" }}
+                      />
+                    </TouchableOpacity>
                     <Ionicons
                       name="close-sharp"
                       size={24}
@@ -152,34 +142,12 @@ export default function CreateScreen() {
 
         {/*Modal require login before use */}
         {!userInfo && (
-          <View style={styles.overlay}>
-            <View style={styles.modalWrap}>
-              <Text>
-                You need to login before you can create a diary entry.
-              </Text>
-              <TouchableOpacity
-                style={{
-                  backgroundColor: "orange",
-                  width: "40%",
-                  alignSelf: "flex-end",
-                  borderRadius: 10,
-                  marginTop: 20,
-                }}
-                onPress={() => router.push("/login")}
-              >
-                <Text
-                  style={{
-                    color: "white",
-                    textAlign: "center",
-                    fontWeight: "bold",
-                    paddingVertical: 5,
-                  }}
-                >
-                  Let's login
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+          <ModalAlert
+            content={"You need to login before you can create a diary entry."}
+            onPress={() => router.push("/login")}
+            acceptBtn
+            acceptBtnText={"Let's login"}
+          />
         )}
       </View>
     </TouchableWithoutFeedback>
@@ -218,22 +186,5 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: "center",
     width: "80%",
-  },
-
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 0, 0, 0.8)",
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 100,
-  },
-  modalWrap: {
-    position: "absolute",
-    width: "70%",
-    backgroundColor: "white",
-    borderWidth: 1,
-    borderColor: "black",
-    borderRadius: 20,
-    padding: 20,
   },
 });

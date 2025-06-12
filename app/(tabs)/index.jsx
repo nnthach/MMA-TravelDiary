@@ -45,7 +45,7 @@ export default function HomeScreen() {
     },
   ];
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: "white" }}>
       {/*Header */}
       <View style={styles.header}>
         <Text>TravelDiary</Text>
