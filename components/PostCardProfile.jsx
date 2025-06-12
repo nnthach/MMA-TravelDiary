@@ -1,10 +1,17 @@
-import { View, Image, Dimensions, TouchableOpacity } from "react-native";
+import { useRouter } from "expo-router";
+import { useState } from "react";
+import {
+  View,
+  Image,
+  Dimensions,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
 
 export default function PostCardProfile({ post }) {
   const screenWidth = Dimensions.get("window").width;
   const itemSize = screenWidth / 3;
-
-  console.log("post", post);
+  const router = useRouter();
 
   return (
     <View
@@ -18,10 +25,17 @@ export default function PostCardProfile({ post }) {
         borderColor: "white",
       }}
     >
-      <TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => router.push(`/(stack)/post/${post._id}`)}
+      >
         <Image
-          source={{ uri: post.images[0] }}
-          style={{ width: "100%", height: "100%" }}
+          source={{
+            uri: post.images[0],
+          }}
+          style={{
+            width: itemSize,
+            height: itemSize,
+          }}
           resizeMode="cover"
         />
       </TouchableOpacity>

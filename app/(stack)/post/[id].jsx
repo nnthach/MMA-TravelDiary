@@ -1,4 +1,11 @@
-import { View, Text, StyleSheet, Dimensions, Image } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Dimensions,
+  Image,
+  FlatList,
+} from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
@@ -9,6 +16,7 @@ export default function PostDetail() {
   const [isLoading, setIsLoading] = useState(false);
   const [postDetail, setPostDetail] = useState(null);
   const route = useRouter();
+  console.log("post detail", postDetail);
 
   useFocusEffect(
     useCallback(() => {
@@ -83,19 +91,23 @@ export default function PostDetail() {
 
         {/*Post Image */}
         <View>
-          <View
-            style={{
-              width: Dimensions.get("window").width,
-              height: 350,
-              backgroundColor: "lightgrey",
-            }}
-          >
-            <Image
-              source={{ uri: `${postDetail?.images[0]}` }}
-              style={{ width: "100%", height: "100%" }}
-              resizeMode="cover"
-            />
-          </View>
+          <FlatList
+            data={postDetail?.images}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(_, index) => index.toString()}
+            renderItem={({ item }) => (
+              <Image
+                source={{ uri: item }}
+                style={{
+                  width: Dimensions.get("window").width,
+                  height: Dimensions.get("window").width,
+                }}
+                resizeMode="cover"
+              />
+            )}
+          />
         </View>
         {/*Post content */}
         <View style={styles.postContent}>

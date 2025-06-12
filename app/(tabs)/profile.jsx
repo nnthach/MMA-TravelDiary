@@ -1,4 +1,4 @@
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -6,36 +6,47 @@ import {
   View,
   Image,
   FlatList,
+  ActivityIndicator,
 } from "react-native";
 import { AuthContext } from "../../context/AuthContext";
 import { useFocusEffect, useRouter } from "expo-router";
-import { Dimensions } from "react-native";
 import postAPIs from "../../services/postAPIs";
 import PostCardProfile from "../../components/PostCardProfile";
-
-const screenWidth = Dimensions.get("window").width;
-const imageSize = screenWidth / 3 - 2;
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function ProfileScreen() {
   const router = useRouter();
   const { userInfo, handleLogout } = useContext(AuthContext);
   const [postListData, setPostListData] = useState([]);
+  const [queryPublic, setQueryPublic] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  console.log("postlistdata", setPostListData);
 
-  useFocusEffect(
-    useCallback(() => {
-      const fetchUserPost = async () => {
-        try {
-          const res = await postAPIs.getByUserId(userInfo._id);
-          console.log("res", res);
-          setPostListData(res.data);
-        } catch (error) {
-          console.log("error", error);
-        }
-      };
+  const fetchUserPost = async () => {
+    setIsLoading(true);
+    try {
+      const res = await postAPIs.getByUserIdAndPublic(
+        userInfo._id,
+        queryPublic
+      );
+      console.log("res", res);
+      setPostListData(res.data);
+      setIsLoading(false);
+    } catch (error) {
+      console.log("error", error);
+      setIsLoading(false);
+    }
+  };
 
-      fetchUserPost();
-    }, [])
-  );
+  useEffect(() => {
+    fetchUserPost();
+  }, [userInfo?._id, queryPublic]);
+
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     fetchUserPost();
+  //   }, [])
+  // );
 
   if (!userInfo) {
     return (
@@ -125,16 +136,66 @@ export default function ProfileScreen() {
         </View>
       )}
 
-      {/* Post grid (placeholder) */}
-      <FlatList
-        data={postListData}
-        keyExtractor={(_, index) => index.toString()}
-        numColumns={3}
-        renderItem={({ item }) => (
-          <PostCardProfile key={item._id} post={item} />
-        )}
-        contentContainerStyle={styles.grid}
-      />
+      <View
+        style={{
+          paddingVertical: 5,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-around",
+        }}
+      >
+        <Ionicons
+          name="apps"
+          size={24}
+          color="black"
+          onPress={() => setQueryPublic("")}
+          style={{
+            padding: 5,
+            borderBottomColor: "black",
+            ...(queryPublic === "" && { borderBottomWidth: 1 }),
+          }}
+        />
+        <Ionicons
+          name="eye-outline"
+          size={24}
+          color="black"
+          onPress={() => setQueryPublic("true")}
+          style={{
+            padding: 5,
+            borderBottomColor: "black",
+            ...(queryPublic === "true" && { borderBottomWidth: 1 }),
+          }}
+        />
+        <Ionicons
+          name="eye-off-outline"
+          size={24}
+          color="black"
+          onPress={() => setQueryPublic("false")}
+          style={{
+            padding: 5,
+            borderBottomColor: "black",
+            ...(queryPublic === "false" && { borderBottomWidth: 1 }),
+          }}
+        />
+      </View>
+
+      {isLoading ? (
+        <View
+          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+        >
+          <ActivityIndicator size="large" color="black" />
+          <Text>Loading</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={postListData}
+          keyExtractor={(_, index) => index.toString()}
+          numColumns={3}
+          renderItem={({ item }) => (
+            <PostCardProfile key={item._id} post={item} />
+          )}
+        />
+      )}
     </View>
   );
 }
