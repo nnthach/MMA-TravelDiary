@@ -5,6 +5,7 @@ import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import storageAPIs from "../services/storageAPIs";
 import { SavedPostContext } from "../context/SavedPostContext";
+import { handleAddPostToStorage, handleRemovePostOutOfStorage } from "../utils/updateStorage";
 
 export default function PostCardGlobal({
   item,
@@ -14,29 +15,6 @@ export default function PostCardGlobal({
   const { userId, userInfo } = useContext(AuthContext);
   const router = useRouter();
   const { fetchStorageOfUser } = useContext(SavedPostContext);
-
-  const handleAddPostToStorage = async (postId) => {
-    if (!userInfo) {
-      alert("You need to login");
-    }
-    try {
-      const result = await storageAPIs.create(userId, { postId });
-      alert(result.data.message);
-      fetchStorageOfUser();
-    } catch (error) {
-      console.log("add post to storage err", error);
-    }
-  };
-
-  const handleRemovePostOutOfStorage = async (postId) => {
-    try {
-      const result = await storageAPIs.delete(userId, postId);
-      alert(result.data.message);
-      fetchStorageOfUser();
-    } catch (error) {
-      console.log("remove post form storage err", error);
-    }
-  };
 
   return (
     <TouchableOpacity
@@ -83,14 +61,25 @@ export default function PostCardGlobal({
                   name="bookmark"
                   size={20}
                   color="black"
-                  onPress={() => handleRemovePostOutOfStorage(item._id)}
+                  onPress={() =>
+                    handleRemovePostOutOfStorage(
+                      userId,
+                      item._id,
+                      fetchStorageOfUser
+                    )
+                  }
                 />
               ) : (
                 <Ionicons
                   name="bookmark-outline"
                   size={20}
                   color="black"
-                  onPress={() => handleAddPostToStorage(item._id)}
+                  onPress={() => handleAddPostToStorage(
+                                          userInfo,
+                                          userId,
+                                          item._id,
+                                          fetchStorageOfUser
+                                        )}
                 />
               )}
               <Ionicons name="alert-circle-outline" size={22} color="black" />

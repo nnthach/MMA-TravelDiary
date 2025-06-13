@@ -97,10 +97,7 @@ export default function CreateScreen() {
               />
 
               {/*Add img */}
-              <TouchableOpacity style={{ backgroundColor: "red" }}>
-                <Text onPress={handlePickImage}>Add an image from camera</Text>
-              </TouchableOpacity>
-              <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+              <View style={styles.addImgWrapArea}>
                 {images.map((img, index) => (
                   <View
                     key={index}
@@ -113,7 +110,7 @@ export default function CreateScreen() {
                   >
                     <TouchableOpacity onPress={() => console.log("img open")}>
                       <Image
-                        source={{ uri: img }}
+                        source={{ uri: img.uri }}
                         style={{ width: "100%", height: "100%" }}
                       />
                     </TouchableOpacity>
@@ -126,12 +123,18 @@ export default function CreateScreen() {
                     />
                   </View>
                 ))}
+                <TouchableOpacity
+                  style={styles.addImgBtn}
+                  onPress={handlePickImage}
+                >
+                  <Text>Add image</Text>
+                </TouchableOpacity>
               </View>
 
               {/*Submit */}
               <TouchableOpacity style={styles.button} onPress={handleSubmit}>
                 <Text
-                  style={{ color: "white", fontWeight: "bold", fontSize: 18 }}
+                  style={{ color: "orange", fontWeight: "bold", fontSize: 18 }}
                 >
                   Create
                 </Text>
@@ -180,11 +183,25 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
   },
   button: {
-    backgroundColor: "pink",
+    backgroundColor: "white",
     padding: 8,
     margin: 10,
     borderRadius: 5,
     alignItems: "center",
     width: "80%",
+  },
+  addImgWrapArea: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    width: "80%",
+  },
+  addImgBtn: {
+    backgroundColor: "lightgrey",
+    width: 100,
+    height: 100,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

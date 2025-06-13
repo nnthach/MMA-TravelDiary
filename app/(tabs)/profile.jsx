@@ -20,6 +20,7 @@ export default function ProfileScreen() {
   const [postListData, setPostListData] = useState([]);
   const [queryPublic, setQueryPublic] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [openDropMenu, setOpenDropMenu] = useState(false);
   console.log("postlistdata", setPostListData);
 
   const fetchUserPost = async () => {
@@ -76,7 +77,7 @@ export default function ProfileScreen() {
           }}
         >
           <Image
-            source={{ uri: userInfo.profileImageURL }}
+            source={{ uri: "" }}
             style={{ width: "100%", height: "100%" }}
           />
         </View>
@@ -99,7 +100,7 @@ export default function ProfileScreen() {
       {/* Username and bio */}
       <View style={{ marginBottom: 12, paddingHorizontal: 16 }}>
         <Text style={{ fontWeight: "bold", fontSize: 18 }}>
-          {userInfo.username}
+          {userInfo?.username}
         </Text>
         <Text style={{ color: "gray", marginTop: 4 }}>
           These are the places I have been to!
@@ -113,15 +114,32 @@ export default function ProfileScreen() {
             Edit Profile
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.buttonWrap}>
-          <Text style={{ color: "#000", fontWeight: "bold" }}>
-            Share Profile
-          </Text>
-        </TouchableOpacity>
+        <View style={{ position: "relative" }}>
+          <Ionicons
+            name="ellipsis-vertical"
+            size={26}
+            color="black"
+            onPress={() => setOpenDropMenu((prev) => !prev)}
+          />
+
+          {openDropMenu && (
+            <View style={styles.dropdownMenu}>
+              <TouchableOpacity
+                style={{ padding: 5 }}
+                onPress={() => {
+                  handleLogout();
+                  setOpenDropMenu(false);
+                }}
+              >
+                <Text>Sign Out</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
       </View>
 
       {/* Admin management button */}
-      {userInfo.role === "Admin" && (
+      {userInfo?.role === "Admin" && (
         <View style={styles.buttonRow}>
           <TouchableOpacity
             style={styles.managementButton}
@@ -200,17 +218,6 @@ export default function ProfileScreen() {
   );
 }
 
-{
-  /* <TouchableOpacity
-          onPress={() => {
-            console.log("logout");
-            handleLogout();
-          }}
-        >
-          <Text>Sign Out</Text>
-        </TouchableOpacity> */
-}
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -235,6 +242,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     justifyContent: "space-between",
     marginBottom: 12,
+    alignItems: "center",
   },
 
   buttonWrap: {
@@ -252,5 +260,19 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 8,
     alignItems: "center",
+  },
+
+  dropdownMenu: {
+    position: "absolute",
+    backgroundColor: "white",
+    width: 100,
+    height: 50,
+    top: 30,
+    right: 0,
+    zIndex: 2,
+    alignItems: "center",
+    justifyContent: "center",
+    boxShadow: "0px 1px 4px rgba(0, 0, 0, 0.5)",
+    borderRadius: 10,
   },
 });

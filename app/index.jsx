@@ -5,8 +5,6 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { AuthContext } from "../context/AuthContext";
 
 export default function Index() {
-  // return <Redirect href={"/(admin)"} />;
-
   const router = useRouter();
 
   return (
@@ -56,7 +54,7 @@ export default function Index() {
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => router.replace("/(tabs)")}>
-          <Text style={{ fontWeight: 500, fontSize: 16, color: "white" }}>
+          <Text style={{ fontWeight: 600, fontSize: 18, color: "white" }}>
             Continue as Guest
           </Text>
         </TouchableOpacity>
@@ -69,7 +67,6 @@ const styles = StyleSheet.create({
   logoWrapImg: {
     width: 300,
     height: 300,
-    backgroundColor: "red",
     overflow: "hidden",
   },
 

@@ -147,10 +147,7 @@ export default function EditPost() {
         />
 
         {/*Add img */}
-        <TouchableOpacity style={{ backgroundColor: "red" }}>
-          <Text onPress={handlePickImage}>Add an image from camera</Text>
-        </TouchableOpacity>
-        <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+        <View style={styles.addImgWrapArea}>
           {images.map((img, index) => (
             <View key={index} style={styles.imageWrap}>
               <TouchableOpacity onPress={() => console.log("img open")}>
@@ -186,6 +183,10 @@ export default function EditPost() {
               />
             </View>
           ))}
+
+          <TouchableOpacity style={styles.addImgBtn} onPress={handlePickImage}>
+            <Text>Add image</Text>
+          </TouchableOpacity>
         </View>
 
         <TouchableOpacity style={styles.button} onPress={handleUpdate}>
@@ -245,5 +246,19 @@ const styles = StyleSheet.create({
     height: 100,
     margin: 5,
     backgroundColor: "lightgrey",
+  },
+  addImgWrapArea: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    width: "80%",
+  },
+  addImgBtn: {
+    backgroundColor: "lightgrey",
+    width: 100,
+    height: 100,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
