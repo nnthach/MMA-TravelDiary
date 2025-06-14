@@ -10,7 +10,7 @@ import {
 import { useRouter } from "expo-router";
 import userApi from "../../services/userApi";
 
-export default function RegisterScreen({ navigation }) {
+export default function RegisterScreen() {
   const router = useRouter();
 
   const [registerForm, setLoginForm] = useState({
@@ -85,15 +85,26 @@ export default function RegisterScreen({ navigation }) {
       <View style={styles.row}>
         <Text>Already have an account?</Text>
         <TouchableOpacity onPress={() => router.push("/login")}>
-          <Text style={[styles.link, { marginLeft: 4 }]}>Login</Text>
+          <Text style={styles.link}>Login</Text>
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity onPress={() => router.replace("/(tabs)")}>
-        <Text style={{ fontSize: 14, color: "black", textAlign: "center" }}>
-          Continue as Guest
-        </Text>
-      </TouchableOpacity>
+      <View style={styles.subFooterLink}>
+        <TouchableOpacity onPress={() => router.replace("/(tabs)")}>
+          <Text style={{ fontSize: 14, color: "black", textAlign: "center" }}>
+            Continue as Guest
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => router.replace("/(tabs)")}>
+          <Text
+            style={{ fontSize: 14, color: "black", textAlign: "center" }}
+            onPress={() => router.replace("/")}
+          >
+            Back
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -135,5 +146,14 @@ const styles = StyleSheet.create({
   link: {
     color: "#007BFF",
     fontWeight: "bold",
+    marginLeft: 4,
+  },
+
+  subFooterLink: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 10,
+    gap: 15,
   },
 });

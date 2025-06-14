@@ -4,130 +4,156 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
+  Image,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
-import React, { useContext, useState } from "react";
+import { useContext, useState } from "react";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { AuthContext } from "../../context/AuthContext";
 import postAPIs from "../../services/postAPIs";
+import uploadImage from "../../utils/uploadImage";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { pickImage, removeImage } from "../../utils/imagePickerUtils";
+import { changeInputUtils } from "../../utils/formUtils";
+import ModalAlert from "../../components/ModalAlert";
 
 export default function CreateScreen() {
   const router = useRouter();
+  const { userInfo } = useContext(AuthContext);
   const initialForm = {
     title: "",
     content: "",
-    images: [],
   };
   const [createForm, setCreateForm] = useState(initialForm);
+  const [images, setImages] = useState([]);
 
-  const { userInfo } = useContext(AuthContext);
+  const handleChange = changeInputUtils(setCreateForm);
 
-  const handleChange = (value, name) => {
-    if (name == "images") {
-      setCreateForm((prev) => ({
-        ...prev,
-        images: [...prev.images, value],
-      }));
-    } else {
-      setCreateForm((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
-    }
+  const handlePickImage = async () => {
+    const newAssets = await pickImage();
+    setImages((prev) => [...prev, ...newAssets]);
   };
+
+  const handleRemoveImage = (index) => {
+    setImages((prev) => removeImage(prev, index));
+  };
+
   const handleSubmit = async () => {
     try {
+      const imageUrlList = [];
+
+      for (const img of images) {
+        const url = await uploadImage(img); // upload tung anh len firebase
+        imageUrlList.push(url);
+      }
       const newCreateForm = {
         ...createForm,
+        images: imageUrlList,
         userId: userInfo._id,
         username: userInfo.username,
       };
-      const res = await postAPIs.create(newCreateForm);
+
+      await postAPIs.create(newCreateForm);
       alert("Create success");
       setCreateForm(initialForm);
+      setImages([]);
     } catch (error) {
       console.log("error create post", error);
     }
   };
   return (
-    <>
-      <View style={styles.container}>
-        <LinearGradient
-          style={styles.backgroundGradient}
-          colors={["#ff7733", "#ffb533", "#ffca33"]}
-        >
-          <View style={styles.formWrap}>
-            <Text
-              style={{
-                textAlign: "center",
-                color: "white",
-                fontSize: 24,
-                fontWeight: "bold",
-              }}
-            >
-              Let's create your diary
-            </Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Title"
-              value={createForm.title}
-              onChangeText={(text) => handleChange(text, "title")}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Images"
-              value={createForm.images}
-              onChangeText={(text) => handleChange(text, "images")}
-            />
-            <TextInput
-              style={[styles.input, styles.textarea]}
-              placeholder="Content"
-              value={createForm.content}
-              multiline
-              onChangeText={(text) => handleChange(text, "content")}
-            />
-
-            <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-              <Text
-                style={{ color: "white", fontWeight: "bold", fontSize: 18 }}
-              >
-                Create
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </LinearGradient>
-      </View>
-
-      {/*Modal require login before use */}
-      {!userInfo && (
-        <View style={styles.overlay}>
-          <View style={styles.modalWrap}>
-            <Text>You need to login before you can create a diary entry.</Text>
-            <TouchableOpacity
-              style={{
-                backgroundColor: "orange",
-                width: "40%",
-                alignSelf: "flex-end",
-                borderRadius: 10,
-                marginTop: 20,
-              }}
-              onPress={() => router.push("/login")}
-            >
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={{ flex: 1 }}>
+        <View style={styles.container}>
+          <LinearGradient
+            style={styles.backgroundGradient}
+            colors={["#ff7733", "#ffb533", "#ffca33"]}
+          >
+            <View style={styles.formWrap}>
               <Text
                 style={{
-                  color: "white",
                   textAlign: "center",
+                  color: "white",
+                  fontSize: 24,
                   fontWeight: "bold",
-                  paddingVertical: 5,
                 }}
               >
-                Let's login
+                Let's create your diary
               </Text>
-            </TouchableOpacity>
-          </View>
+              <TextInput
+                style={styles.input}
+                placeholder="Title"
+                value={createForm.title}
+                onChangeText={(text) => handleChange(text, "title")}
+              />
+              <TextInput
+                style={[styles.input, styles.textarea]}
+                placeholder="Content"
+                value={createForm.content}
+                multiline
+                onChangeText={(text) => handleChange(text, "content")}
+              />
+
+              {/*Add img */}
+              <View style={styles.addImgWrapArea}>
+                {images.map((img, index) => (
+                  <View
+                    key={index}
+                    style={{
+                      position: "relative",
+                      width: 100,
+                      height: 100,
+                      margin: 5,
+                    }}
+                  >
+                    <TouchableOpacity onPress={() => console.log("img open")}>
+                      <Image
+                        source={{ uri: img.uri }}
+                        style={{ width: "100%", height: "100%" }}
+                      />
+                    </TouchableOpacity>
+                    <Ionicons
+                      name="close-sharp"
+                      size={24}
+                      color="black"
+                      style={{ position: "absolute", top: 0, right: 0 }}
+                      onPress={() => handleRemoveImage(index)}
+                    />
+                  </View>
+                ))}
+                <TouchableOpacity
+                  style={styles.addImgBtn}
+                  onPress={handlePickImage}
+                >
+                  <Text>Add image</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/*Submit */}
+              <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+                <Text
+                  style={{ color: "orange", fontWeight: "bold", fontSize: 18 }}
+                >
+                  Create
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </LinearGradient>
         </View>
-      )}
-    </>
+
+        {/*Modal require login before use */}
+        {!userInfo && (
+          <ModalAlert
+            content={"You need to login before you can create a diary entry."}
+            onPress={() => router.push("/login")}
+            acceptBtn
+            acceptBtnText={"Let's login"}
+          />
+        )}
+      </View>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -157,28 +183,25 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
   },
   button: {
-    backgroundColor: "pink",
+    backgroundColor: "white",
     padding: 8,
     margin: 10,
     borderRadius: 5,
     alignItems: "center",
     width: "80%",
   },
-
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 0, 0, 0.8)",
-    justifyContent: "center",
+  addImgWrapArea: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "flex-start",
     alignItems: "center",
-    zIndex: 100,
+    width: "80%",
   },
-  modalWrap: {
-    position: "absolute",
-    width: "70%",
-    backgroundColor: "white",
-    borderWidth: 1,
-    borderColor: "black",
-    borderRadius: 20,
-    padding: 20,
+  addImgBtn: {
+    backgroundColor: "lightgrey",
+    width: 100,
+    height: 100,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

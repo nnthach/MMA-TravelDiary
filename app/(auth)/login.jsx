@@ -12,13 +12,13 @@ import userApi from "../../services/userApi";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthContext } from "../../context/AuthContext";
 
-export default function LoginScreen({ navigation }) {
+export default function LoginScreen() {
   const router = useRouter();
   const [loginForm, setLoginForm] = useState({
     account: "",
     password: "",
   });
-  const { setUserId, userId } = useContext(AuthContext);
+  const { setUserId } = useContext(AuthContext);
 
   const handleChange = (value, name) => {
     setLoginForm((prev) => ({
@@ -28,8 +28,11 @@ export default function LoginScreen({ navigation }) {
   };
 
   const handleLogin = async () => {
+    console.log("start login");
     try {
+      console.log("login data", loginForm);
       const res = await userApi.login(loginForm);
+      console.log("res login", res);
       const { accessToken, refreshToken } = res.data;
 
       setUserId(res.data.userId);
@@ -54,8 +57,8 @@ export default function LoginScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Welcome back.</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>Welcome back</Text>
 
       <TextInput
         placeholder="Email or username"
@@ -88,10 +91,27 @@ export default function LoginScreen({ navigation }) {
       <View style={styles.row}>
         <Text>Don’t have an account? </Text>
         <TouchableOpacity onPress={() => router.push("/register")}>
-          <Text style={[styles.link, { marginLeft: 4 }]}>Sign up</Text>
+          <Text style={styles.link}>Sign up</Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+
+      <View style={styles.subFooterLink}>
+        <TouchableOpacity onPress={() => router.replace("/(tabs)")}>
+          <Text style={{ fontSize: 14, color: "black", textAlign: "center" }}>
+            Continue as Guest
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => router.replace("/(tabs)")}>
+          <Text
+            style={{ fontSize: 14, color: "black", textAlign: "center" }}
+            onPress={() => router.replace("/")}
+          >
+            Back
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 }
 
@@ -136,5 +156,17 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     justifyContent: "center",
+  },
+  link: {
+    color: "#007BFF",
+    fontWeight: "bold",
+    marginLeft: 4,
+  },
+  subFooterLink: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 10,
+    gap: 15,
   },
 });

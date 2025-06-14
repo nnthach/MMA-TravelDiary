@@ -1,13 +1,30 @@
-import { View, Text, StyleSheet, Dimensions, Image } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Dimensions,
+  Image,
+  FlatList,
+} from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import postAPIs from "../../../services/postAPIs";
+import { SavedPostContext } from "../../../context/SavedPostContext";
+import { AuthContext } from "../../../context/AuthContext";
+import storageAPIs from "../../../services/storageAPIs";
+import {
+  handleAddPostToStorage,
+  handleRemovePostOutOfStorage,
+} from "../../../utils/updateStorage";
 
 export default function PostDetail() {
   const { id } = useLocalSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [postDetail, setPostDetail] = useState(null);
+  const { savedPostData, fetchStorageOfUser } = useContext(SavedPostContext);
+  const { userInfo, userId } = useContext(AuthContext);
+
   const route = useRouter();
 
   useFocusEffect(
@@ -76,26 +93,85 @@ export default function PostDetail() {
               alignItems: "center",
             }}
           >
-            <Ionicons name="bookmark-outline" size={20} color="black" />
-            <Ionicons name="alert-circle-outline" size={22} color="black" />
+            <Text
+              style={{
+                backgroundColor: postDetail?.public ? "green" : "#f1df00",
+                color: "white",
+                fontWeight: "bold",
+                padding: 5,
+                borderRadius: 5,
+              }}
+            >
+              {postDetail?.public ? "Public" : "Private"}
+            </Text>
+
+            {userInfo && userId == postDetail?.userId ? (
+              <Ionicons
+                name="build-outline"
+                size={22}
+                color="black"
+                onPress={(e) => {
+                  e.stopPropagation();
+                  console.log("edit icon");
+                  router.push(`/post/edit/${item._id}`);
+                }}
+              />
+            ) : (
+              <>
+                {userInfo &&
+                savedPostData.map((p) => p._id).includes(postDetail?._id) ? (
+                  <Ionicons
+                    name="bookmark"
+                    size={20}
+                    color="black"
+                    onPress={() =>
+                      handleRemovePostOutOfStorage(
+                        userId,
+                        postDetail._id,
+                        fetchStorageOfUser
+                      )
+                    }
+                  />
+                ) : (
+                  <Ionicons
+                    name="bookmark-outline"
+                    size={20}
+                    color="black"
+                    onPress={() =>
+                      handleAddPostToStorage(
+                        userInfo,
+                        userId,
+                        postDetail._id,
+                        fetchStorageOfUser
+                      )
+                    }
+                  />
+                )}
+                <Ionicons name="alert-circle-outline" size={22} color="black" />
+              </>
+            )}
           </View>
         </View>
 
         {/*Post Image */}
         <View>
-          <View
-            style={{
-              width: Dimensions.get("window").width,
-              height: 350,
-              backgroundColor: "lightgrey",
-            }}
-          >
-            <Image
-              source={{ uri: `${postDetail?.images[0]}` }}
-              style={{ width: "100%", height: "100%" }}
-              resizeMode="cover"
-            />
-          </View>
+          <FlatList
+            data={postDetail?.images}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(_, index) => index.toString()}
+            renderItem={({ item }) => (
+              <Image
+                source={{ uri: item }}
+                style={{
+                  width: Dimensions.get("window").width,
+                  height: Dimensions.get("window").width,
+                }}
+                resizeMode="cover"
+              />
+            )}
+          />
         </View>
         {/*Post content */}
         <View style={styles.postContent}>
