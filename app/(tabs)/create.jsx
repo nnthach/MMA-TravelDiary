@@ -1,207 +1,228 @@
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  TouchableWithoutFeedback,
-  Keyboard,
-} from "react-native";
-import { useContext, useState } from "react";
-import { useRouter } from "expo-router";
-import { LinearGradient } from "expo-linear-gradient";
-import { AuthContext } from "../../context/AuthContext";
-import postAPIs from "../../services/postAPIs";
-import uploadImage from "../../utils/uploadImage";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import { pickImage, removeImage } from "../../utils/imagePickerUtils";
-import { changeInputUtils } from "../../utils/formUtils";
-import ModalAlert from "../../components/ModalAlert";
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator, Image, Alert } from 'react-native';
+import axios from 'axios';
+import * as ImagePicker from 'expo-image-picker';
+import { Picker } from '@react-native-picker/picker';  // Import Picker đúng cách
 
-export default function CreateScreen() {
-  const router = useRouter();
-  const { userInfo } = useContext(AuthContext);
-  const initialForm = {
-    title: "",
-    content: "",
+const CreateScreen = () => {
+  const [createForm, setCreateForm] = useState({
+    title: '',
+    content: '',
+    province: '',
+    district: '',
+    ward: '',
+    images: [],
+  });
+
+  const [provinces, setProvinces] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [wards, setWards] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  // Fetch provinces on mount
+  useEffect(() => {
+    fetchProvinces();
+  }, []);
+
+  const fetchProvinces = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get('https://api.vnappmob.com/api/v2/province/');
+      setProvinces(response.data.results);
+      setLoading(false);
+    } catch (error) {
+      setError('Failed to fetch provinces');
+      setLoading(false);
+      console.error(error);
+    }
   };
-  const [createForm, setCreateForm] = useState(initialForm);
-  const [images, setImages] = useState([]);
 
-  const handleChange = changeInputUtils(setCreateForm);
-
-  const handlePickImage = async () => {
-    const newAssets = await pickImage();
-    setImages((prev) => [...prev, ...newAssets]);
+  const fetchDistricts = async (provinceId) => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`https://api.vnappmob.com/api/v2/province/district/${provinceId}`);
+      setDistricts(response.data.results);
+      setWards([]); // Reset wards when district changes
+      setLoading(false);
+    } catch (error) {
+      setError('Failed to fetch districts');
+      setLoading(false);
+      console.error(error);
+    }
   };
 
-  const handleRemoveImage = (index) => {
-    setImages((prev) => removeImage(prev, index));
+  const fetchWards = async (districtId) => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`https://api.vnappmob.com/api/v2/province/ward/${districtId}`);
+      setWards(response.data.results);
+      setLoading(false);
+    } catch (error) {
+      setError('Failed to fetch wards');
+      setLoading(false);
+      console.error(error);
+    }
+  };
+
+  const handleChange = (value, field) => {
+    setCreateForm({
+      ...createForm,
+      [field]: value,
+    });
+  };
+
+  const handleProvinceChange = (provinceId) => {
+    handleChange(provinceId, 'province');
+    fetchDistricts(provinceId);
+  };
+
+  const handleDistrictChange = (districtId) => {
+    handleChange(districtId, 'district');
+    fetchWards(districtId);
+  };
+
+  const handleWardChange = (wardId) => {
+    handleChange(wardId, 'ward');
+  };
+
+  const handleImagePick = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      setCreateForm({
+        ...createForm,
+        images: [...createForm.images, result.uri],
+      });
+    }
   };
 
   const handleSubmit = async () => {
+    if (!createForm.title || !createForm.content) {
+      Alert.alert('Error', 'Title and content are required!');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
     try {
-      const imageUrlList = [];
-
-      for (const img of images) {
-        const url = await uploadImage(img); // upload tung anh len firebase
-        imageUrlList.push(url);
-      }
-      const newCreateForm = {
-        ...createForm,
-        images: imageUrlList,
-        userId: userInfo._id,
-        username: userInfo.username,
-      };
-
-      await postAPIs.create(newCreateForm);
-      alert("Create success");
-      setCreateForm(initialForm);
-      setImages([]);
-    } catch (error) {
-      console.log("error create post", error);
+      const response = await axios.post('http://localhost:3000/api/posts', createForm); // Đảm bảo URL API đúng
+      Alert.alert('Success', 'Post created successfully!');
+      setCreateForm({
+        title: '',
+        content: '',
+        province: '',
+        district: '',
+        ward: '',
+        images: [],
+      });
+      setLoading(false);
+    } catch (err) {
+      setError('Error creating post');
+      setLoading(false);
+      console.error(err);
     }
   };
+
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={{ flex: 1 }}>
-        <View style={styles.container}>
-          <LinearGradient
-            style={styles.backgroundGradient}
-            colors={["#ff7733", "#ffb533", "#ffca33"]}
-          >
-            <View style={styles.formWrap}>
-              <Text
-                style={{
-                  textAlign: "center",
-                  color: "white",
-                  fontSize: 24,
-                  fontWeight: "bold",
-                }}
-              >
-                Let's create your diary
-              </Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Title"
-                value={createForm.title}
-                onChangeText={(text) => handleChange(text, "title")}
-              />
-              <TextInput
-                style={[styles.input, styles.textarea]}
-                placeholder="Content"
-                value={createForm.content}
-                multiline
-                onChangeText={(text) => handleChange(text, "content")}
-              />
+    <View style={styles.container}>
+      <Text style={styles.header}>Create Your Post</Text>
 
-              {/*Add img */}
-              <View style={styles.addImgWrapArea}>
-                {images.map((img, index) => (
-                  <View
-                    key={index}
-                    style={{
-                      position: "relative",
-                      width: 100,
-                      height: 100,
-                      margin: 5,
-                    }}
-                  >
-                    <TouchableOpacity onPress={() => console.log("img open")}>
-                      <Image
-                        source={{ uri: img.uri }}
-                        style={{ width: "100%", height: "100%" }}
-                      />
-                    </TouchableOpacity>
-                    <Ionicons
-                      name="close-sharp"
-                      size={24}
-                      color="black"
-                      style={{ position: "absolute", top: 0, right: 0 }}
-                      onPress={() => handleRemoveImage(index)}
-                    />
-                  </View>
-                ))}
-                <TouchableOpacity
-                  style={styles.addImgBtn}
-                  onPress={handlePickImage}
-                >
-                  <Text>Add image</Text>
-                </TouchableOpacity>
-              </View>
+      {error && <Text style={styles.errorText}>{error}</Text>}
 
-              {/*Submit */}
-              <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-                <Text
-                  style={{ color: "orange", fontWeight: "bold", fontSize: 18 }}
-                >
-                  Create
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </LinearGradient>
+      <TextInput
+        style={styles.input}
+        placeholder="Title"
+        value={createForm.title}
+        onChangeText={(text) => handleChange(text, 'title')}
+      />
+      <TextInput
+        style={[styles.input, styles.textarea]}
+        placeholder="Content"
+        value={createForm.content}
+        multiline
+        onChangeText={(text) => handleChange(text, 'content')}
+      />
+
+      {/* Select Province */}
+      <Picker
+        selectedValue={createForm.province}
+        style={styles.picker}
+        onValueChange={handleProvinceChange}
+      >
+        <Picker.Item label="Select Province" value="" />
+        {provinces.map((province) => (
+          <Picker.Item key={province.province_id} label={province.province_name} value={province.province_id} />
+        ))}
+      </Picker>
+
+      {/* Select District */}
+      <Picker
+        selectedValue={createForm.district}
+        style={styles.picker}
+        onValueChange={handleDistrictChange}
+      >
+        <Picker.Item label="Select District" value="" />
+        {districts.map((district) => (
+          <Picker.Item key={district.district_id} label={district.district_name} value={district.district_id} />
+        ))}
+      </Picker>
+
+      {/* Select Ward */}
+      <Picker
+        selectedValue={createForm.ward}
+        style={styles.picker}
+        onValueChange={handleWardChange}
+      >
+        <Picker.Item label="Select Ward" value="" />
+        {wards.map((ward) => (
+          <Picker.Item key={ward.ward_id} label={ward.ward_name} value={ward.ward_id} />
+        ))}
+      </Picker>
+
+      {/* Add Images */}
+      <TouchableOpacity style={styles.imageButton} onPress={handleImagePick}>
+        <Text>Add Images</Text>
+      </TouchableOpacity>
+
+      {createForm.images.length > 0 && (
+        <View style={styles.imagePreview}>
+          {createForm.images.map((imageUri, index) => (
+            <Image key={index} source={{ uri: imageUri }} style={styles.image} />
+          ))}
         </View>
+      )}
 
-        {/*Modal require login before use */}
-        {!userInfo && (
-          <ModalAlert
-            content={"You need to login before you can create a diary entry."}
-            onPress={() => router.push("/login")}
-            acceptBtn
-            acceptBtnText={"Let's login"}
-          />
+      {/* Submit Button */}
+      <TouchableOpacity style={styles.button} onPress={handleSubmit} disabled={loading}>
+        {loading ? (
+          <ActivityIndicator size="small" color="#fff" />
+        ) : (
+          <Text style={styles.buttonText}>Create Post</Text>
         )}
-      </View>
-    </TouchableWithoutFeedback>
+      </TouchableOpacity>
+    </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  backgroundGradient: {
-    flex: 1,
-  },
-  formWrap: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  input: {
-    width: "80%",
-    borderWidth: 1,
-    borderColor: "white",
-    padding: 10,
-    margin: 10,
-    borderRadius: 5,
-    color: "white",
-  },
-  textarea: {
-    height: 100,
-    textAlignVertical: "top",
-  },
-  button: {
-    backgroundColor: "white",
-    padding: 8,
-    margin: 10,
-    borderRadius: 5,
-    alignItems: "center",
-    width: "80%",
-  },
-  addImgWrapArea: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "flex-start",
-    alignItems: "center",
-    width: "80%",
-  },
-  addImgBtn: {
-    backgroundColor: "lightgrey",
-    width: 100,
-    height: 100,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  container: { flex: 1, padding: 20, backgroundColor: '#f9f9f9' },
+  header: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
+  input: { width: '100%', padding: 10, borderWidth: 1, borderColor: '#ccc', marginBottom: 20, backgroundColor: '#fff' },
+  textarea: { height: 100, textAlignVertical: 'top' },
+  picker: { width: '100%', height: 50, marginBottom: 20 },
+  button: { backgroundColor: '#ff7733', padding: 15, alignItems: 'center', marginTop: 20, borderRadius: 5 },
+  buttonText: { color: '#fff', fontSize: 18 },
+  imageButton: { backgroundColor: '#ccc', padding: 10, borderRadius: 5, marginBottom: 15 },
+  imagePreview: { flexDirection: 'row', marginBottom: 20 },
+  image: { width: 100, height: 100, margin: 5, borderRadius: 5 },
+  errorText: { color: 'red', marginBottom: 10 },
 });
+
+export default CreateScreen;
