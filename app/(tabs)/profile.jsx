@@ -189,6 +189,8 @@ export default function ProfileScreen() {
         />
       </View>
 
+      
+
       {isLoading ? (
         <View
           style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
@@ -253,6 +255,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center",
   },
+
 
   dropdownMenu: {
     position: "absolute",
