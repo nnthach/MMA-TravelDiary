@@ -21,7 +21,6 @@ export default function ProfileScreen() {
   const [queryPublic, setQueryPublic] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [openDropMenu, setOpenDropMenu] = useState(false);
-  console.log("postlistdata", setPostListData);
 
   const fetchUserPost = async () => {
     setIsLoading(true);
@@ -30,7 +29,6 @@ export default function ProfileScreen() {
         userInfo._id,
         queryPublic
       );
-      console.log("res", res);
       setPostListData(res.data);
       setIsLoading(false);
     } catch (error) {
@@ -42,12 +40,6 @@ export default function ProfileScreen() {
   useEffect(() => {
     fetchUserPost();
   }, [userInfo?._id, queryPublic]);
-
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     fetchUserPost();
-  //   }, [])
-  // );
 
   if (!userInfo) {
     return (

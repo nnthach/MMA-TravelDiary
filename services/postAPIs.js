@@ -1,7 +1,7 @@
 import axiosClient from "../config/axiosClient";
 
 const postAPIs = {
-  getAllPost: () => axiosClient.get("/post"),
+  getAllPost: () => axiosClient.get("/post?public=true"),
   getById: (id) => axiosClient.get(`/post/${id}`),
   getByUserIdAndPublic: (id, query) =>
     axiosClient.get(`/post/user/${id}?public=${query}`),

@@ -5,7 +5,10 @@ import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import storageAPIs from "../services/storageAPIs";
 import { SavedPostContext } from "../context/SavedPostContext";
-import { handleAddPostToStorage, handleRemovePostOutOfStorage } from "../utils/updateStorage";
+import {
+  handleAddPostToStorage,
+  handleRemovePostOutOfStorage,
+} from "../utils/updateStorage";
 
 export default function PostCardGlobal({
   item,
@@ -74,12 +77,14 @@ export default function PostCardGlobal({
                   name="bookmark-outline"
                   size={20}
                   color="black"
-                  onPress={() => handleAddPostToStorage(
-                                          userInfo,
-                                          userId,
-                                          item._id,
-                                          fetchStorageOfUser
-                                        )}
+                  onPress={() =>
+                    handleAddPostToStorage(
+                      userInfo,
+                      userId,
+                      item._id,
+                      fetchStorageOfUser
+                    )
+                  }
                 />
               )}
               <Ionicons name="alert-circle-outline" size={22} color="black" />
