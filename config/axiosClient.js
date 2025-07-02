@@ -4,7 +4,7 @@ import userApi from "../services/userApi";
 
 const axiosClient = axios.create({
   // baseURL: "http://10.0.2.2:3000/v1", // Thay đổi URL thành 10.0.2.2 cho Android Emulator
-  baseURL: "http://172.20.10.2:3000/v1",
+  baseURL: "http://192.168.1.7:3000/v1",
   timeout: 10000, // Timeout thời gian yêu cầu
   headers: {
     "Content-Type": "application/json",
@@ -49,9 +49,8 @@ axiosClient.interceptors.response.use(
     console.log("axios res error", error);
 
     const originalRequest = error.config;
-    console.log("err ressponse", error.response);
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (error?.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       console.log("originalReq retry", originalRequest._retry);
       const refreshToken = await AsyncStorage.getItem("refreshToken");
@@ -74,6 +73,13 @@ axiosClient.interceptors.response.use(
       } catch (error) {
         return Promise.reject(error);
       }
+    }
+
+    if (error.response) {
+      const { status, data } = error.response;
+      console.log("📛 Axios Error:", status, data?.message || data);
+    } else {
+      console.log("❌ Axios Unknown Error:", error.message);
     }
 
     console.log("res error", error);
