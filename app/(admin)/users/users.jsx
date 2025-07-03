@@ -129,6 +129,8 @@ export default function AdminUsers() {
           <Text style={styles.tableHeaderText}>Email</Text>
           <Text style={styles.tableHeaderText}>Role</Text>
           <Text style={styles.tableHeaderText}>Actions</Text>
+                    <Text style={styles.tableHeaderText}>UpdateTime</Text>
+
         </View>
 
         <FlatList
@@ -139,11 +141,13 @@ export default function AdminUsers() {
               <Text style={styles.tableCell}>{item.username}</Text>
               <Text style={styles.tableCell}>{item.email}</Text>
               <Text style={styles.tableCell}>{item.role}</Text>
+                            <Text style={styles.tableCell}>{item.updatedAt}</Text>
+
               <View style={styles.tableActions}>
                 <TouchableOpacity
                   onPress={() => {
                     setCurrentUser(item);
-                    setUserData({ username: item.username, email: item.email, role: item.role });
+                    setUserData({ username: item.username, email: item.email, role: item.role, updatedAt: item.updatedAt });
                     setShowModal(true);
                   }}
                 >
@@ -189,6 +193,8 @@ export default function AdminUsers() {
               <Picker.Item label="User" value="User" />
               <Picker.Item label="Admin" value="Admin" />
             </Picker>
+
+
 
             <View style={styles.modalActions}>
               <TouchableOpacity

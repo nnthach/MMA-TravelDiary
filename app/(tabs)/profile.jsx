@@ -76,10 +76,13 @@ export default function ProfileScreen() {
             borderRadius: 50,
           }}
         >
-          <Image
-            source={{ uri: "" }}
-            style={{ width: "100%", height: "100%" }}
-          />
+      {userInfo?.avatar && (
+  <Image
+    source={{ uri: userInfo.avatar }}
+    style={{ width: "100%", height: "100%" }}
+  />
+)}
+
         </View>
         <View style={styles.postsNumWrap}>
           <View style={{ alignItems: "left" }}>
