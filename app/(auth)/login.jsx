@@ -28,11 +28,8 @@ export default function LoginScreen() {
   };
 
   const handleLogin = async () => {
-    console.log("start login");
     try {
-      console.log("login data", loginForm);
       const res = await userApi.login(loginForm);
-      console.log("res login", res);
       const { accessToken, refreshToken } = res.data;
 
       setUserId(res.data.userId);

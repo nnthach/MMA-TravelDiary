@@ -28,8 +28,6 @@ export default function EditPost() {
   const [isLoading, setIsLoading] = useState(false);
   const [images, setImages] = useState([]);
   const [newImages, setNewImages] = useState([]);
-  console.log("old img", images);
-  console.log("new img", newImages);
 
   const initialForm = {
     title: "",
@@ -91,6 +89,8 @@ export default function EditPost() {
         images: allImages,
         userId,
       };
+
+      console.log("editData", editData);
       await postAPIs.update(id, newEditData);
       alert("Update successfully");
       setTimeout(() => {
