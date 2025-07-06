@@ -139,7 +139,7 @@ const CreateScreen = () => {
       };
       console.log("create data send", newCreateData);
       const response = await postAPIs.create(newCreateData);
-      console.log("create res", response);
+      console.log("create res", response.data);
       Alert.alert("Success", "Post created successfully!");
       setCreateForm({
         title: "",

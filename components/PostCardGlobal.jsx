@@ -21,13 +21,20 @@ export default function PostCardGlobal({
   const { fetchStorageOfUser } = useContext(SavedPostContext);
   const [openReport, setOpenReport] = useState(false);
   const [openComment, setOpenComment] = useState(false);
+  const [actionPostID, setActionPostID] = useState(false);
   const [reportDataForm, setReportDataForm] = useState({
     postId: "",
     reporterId: userId,
     reason: "",
     description: "",
   });
+  const [commentInPostData, setCommentInPostData] = useState(item?.comments);
+  console.log("post detail", item);
 
+  const handleOpenComment = (id) => {
+    setActionPostID(id);
+    setOpenComment(true);
+  };
   return (
     <>
       <View style={styles.container}>
@@ -115,7 +122,7 @@ export default function PostCardGlobal({
             </View>
             <TouchableOpacity
               style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
-              onPress={() => setOpenComment(true)}
+              onPress={() => handleOpenComment(item._id)}
             >
               <Ionicons name="chatbubbles-outline" size={24} color="black" />
               <Text>120</Text>
@@ -191,8 +198,10 @@ export default function PostCardGlobal({
 
       {openComment && (
         <CommentModal
-          openComment={openComment}
+          actionPostID={actionPostID}
+          setActionPostID={setActionPostID}
           setOpenComment={setOpenComment}
+          openComment={openComment}
         />
       )}
     </>

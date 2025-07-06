@@ -1,9 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import userApi from "../services/userApi";
 
 const axiosClient = axios.create({
   // baseURL: "http://10.0.2.2:3000/v1", // Thay đổi URL thành 10.0.2.2 cho Android Emulator
-  baseURL: "http://192.168.1.3:3000/v1",
+  baseURL: "http://192.168.1.5:3000/v1",
   timeout: 10000, // Timeout thời gian yêu cầu
   headers: {
     "Content-Type": "application/json",
