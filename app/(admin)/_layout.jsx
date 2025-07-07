@@ -52,6 +52,17 @@ export default function AdminLayout() {
               Post
             </Text>
           </Link>
+          <Link href="/(admin)/report/report">
+  <Text
+    style={[
+      styles.link,
+      pathname === "/(admin)/report/report" && styles.activeLink,
+    ]}
+  >
+    Report
+  </Text>
+</Link>
+
             <TouchableOpacity
                     onPress={() => {
                       console.log("logout");

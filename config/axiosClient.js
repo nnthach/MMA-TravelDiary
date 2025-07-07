@@ -3,78 +3,81 @@ import axios from "axios";
 import userApi from "../services/userApi";
 
 const axiosClient = axios.create({
-  // baseURL: "http://10.0.2.2:3000/v1", // Thay đổi URL thành 10.0.2.2 cho Android Emulator
-  baseURL: "http://192.168.1.7:3000/v1",
-  timeout: 10000, // Timeout thời gian yêu cầu
+    // baseURL: "http://10.0.2.2:3000/v1", // Thay đổi URL thành 10.0.2.2 cho Android Emulator
+  //baseURL: "http://192.168.1.7:3000/v1",
+  baseURL: "http://192.168.1.5:3000/v1",
+  timeout: 10000,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// Case truyen token vao header khi call api
+// Gắn accessToken vào mỗi request
 axiosClient.interceptors.request.use(
-  async function (config) {
-    // Do something before request is sent
+  async (config) => {
     if (config.skipAuth) return config;
-    const accessToken = await AsyncStorage.getItem("accessToken");
 
     try {
-      console.log("send acTokne", accessToken);
-
+      const accessToken = await AsyncStorage.getItem("accessToken");
       if (accessToken) {
         config.headers.Authorization = `Bearer ${accessToken}`;
+        console.log("🔐 send accessToken:", accessToken);
       }
-
-      return config;
-    } catch (error) {
-      console.log("Error reading token", error);
-      return config; // vẫn gửi request nếu không có token
+    } catch (err) {
+      console.log("❌ Error reading accessToken", err);
     }
+
+    return config;
   },
-  function (error) {
-    console.log("send actoken err", error);
-    // Do something with request error
+  (error) => {
+    console.log("❌ Request error", error);
     return Promise.reject(error);
   }
 );
 
-// Case token expire or invalid => refreshToken
-// Add a response interceptor
+// Xử lý refresh token khi accessToken hết hạn
 axiosClient.interceptors.response.use(
-  function (response) {
-    console.log("axios res", response.data);
+  (response) => {
     return response;
   },
-  async function (error) {
-    console.log("axios res error", error);
-
+  async (error) => {
     const originalRequest = error.config;
 
     if (error?.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      console.log("originalReq retry", originalRequest._retry);
-      const refreshToken = await AsyncStorage.getItem("refreshToken");
-      console.log("refreshToken", refreshToken);
+      console.log("🔁 Token expired. Attempting refresh...");
 
-      if (!refreshToken) return Promise.reject(error);
+      const refreshToken = await AsyncStorage.getItem("refreshToken");
+      if (!refreshToken) {
+        console.log("⚠️ No refresh token available.");
+        return Promise.reject(error);
+      }
 
       try {
-        console.log("start refresh token");
         const res = await userApi.refreshToken({ refreshToken });
-        console.log("refreshtoken called res", res);
-
         const newAccessToken = res.data.accessToken;
 
-        AsyncStorage.setItem("accessToken", newAccessToken);
+        console.log("✅ Token refreshed:", newAccessToken);
 
+        // Cập nhật lại token và retry request cũ
+        await AsyncStorage.setItem("accessToken", newAccessToken);
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
         return axiosClient(originalRequest);
-      } catch (error) {
-        return Promise.reject(error);
+      } catch (refreshErr) {
+        console.log("❌ Refresh token failed:", refreshErr.response?.data || refreshErr.message);
+
+        // Clear token → logout
+        await AsyncStorage.removeItem("accessToken");
+        await AsyncStorage.removeItem("refreshToken");
+
+        // 👉 Có thể thêm navigation.navigate('Login') tại đây nếu dùng React Navigation
+
+        return Promise.reject(refreshErr); // DỪNG lặp
       }
     }
 
+    // Các lỗi khác (không phải 401)
     if (error.response) {
       const { status, data } = error.response;
       console.log("📛 Axios Error:", status, data?.message || data);
@@ -82,7 +85,6 @@ axiosClient.interceptors.response.use(
       console.log("❌ Axios Unknown Error:", error.message);
     }
 
-    console.log("res error", error);
     return Promise.reject(error);
   }
 );
