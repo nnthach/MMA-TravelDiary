@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import userApi from "../../services/userApi";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -43,93 +44,99 @@ export default function RegisterScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Create Account</Text>
+    <LinearGradient
+      colors={["#f9f0e1", "#f9f0e1", "#f6c169"]}
+      style={{ flex: 1, justifyContent: "center" }}
+    >
+      <View style={styles.container}>
+        <Text style={styles.title}>Create Account</Text>
 
-      <TextInput
-        placeholder="Username"
-        style={styles.input}
-        value={registerForm.username}
-        onChangeText={(text) => handleChange(text, "username")}
-      />
+        <TextInput
+          placeholder="Username"
+          style={styles.input}
+          value={registerForm.username}
+          onChangeText={(text) => handleChange(text, "username")}
+        />
 
-      <TextInput
-        placeholder="Email"
-        style={styles.input}
-        value={registerForm.email}
-        onChangeText={(text) => handleChange(text, "email")}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
+        <TextInput
+          placeholder="Email"
+          style={styles.input}
+          value={registerForm.email}
+          onChangeText={(text) => handleChange(text, "email")}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
 
-      <TextInput
-        placeholder="Password"
-        style={styles.input}
-        value={registerForm.password}
-        onChangeText={(text) => handleChange(text, "password")}
-        secureTextEntry
-      />
+        <TextInput
+          placeholder="Password"
+          style={styles.input}
+          value={registerForm.password}
+          onChangeText={(text) => handleChange(text, "password")}
+          secureTextEntry
+        />
 
-      <TextInput
-        placeholder="Confirm Password"
-        style={styles.input}
-        value={registerForm.confirm_password}
-        onChangeText={(text) => handleChange(text, "confirm_password")}
-        secureTextEntry
-      />
+        <TextInput
+          placeholder="Confirm Password"
+          style={styles.input}
+          value={registerForm.confirm_password}
+          onChangeText={(text) => handleChange(text, "confirm_password")}
+          secureTextEntry
+        />
 
-      <TouchableOpacity style={styles.button} onPress={handleRegister}>
-        <Text style={styles.buttonText}>Sign Up</Text>
-      </TouchableOpacity>
-
-      <View style={styles.row}>
-        <Text>Already have an account?</Text>
-        <TouchableOpacity onPress={() => router.push("/login")}>
-          <Text style={styles.link}>Login</Text>
+        <TouchableOpacity style={styles.button} onPress={handleRegister}>
+          <Text style={styles.buttonText}>Sign Up</Text>
         </TouchableOpacity>
+
+        <View style={styles.row}>
+          <Text style={{ color: "#f3997c" }}>Already have an account?</Text>
+          <TouchableOpacity onPress={() => router.push("/login")}>
+            <Text style={styles.link}>Login</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.subFooterLink}>
+          <TouchableOpacity onPress={() => router.replace("/(tabs)")}>
+            <Text
+              style={{ fontSize: 14, color: "#f3997c", textAlign: "center" }}
+            >
+              Continue as Guest
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => router.replace("/(tabs)")}>
+            <Text
+              style={{ fontSize: 14, color: "#f3997c", textAlign: "center" }}
+              onPress={() => router.replace("/")}
+            >
+              Back
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
-
-      <View style={styles.subFooterLink}>
-        <TouchableOpacity onPress={() => router.replace("/(tabs)")}>
-          <Text style={{ fontSize: 14, color: "black", textAlign: "center" }}>
-            Continue as Guest
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => router.replace("/(tabs)")}>
-          <Text
-            style={{ fontSize: 14, color: "black", textAlign: "center" }}
-            onPress={() => router.replace("/")}
-          >
-            Back
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     paddingHorizontal: 24,
-    justifyContent: "center",
   },
   title: {
     fontSize: 28,
     fontWeight: "bold",
     marginBottom: 24,
     textAlign: "center",
+    color: "#f3997c",
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: "#f3997c",
     borderRadius: 6,
     padding: 12,
     marginBottom: 16,
   },
   button: {
-    backgroundColor: "#ff7733",
+    backgroundColor: "#f3997c",
     paddingVertical: 12,
     borderRadius: 6,
     alignItems: "center",
@@ -144,13 +151,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   link: {
-    color: "#007BFF",
+    color: "#ff9900",
     fontWeight: "bold",
     marginLeft: 4,
   },
 
   subFooterLink: {
-    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     marginTop: 10,

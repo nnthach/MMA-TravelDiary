@@ -3,6 +3,7 @@ import { Redirect, useRouter } from "expo-router";
 import { useContext, useEffect } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { AuthContext } from "../context/AuthContext";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
   const router = useRouter();
@@ -10,55 +11,84 @@ export default function Index() {
   return (
     <LinearGradient
       colors={["#f9f0e1", "#f9f0e1", "#f6c169"]}
-      style={{ width: "100%", height: "100%" }}
+      style={{ flex: 1 }}
     >
-      <View
-        style={{
-          width: "100%",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <View style={styles.logoWrapImg}>
-          {/* LOGO app */}
-          <Image
-            source={require("../assets/logo.png")}
-            style={{ width: "100%", height: "100%" }}
-            resizeMode="cover"
-          />
+      <SafeAreaView style={{ flex: 1 }}>
+        <View
+          style={{
+            width: "100%",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <View style={styles.logoWrapImg}>
+            {/* LOGO app */}
+            <Image
+              source={require("../assets/logo.png")}
+              style={{ width: "100%", height: "100%" }}
+              resizeMode="cover"
+            />
+          </View>
         </View>
-      </View>
 
-      <View style={{ alignItems: "center", flex: 1 }}>
-        <Text style={{ fontSize: 30, color: "orange", fontWeight: "bold" }}>
-          Welcome to our diary!
-        </Text>
-      </View>
+        <View style={styles.bottomWrap}>
+          {/*SIGN IN */}
+          <TouchableOpacity
+            onPress={() => router.push("/(auth)/login")}
+            style={{ width: "100%", alignItems: "center" }}
+          >
+            <View style={styles.authButtonWrap}>
+              <Text style={styles.authText}>Sign In</Text>
+            </View>
+          </TouchableOpacity>
 
-      <View style={styles.bottomWrap}>
-        <TouchableOpacity
-          onPress={() => router.push("/(auth)/login")}
-          style={{ width: "100%", alignItems: "center" }}
-        >
-          <View style={styles.authButtonWrap}>
-            <Text style={styles.authText}>Sign In</Text>
+          {/*SIGN UP */}
+          <TouchableOpacity
+            onPress={() => router.push("/(auth)/register")}
+            style={{ width: "100%", alignItems: "center" }}
+          >
+            <View style={styles.authButtonWrap}>
+              <Text style={styles.authText}>Sign Up</Text>
+            </View>
+          </TouchableOpacity>
+
+          {/*Or line */}
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              width: "80%",
+              marginVertical: 20,
+            }}
+          >
+            <View style={{ flex: 1, height: 1, backgroundColor: "#f3997c" }} />
+            <Text style={{ paddingHorizontal: 10, color: "#f3997c" }}>OR</Text>
+            <View style={{ flex: 1, height: 1, backgroundColor: "#f3997c" }} />
           </View>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => router.push("/(auth)/register")}
-          style={{ width: "100%", alignItems: "center" }}
-        >
-          <View style={styles.authButtonWrap}>
-            <Text style={styles.authText}>Sign Up</Text>
-          </View>
-        </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => router.replace("/(tabs)")}>
-          <Text style={{ fontWeight: 600, fontSize: 18, color: "white" }}>
-            Continue as Guest
-          </Text>
-        </TouchableOpacity>
-      </View>
+          {/*Google */}
+          <TouchableOpacity
+            onPress={() => router.push("/(auth)/register")}
+            style={{ width: "100%", alignItems: "center" }}
+          >
+            <View style={[styles.authButtonWrap, styles.authButtonOtherOption]}>
+              <Image
+                source={require("../assets/googlelogo.webp")}
+                style={{ width: 20, height: 20 }}
+                resizeMode="cover"
+              />
+              <Text style={styles.authText}>Continue with Google</Text>
+            </View>
+          </TouchableOpacity>
+
+          {/*GUEST */}
+          <TouchableOpacity onPress={() => router.replace("/(tabs)")}>
+            <Text style={{ fontSize: 16, color: "white" }}>
+              Continue as Guest
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
     </LinearGradient>
   );
 }
@@ -78,12 +108,22 @@ const styles = StyleSheet.create({
     gap: 10,
   },
 
+  authButtonOtherOption: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+  },
+
   authButtonWrap: {
-    backgroundColor: "#FBF1E1",
+    // backgroundColor: "#FBF1E1",
+    backgroundColor: "white",
     width: "80%",
     alignItems: "center",
     paddingVertical: 10,
     borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#fec1ad",
   },
   authText: {
     fontSize: 16,

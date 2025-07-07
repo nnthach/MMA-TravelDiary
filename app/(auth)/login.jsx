@@ -11,6 +11,7 @@ import { useRouter } from "expo-router";
 import userApi from "../../services/userApi";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthContext } from "../../context/AuthContext";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -54,80 +55,85 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome back</Text>
+    <LinearGradient
+      colors={["#f9f0e1", "#f9f0e1", "#f6c169"]}
+      style={{ flex: 1, justifyContent: "center" }}
+    >
+      <View style={styles.container}>
+        <Text style={styles.title}>Welcome back</Text>
 
-      <TextInput
-        placeholder="Email or username"
-        style={styles.input}
-        value={loginForm.account}
-        onChangeText={(text) => handleChange(text, "account")}
-        autoCapitalize="none"
-        keyboardType="email-address"
-      />
+        <TextInput
+          placeholder="Email or username"
+          style={styles.input}
+          value={loginForm.account}
+          onChangeText={(text) => handleChange(text, "account")}
+          autoCapitalize="none"
+          keyboardType="email-address"
+        />
 
-      <TextInput
-        placeholder="Password"
-        style={styles.input}
-        value={loginForm.password}
-        onChangeText={(text) => handleChange(text, "password")}
-        secureTextEntry
-      />
+        <TextInput
+          placeholder="Password"
+          style={styles.input}
+          value={loginForm.password}
+          onChangeText={(text) => handleChange(text, "password")}
+          secureTextEntry
+        />
 
-      <TouchableOpacity
-        onPress={() => console.log("Forgot Password")}
-        style={styles.forgotPassword}
-      >
-        <Text style={styles.linkText}>Forgot your password?</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Login</Text>
-      </TouchableOpacity>
-
-      <View style={styles.row}>
-        <Text>Don’t have an account? </Text>
-        <TouchableOpacity onPress={() => router.push("/register")}>
-          <Text style={styles.link}>Sign up</Text>
+        <TouchableOpacity
+          onPress={() => console.log("Forgot Password")}
+          style={styles.forgotPassword}
+        >
+          <Text style={styles.linkText}>Forgot your password?</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          <Text style={styles.buttonText}>Login</Text>
+        </TouchableOpacity>
+
+        <View style={styles.row}>
+          <Text style={{ color: "#f3997c" }}>Don’t have an account? </Text>
+          <TouchableOpacity onPress={() => router.push("/register")}>
+            <Text style={styles.link}>Sign up</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.subFooterLink}>
+          <TouchableOpacity onPress={() => router.replace("/(tabs)")}>
+            <Text
+              style={{ fontSize: 14, color: "#f3997c", textAlign: "center" }}
+            >
+              Continue as Guest
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => router.replace("/(tabs)")}>
+            <Text
+              style={{ fontSize: 14, color: "#f3997c", textAlign: "center" }}
+              onPress={() => router.replace("/")}
+            >
+              Back
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
-
-      <View style={styles.subFooterLink}>
-        <TouchableOpacity onPress={() => router.replace("/(tabs)")}>
-          <Text style={{ fontSize: 14, color: "black", textAlign: "center" }}>
-            Continue as Guest
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => router.replace("/(tabs)")}>
-          <Text
-            style={{ fontSize: 14, color: "black", textAlign: "center" }}
-            onPress={() => router.replace("/")}
-          >
-            Back
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     paddingHorizontal: 24,
-    justifyContent: "center",
-    backgroundColor: "#fff",
   },
   title: {
     fontSize: 28,
     fontWeight: "bold",
     marginBottom: 24,
     textAlign: "center",
+    color: "#f3997c",
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: "#f3997c",
     borderRadius: 6,
     padding: 12,
     marginBottom: 16,
@@ -137,10 +143,10 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   linkText: {
-    color: "#007BFF",
+    color: "#ff9900",
   },
   button: {
-    backgroundColor: "#ff7733",
+    backgroundColor: "#f3997c",
     paddingVertical: 12,
     borderRadius: 6,
     alignItems: "center",
@@ -155,12 +161,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   link: {
-    color: "#007BFF",
+    color: "#ff9900",
     fontWeight: "bold",
     marginLeft: 4,
   },
   subFooterLink: {
-    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     marginTop: 10,
