@@ -18,7 +18,7 @@ export default function LocationScreen() {
   const [postListData, setPostListData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const { savedPostData } = useContext(SavedPostContext);
-  const { userId,userInfo } = useContext(AuthContext);
+  const { userId, userInfo } = useContext(AuthContext);
 
   const route = useRouter();
 
@@ -28,6 +28,7 @@ export default function LocationScreen() {
         setIsLoading(true);
         try {
           const res = await postAPIs.getAllPost();
+          console.log("get all post res", res.data);
           setPostListData(res.data);
           setIsLoading(false);
         } catch (error) {
@@ -80,8 +81,10 @@ export default function LocationScreen() {
               item={item}
               // b1: convert mảng object của savedPostData => mảng string chứa các id
               // b2: so sánh các id đó với id của fetchAllPost xem có trùng thì trả về true
-              isSaved={userInfo&&savedPostData.map((p) => p._id).includes(item._id)}
-              isOwner={userInfo&&userId == item.userId}
+              isSaved={
+                userInfo && savedPostData.map((p) => p._id).includes(item._id)
+              }
+              isOwner={userInfo && userId == item.userId}
             />
           )}
           ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
