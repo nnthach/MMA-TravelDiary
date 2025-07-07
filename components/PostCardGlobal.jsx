@@ -10,31 +10,41 @@ import {
 } from "../utils/updateStorage";
 import ReportModal from "./ReportModal";
 import CommentModal from "./CommentModal";
+import { PostContext } from "../context/PostContext";
 
 export default function PostCardGlobal({
   item,
   isSaved = false,
   isOwner = false,
+  setOpenComment,
+  setActionPostID
 }) {
   const { userId, userInfo } = useContext(AuthContext);
   const router = useRouter();
   const { fetchStorageOfUser } = useContext(SavedPostContext);
   const [openReport, setOpenReport] = useState(false);
-  const [openComment, setOpenComment] = useState(false);
-  const [actionPostID, setActionPostID] = useState(false);
   const [reportDataForm, setReportDataForm] = useState({
     postId: "",
     reporterId: userId,
     reason: "",
     description: "",
   });
-  const [commentInPostData, setCommentInPostData] = useState(item?.comments);
+
+  const {
+    postListData,
+    setPostListData,
+    isLoading,
+    postDetail,
+    getAllPost,
+    getPostDetail,
+  } = useContext(PostContext);
   console.log("post detail", item);
 
   const handleOpenComment = (id) => {
     setActionPostID(id);
     setOpenComment(true);
   };
+
   return (
     <>
       <View style={styles.container}>
@@ -118,6 +128,7 @@ export default function PostCardGlobal({
               style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
             >
               <Ionicons name="heart-outline" size={24} color="black" />
+
               <Text>120</Text>
             </View>
             <TouchableOpacity
@@ -125,7 +136,9 @@ export default function PostCardGlobal({
               onPress={() => handleOpenComment(item._id)}
             >
               <Ionicons name="chatbubbles-outline" size={24} color="black" />
-              <Text>120</Text>
+              {item?.comments.length >= 1 && (
+                <Text>{item?.comments.length}</Text>
+              )}
             </TouchableOpacity>
           </View>
 
@@ -193,15 +206,6 @@ export default function PostCardGlobal({
           setOpenReport={setOpenReport}
           reportDataForm={reportDataForm}
           setReportDataForm={setReportDataForm}
-        />
-      )}
-
-      {openComment && (
-        <CommentModal
-          actionPostID={actionPostID}
-          setActionPostID={setActionPostID}
-          setOpenComment={setOpenComment}
-          openComment={openComment}
         />
       )}
     </>

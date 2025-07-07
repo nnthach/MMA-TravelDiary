@@ -1,13 +1,10 @@
 import axiosClient from "../config/axiosClient";
 
 const commentAPIs = {
-  // getAllPost: () => axiosClient.get("/post?public=true"),
-  // getById: (id) => axiosClient.get(`/post/${id}`),
-  // getByUserIdAndPublic: (id, query) =>
-  //   axiosClient.get(`/post/user/${id}?public=${query}`),
+  getById: (id) => axiosClient.get(`/comments/${id}`),
   create: (data) => axiosClient.post("/comments", data),
-  // update: (id, data) => axiosClient.put(`/post/${id}`, data),
-  // delete: (id) => axiosClient.delete(`/post/${id}`),
+  update: (id, data) => axiosClient.put(`/comments/${id}`, data),
+  delete: (id) => axiosClient.delete(`/comments/${id}`),
 };
 
 export default commentAPIs;

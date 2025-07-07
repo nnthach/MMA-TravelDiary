@@ -9,6 +9,9 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
+  FlatList,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useCallback, useContext, useEffect, useState } from "react";
@@ -16,6 +19,7 @@ import { AuthContext } from "../context/AuthContext";
 import commentAPIs from "../services/commentAPIs";
 import postAPIs from "../services/postAPIs";
 import { useFocusEffect } from "expo-router";
+import { PostContext } from "../context/PostContext";
 
 export default function CommentModal({
   actionPostID,
@@ -29,29 +33,68 @@ export default function CommentModal({
     content: "",
     postId: actionPostID,
   });
-  const [postDetail, setPostDetail] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [openDropMenuCommentId, setOpenDropMenuCommentId] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const { isLoading, postDetail, getAllPost, getPostDetail } =
+    useContext(PostContext);
 
-  console.log("post detail", postDetail);
-
-  const getPostById = async () => {
-    setIsLoading(true);
+  const handleGetCommentDetail = async (id) => {
     try {
-      const res = await postAPIs.getById(actionPostID);
-      console.log("get pos dtetail res", res);
-      setPostDetail(res.data);
-      setIsLoading(false);
+      const res = await commentAPIs.getById(id);
+      console.log("get comment detail res", res);
+      setCommentDataForm((prev) => ({
+        ...prev,
+        content: res.data.content,
+      }));
+      setIsEditing(true);
+      setEditingCommentId(id);
+      setOpenDropMenuCommentId(null);
     } catch (error) {
-      console.log("error", error);
-      setPostDetail(null);
-      setIsLoading(false);
+      console.log("get comment detail error", error);
+    }
+  };
+
+  const handleUpdateComment = async () => {
+    try {
+      const res = await commentAPIs.update(editingCommentId, {
+        content: commentDataForm?.content,
+        postId: postDetail._id,
+      });
+      console.log("update comment res", res.data);
+
+      setIsEditing(false);
+      setEditingCommentId(null);
+      setCommentDataForm((prev) => ({
+        ...prev,
+        content: "",
+      }));
+
+      await getPostDetail(actionPostID);
+    } catch (error) {
+      console.log("update comment error", error);
+      Alert.alert("Error", "Update failed");
+    }
+  };
+
+  const handleDeleteComment = async (id) => {
+    try {
+      const res = await commentAPIs.delete(id);
+      console.log("delete comment res", res.data);
+
+      await getPostDetail(actionPostID);
+      await getAllPost();
+    } catch (error) {
+      console.log("delete comment errro", error);
     }
   };
 
   useFocusEffect(
     useCallback(() => {
-      getPostById();
-    }, [])
+      if (actionPostID) {
+        getPostDetail(actionPostID);
+      }
+    }, [actionPostID])
   );
 
   const handleCreateComment = async () => {
@@ -64,7 +107,10 @@ export default function CommentModal({
         content: "",
       }));
 
-      await getPostById();
+      await getPostDetail(actionPostID);
+      await getAllPost();
+
+      setIsEditing(false);
     } catch (error) {
       if (error.response && error.response.data?.message) {
         Alert.alert("Error", error.response.data.message);
@@ -72,6 +118,11 @@ export default function CommentModal({
         Alert.alert("Error", "Something wrong");
       }
       console.log("create comment err", error);
+      setCommentDataForm((prev) => ({
+        ...prev,
+        content: "",
+      }));
+      setIsEditing(false);
     }
   };
 
@@ -108,9 +159,20 @@ export default function CommentModal({
                 <Text>No comments</Text>
               </View>
             ) : (
-              <ScrollView style={{ flex: 1 }}>
-                {postDetail?.comments.map((comment) => (
-                  <View key={comment._id} style={{ marginBottom: 15 }}>
+              // <ScrollView style={{ flex: 1, zIndex: 0 }}>
+              <FlatList
+                data={postDetail?.comments}
+                keyExtractor={(item) => item._id}
+                contentContainerStyle={{ paddingBottom: 20 }}
+                renderItem={({ item: comment }) => (
+                  <View
+                    key={comment._id}
+                    style={{
+                      marginBottom: 15,
+                      position: "relative",
+                      zIndex: openDropMenuCommentId === comment._id ? 9999 : 0,
+                    }}
+                  >
                     {/*Comment-item-heading */}
                     <View
                       style={{
@@ -135,47 +197,103 @@ export default function CommentModal({
                         </Text>
                       </View>
                       {/*Right */}
+                      <View style={{ position: "relative" }}>
+                        <Ionicons
+                          name="ellipsis-vertical"
+                          size={18}
+                          color="black"
+                          onPress={() =>
+                            setOpenDropMenuCommentId((prev) =>
+                              prev === comment._id ? null : comment._id
+                            )
+                          }
+                        />
+
+                        {openDropMenuCommentId === comment._id && (
+                          <View style={styles.dropdownMenu}>
+                            {/*Edit menu */}
+                            <TouchableOpacity
+                              style={styles.dropdownMenuItem}
+                              onPress={() => {
+                                handleGetCommentDetail(comment._id);
+                              }}
+                            >
+                              <Ionicons
+                                name="build-outline"
+                                size={20}
+                                color="black"
+                              />
+                              <Text
+                                style={{ textAlign: "right", marginLeft: 5 }}
+                              >
+                                Edit
+                              </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                              style={styles.dropdownMenuItem}
+                              onPress={() => {
+                                console.log("delete");
+                                handleDeleteComment(comment._id);
+                              }}
+                            >
+                              <Ionicons name="trash" size={20} color="black" />
+                              <Text
+                                style={{ textAlign: "right", marginLeft: 5 }}
+                              >
+                                Delete
+                              </Text>
+                            </TouchableOpacity>
+                          </View>
+                        )}
+                      </View>
+                      {/*End right header of comment */}
                     </View>
                     {/*Comment-item-content */}
                     <Text>{comment?.content || "content"}</Text>
                   </View>
-                ))}
-              </ScrollView>
+                )}
+              />
             )}
 
             {/*Input comment */}
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 10,
-                paddingTop: 10,
-                paddingBottom: Platform.OS === "ios" ? 20 : 10,
-              }}
-            >
-              <View style={{ maxWidth: 45, overflow: "hidden" }}>
-                <Text style={{ fontWeight: "bold", fontSize: 16 }}>
-                  {userInfo?.username || "guest"}
-                </Text>
-              </View>
-              <TextInput
-                style={styles.input}
-                placeholder="Type here"
-                value={commentDataForm.content}
-                onChangeText={(text) =>
-                  setCommentDataForm((prev) => ({ ...prev, content: text }))
-                }
-              />
-              <TouchableOpacity
-                onPress={() => {
-                  console.log("comment send", commentDataForm);
-                  // reset nếu muốn
-                  handleCreateComment();
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 10,
+                  paddingTop: 10,
+                  paddingBottom: Platform.OS === "ios" ? 20 : 10,
                 }}
               >
-                <Ionicons name="send" size={22} color="black" />
-              </TouchableOpacity>
-            </View>
+                <View style={{ maxWidth: 45, overflow: "hidden" }}>
+                  <Text style={{ fontWeight: "bold", fontSize: 16 }}>
+                    {userInfo?.username || "guest"}
+                  </Text>
+                </View>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Type here"
+                  value={commentDataForm.content}
+                  onChangeText={(text) =>
+                    setCommentDataForm((prev) => ({ ...prev, content: text }))
+                  }
+                />
+                <TouchableOpacity
+                  onPress={() => {
+                    if (isEditing) {
+                      console.log("run update");
+                      handleUpdateComment();
+                    } else {
+                      console.log("run create");
+                      handleCreateComment();
+                    }
+                  }}
+                >
+                  <Ionicons name="send" size={22} color="black" />
+                </TouchableOpacity>
+              </View>
+            </TouchableWithoutFeedback>
           </KeyboardAvoidingView>
         )}
       </View>
@@ -215,5 +333,28 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlignVertical: "top",
     fontSize: 14,
+  },
+  dropdownMenu: {
+    position: "absolute",
+    backgroundColor: "white",
+    width: 90,
+    height: 70,
+    top: 20,
+    right: 5,
+    zIndex: 10000,
+    elevation: 10,
+    alignItems: "flex-end",
+    justifyContent: "center",
+    boxShadow: "0px 1px 4px rgba(0, 0, 0, 0.5)",
+    borderRadius: 10,
+  },
+
+  dropdownMenuItem: {
+    padding: 5,
+    paddingHorizontal: 10,
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
   },
 });

@@ -12,30 +12,31 @@ import { useCallback, useContext, useState } from "react";
 import postAPIs from "../../../services/postAPIs";
 import { SavedPostContext } from "../../../context/SavedPostContext";
 import { AuthContext } from "../../../context/AuthContext";
+import { PostContext } from "../../../context/PostContext";
+import CommentModal from "../../../components/CommentModal";
 
 export default function LocationScreen() {
   const { city, country } = useLocalSearchParams();
-  const [postListData, setPostListData] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
   const { savedPostData } = useContext(SavedPostContext);
   const { userId, userInfo } = useContext(AuthContext);
+  const [openComment, setOpenComment] = useState(false);
+  const [actionPostID, setActionPostID] = useState(null);
+  const {
+    postListData,
+    setPostListData,
+    isLoading,
+    postDetail,
+    getAllPost,
+    getPostDetail,
+    setIsLoading,
+  } = useContext(PostContext);
 
   const route = useRouter();
 
+  console.log('actionpotid',actionPostID)
+
   useFocusEffect(
     useCallback(() => {
-      const getAllPost = async () => {
-        setIsLoading(true);
-        try {
-          const res = await postAPIs.getAllPost();
-          console.log("get all post res", res.data);
-          setPostListData(res.data);
-          setIsLoading(false);
-        } catch (error) {
-          console.log("error get all post", error);
-          setIsLoading(false);
-        }
-      };
       getAllPost();
     }, [])
   );
@@ -85,10 +86,21 @@ export default function LocationScreen() {
                 userInfo && savedPostData.map((p) => p._id).includes(item._id)
               }
               isOwner={userInfo && userId == item.userId}
+              setOpenComment={setOpenComment}
+              setActionPostID={setActionPostID}
             />
           )}
           ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
           contentContainerStyle={{ padding: 10 }}
+        />
+      )}
+
+      {openComment && (
+        <CommentModal
+          actionPostID={actionPostID}
+          setActionPostID={setActionPostID}
+          setOpenComment={setOpenComment}
+          openComment={openComment}
         />
       )}
     </>
