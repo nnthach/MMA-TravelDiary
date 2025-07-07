@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
+  Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
 import userApi from "../../services/userApi";
@@ -13,44 +14,37 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthContext } from "../../context/AuthContext";
 import { LinearGradient } from "expo-linear-gradient";
 
-export default function LoginScreen() {
+export default function ResetPasswordScreen() {
   const router = useRouter();
-  const [loginForm, setLoginForm] = useState({
-    account: "",
+  const { emailResetPassword } = useContext(AuthContext);
+
+  console.log("email in reset", emailResetPassword);
+
+  const [resetPasswordForm, setResetPasswordForm] = useState({
+    email: emailResetPassword,
+    otp: "",
     password: "",
+    confirmPassword: "",
   });
-  const { setUserId } = useContext(AuthContext);
 
   const handleChange = (value, name) => {
-    setLoginForm((prev) => ({
+    setResetPasswordForm((prev) => ({
       ...prev,
       [name]: value,
     }));
   };
 
-  const handleLogin = async () => {
+  const handleResetPassword = async () => {
     try {
-      const res = await userApi.login(loginForm);
-      const { accessToken, refreshToken } = res.data;
-
-      setUserId(res.data.userId);
-
-      AsyncStorage.setItem("accessToken", accessToken);
-      AsyncStorage.setItem("refreshToken", refreshToken);
-      AsyncStorage.setItem("userId", res.data.userId);
-
-      alert("login success");
-
+      const { confirmPassword, ...newForm } = resetPasswordForm;
+      const res = await userApi.resetPassword(newForm);
+      console.log("res reset pw", res);
+      Alert.alert("Reset password successfully");
       setTimeout(() => {
-        if (res.data.role == "Admin") {
-          router.replace("/(admin)");
-        } else {
-          router.replace("/(tabs)");
-        }
-      }, 3000);
+        router.replace("/login");
+      }, 1000);
     } catch (error) {
-      console.log("login error", error);
-      alert("fail to login");
+      console.log("reset password error", error);
     }
   };
 
@@ -60,56 +54,43 @@ export default function LoginScreen() {
       style={{ flex: 1, justifyContent: "center" }}
     >
       <View style={styles.container}>
-        <Text style={styles.title}>Welcome back</Text>
+        <Text style={styles.title}>Reset Password</Text>
+        <Text style={{ color: "grey", textAlign: "center", marginBottom: 10 }}>
+          OTP sent to your email, please check it!
+        </Text>
 
         <TextInput
-          placeholder="Email or username"
+          placeholder="Enter OTP"
           style={styles.input}
-          value={loginForm.account}
-          onChangeText={(text) => handleChange(text, "account")}
+          value={resetPasswordForm.otp}
+          onChangeText={(text) => handleChange(text, "otp")}
           autoCapitalize="none"
-          keyboardType="email-address"
         />
 
         <TextInput
           placeholder="Password"
           style={styles.input}
-          value={loginForm.password}
+          value={resetPasswordForm.password}
           onChangeText={(text) => handleChange(text, "password")}
           secureTextEntry
         />
 
-        <TouchableOpacity
-          onPress={() => router.push("/forgotPassword")}
-          style={styles.forgotPassword}
-        >
-          <Text style={styles.linkText}>Forgot your password?</Text>
-        </TouchableOpacity>
+        <TextInput
+          placeholder="Confirm Password"
+          style={styles.input}
+          value={resetPasswordForm.confirmPassword}
+          onChangeText={(text) => handleChange(text, "confirmPassword")}
+          secureTextEntry
+        />
 
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Login</Text>
+        <TouchableOpacity style={styles.button} onPress={handleResetPassword}>
+          <Text style={styles.buttonText}>Send</Text>
         </TouchableOpacity>
-
-        <View style={styles.row}>
-          <Text style={{ color: "#f3997c" }}>Don’t have an account? </Text>
-          <TouchableOpacity onPress={() => router.push("/register")}>
-            <Text style={styles.link}>Sign up</Text>
-          </TouchableOpacity>
-        </View>
 
         <View style={styles.subFooterLink}>
-          <TouchableOpacity onPress={() => router.replace("/(tabs)")}>
+          <TouchableOpacity onPress={() => router.replace("/")}>
             <Text
               style={{ fontSize: 14, color: "#f3997c", textAlign: "center" }}
-            >
-              Continue as Guest
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => router.replace("/(tabs)")}>
-            <Text
-              style={{ fontSize: 14, color: "#f3997c", textAlign: "center" }}
-              onPress={() => router.replace("/")}
             >
               Back
             </Text>
@@ -127,7 +108,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    marginBottom: 24,
+    marginBottom: 10,
     textAlign: "center",
     color: "#f3997c",
   },

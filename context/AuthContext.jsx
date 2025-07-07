@@ -8,6 +8,7 @@ export const AuthContext = createContext({});
 export const AuthProvider = ({ children }) => {
   const [userInfo, setUserInfo] = useState(null);
   const [userId, setUserId] = useState(null);
+  const [emailResetPassword, setEmailResetPassword] = useState(null);
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -32,7 +33,15 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ userInfo, setUserInfo, handleLogout, setUserId, userId }}
+      value={{
+        userInfo,
+        setUserInfo,
+        handleLogout,
+        setUserId,
+        userId,
+        emailResetPassword,
+        setEmailResetPassword,
+      }}
     >
       {children}
     </AuthContext.Provider>
