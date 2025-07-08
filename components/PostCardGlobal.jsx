@@ -11,13 +11,14 @@ import {
 import ReportModal from "./ReportModal";
 import { PostContext } from "../context/PostContext";
 import postAPIs from "../services/postAPIs";
+import FooterPost from "./FooterPost";
 
 export default function PostCardGlobal({
   item,
   isSaved = false,
   isOwner = false,
   setOpenComment,
-  setActionPostID
+  setActionPostID,
 }) {
   const { userId, userInfo } = useContext(AuthContext);
   const router = useRouter();
@@ -120,77 +121,15 @@ export default function PostCardGlobal({
         </TouchableOpacity>
 
         {/* Footer */}
-        <View style={styles.footerWrap}>
-          {/* Left */}
-          <View style={{ flexDirection: "row", gap: 15 }}>
-            <TouchableOpacity onPress={handleToggleLike}>
-              <Ionicons
-                name={isLiked ? "heart" : "heart-outline"}
-                size={24}
-                color={isLiked ? "red" : "black"}
-              />
-              <Text>{likes.length}</Text> {/* ✅ dùng state */}
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
-              onPress={() => handleOpenComment(item._id)}
-            >
-              <Ionicons name="chatbubbles-outline" size={24} color="black" />
-              {Array.isArray(item?.comments) && item.comments.length > 0 && (
-                <Text>{item.comments.length}</Text>
-              )}
-            </TouchableOpacity>
-          </View>
-
-          {/* Right */}
-          <View style={{ flexDirection: "row", gap: 10, alignItems: "center" }}>
-            {!isOwner && (
-              <>
-                {isSaved ? (
-                  <Ionicons
-                    name="bookmark"
-                    size={20}
-                    color="black"
-                    onPress={() =>
-                      handleRemovePostOutOfStorage(
-                        userId,
-                        item._id,
-                        fetchStorageOfUser
-                      )
-                    }
-                  />
-                ) : (
-                  <Ionicons
-                    name="bookmark-outline"
-                    size={20}
-                    color="black"
-                    onPress={() =>
-                      handleAddPostToStorage(
-                        userInfo,
-                        userId,
-                        item._id,
-                        fetchStorageOfUser
-                      )
-                    }
-                  />
-                )}
-                <Ionicons
-                  name="alert-circle-outline"
-                  size={22}
-                  color="black"
-                  onPress={() => {
-                    setReportDataForm((prev) => ({
-                      ...prev,
-                      postId: item._id,
-                    }));
-                    setOpenReport(true);
-                  }}
-                />
-              </>
-            )}
-          </View>
-        </View>
+        <FooterPost
+          item={item}
+          isSaved={isSaved}
+          isOwner={isOwner}
+          setOpenComment={setOpenComment}
+          setActionPostID={setActionPostID}
+          setOpenReport={setOpenReport}
+          setReportDataForm={setReportDataForm}
+        />
       </View>
 
       {/* Report Modal */}

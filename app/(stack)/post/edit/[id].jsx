@@ -19,6 +19,7 @@ import { AuthContext } from "../../../../context/AuthContext";
 import { changeInputUtils } from "../../../../utils/formUtils";
 import { pickImage, removeImage } from "../../../../utils/imagePickerUtils";
 import uploadImage from "../../../../utils/uploadImage";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function EditPost() {
   const route = useRouter();
@@ -110,7 +111,12 @@ export default function EditPost() {
   }
 
   return (
-    <>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: "white",
+      }}
+    >
       {/*Header */}
       <View style={styles.header}>
         <Ionicons
@@ -193,7 +199,7 @@ export default function EditPost() {
           <Text style={styles.buttonText}>Update</Text>
         </TouchableOpacity>
       </View>
-    </>
+    </SafeAreaView>
   );
 }
 

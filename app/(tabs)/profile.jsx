@@ -13,6 +13,8 @@ import { useFocusEffect, useRouter } from "expo-router";
 import postAPIs from "../../services/postAPIs";
 import PostCardProfile from "../../components/PostCardProfile";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { LinearGradient } from "expo-linear-gradient";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -41,14 +43,37 @@ export default function ProfileScreen() {
     fetchUserPost();
   }, [userInfo?._id, queryPublic]);
 
+  useFocusEffect(
+    useCallback(() => {
+      fetchUserPost();
+    }, [])
+  );
+
   if (!userInfo) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text style={{ fontSize: 16, marginBottom: 12 }}>
+        <Text
+          style={{
+            fontSize: 20,
+            fontWeight: "bold",
+            marginBottom: 12,
+            color: "#f3997c",
+          }}
+        >
           Let's sign in first
         </Text>
-        <TouchableOpacity onPress={() => router.replace("/(auth)/login")}>
-          <Text style={{ color: "#007AFF", fontWeight: "bold" }}>
+        <TouchableOpacity
+          onPress={() => router.replace("/(auth)/login")}
+          style={{
+            backgroundColor: "#f3997c",
+            paddingVertical: 12,
+            paddingHorizontal: 10,
+            borderRadius: 6,
+            alignItems: "center",
+            marginBottom: 24,
+          }}
+        >
+          <Text style={{ color: "white", fontWeight: "bold" }}>
             Go to Sign In
           </Text>
         </TouchableOpacity>
@@ -57,161 +82,166 @@ export default function ProfileScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      {/* Profile Header */}
-      <View style={styles.profileHeader}>
-        <View
-          style={{
-            backgroundColor: "lightgrey",
-            width: 100,
-            height: 100,
-            borderRadius: 50,
-          }}
-        >
-      {userInfo?.avatar && (
-  <Image
-    source={{ uri: userInfo.avatar }}
-    style={{ width: "100%", height: "100%" }}
-  />
-)}
-
-        </View>
-        <View style={styles.postsNumWrap}>
-          <View style={{ alignItems: "left" }}>
-            <Text style={{ fontSize: 16, fontWeight: "bold" }}>120</Text>
-            <Text style={{ color: "grey" }}>Posts</Text>
-          </View>
-          <View style={{ alignItems: "left" }}>
-            <Text style={{ fontSize: 16, fontWeight: "bold" }}>120</Text>
-            <Text style={{ color: "grey" }}>Public posts</Text>
-          </View>
-          <View style={{ alignItems: "left" }}>
-            <Text style={{ fontSize: 16, fontWeight: "bold" }}>12</Text>
-            <Text style={{ color: "grey" }}>Private posts</Text>
-          </View>
-        </View>
-      </View>
-
-      {/* Username and bio */}
-      <View style={{ marginBottom: 12, paddingHorizontal: 16 }}>
-        <Text style={{ fontWeight: "bold", fontSize: 18 }}>
-          {userInfo?.username}
-        </Text>
-        <Text style={{ color: "gray", marginTop: 4 }}>
-          These are the places I have been to!
-        </Text>
-      </View>
-
-      {/* Edit Profile / Share Profile */}
-      <View style={styles.buttonActionWrap}>
-        <TouchableOpacity style={styles.buttonWrap}>
-          <Text style={{ color: "#000", fontWeight: "bold" }}>
-            Edit Profile
-          </Text>
-        </TouchableOpacity>
-        <View style={{ position: "relative" }}>
-          <Ionicons
-            name="ellipsis-vertical"
-            size={26}
-            color="black"
-            onPress={() => setOpenDropMenu((prev) => !prev)}
-          />
-
-          {openDropMenu && (
-            <View style={styles.dropdownMenu}>
-              <TouchableOpacity
-                style={{ padding: 5 }}
-                onPress={() => {
-                  handleLogout();
-                  setOpenDropMenu(false);
-                }}
-              >
-                <Text>Sign Out</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </View>
-      </View>
-
-      {/* Admin management button */}
-      {userInfo?.role === "Admin" && (
-        <View style={styles.buttonRow}>
-          <TouchableOpacity
-            style={styles.managementButton}
-            onPress={() => {
-              router.replace("/(admin)");
+    <SafeAreaView
+      edges={["top"]}
+      style={{
+        flex: 1,
+        backgroundColor: "white",
+      }}
+    >
+      <View style={styles.container}>
+        {/* Profile Header */}
+        <View style={styles.profileHeader}>
+          <View
+            style={{
+              backgroundColor: "lightgrey",
+              width: 100,
+              height: 100,
+              borderRadius: 50,
             }}
           >
+            {userInfo?.avatar && (
+              <Image
+                source={{ uri: userInfo.avatar }}
+                style={{ width: "100%", height: "100%" }}
+              />
+            )}
+          </View>
+          <View style={styles.postsNumWrap}>
+            <View style={{ alignItems: "left" }}>
+              <Text style={{ fontSize: 16, fontWeight: "bold" }}>120</Text>
+              <Text style={{ color: "grey" }}>Posts</Text>
+            </View>
+            <View style={{ alignItems: "left" }}>
+              <Text style={{ fontSize: 16, fontWeight: "bold" }}>120</Text>
+              <Text style={{ color: "grey" }}>Public posts</Text>
+            </View>
+            <View style={{ alignItems: "left" }}>
+              <Text style={{ fontSize: 16, fontWeight: "bold" }}>12</Text>
+              <Text style={{ color: "grey" }}>Private posts</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Username and bio */}
+        <View style={{ marginBottom: 12, paddingHorizontal: 16 }}>
+          <Text style={{ fontWeight: "bold", fontSize: 18 }}>
+            {userInfo?.username}
+          </Text>
+          <Text style={{ color: "gray", marginTop: 4 }}>
+            These are the places I have been to!
+          </Text>
+        </View>
+
+        {/* Edit Profile / Share Profile */}
+        <View style={styles.buttonActionWrap}>
+          <TouchableOpacity style={styles.buttonWrap}>
             <Text style={{ color: "#000", fontWeight: "bold" }}>
-              Back to Management
+              Edit Profile
             </Text>
           </TouchableOpacity>
+          <View style={{ position: "relative" }}>
+            <Ionicons
+              name="ellipsis-vertical"
+              size={26}
+              color="black"
+              onPress={() => setOpenDropMenu((prev) => !prev)}
+            />
+
+            {openDropMenu && (
+              <View style={styles.dropdownMenu}>
+                <TouchableOpacity
+                  style={{ padding: 5 }}
+                  onPress={() => {
+                    handleLogout();
+                    setOpenDropMenu(false);
+                  }}
+                >
+                  <Text>Sign Out</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
         </View>
-      )}
 
-      <View
-        style={{
-          paddingVertical: 5,
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-around",
-        }}
-      >
-        <Ionicons
-          name="apps"
-          size={24}
-          color="black"
-          onPress={() => setQueryPublic("")}
-          style={{
-            padding: 5,
-            borderBottomColor: "black",
-            ...(queryPublic === "" && { borderBottomWidth: 1 }),
-          }}
-        />
-        <Ionicons
-          name="eye-outline"
-          size={24}
-          color="black"
-          onPress={() => setQueryPublic("true")}
-          style={{
-            padding: 5,
-            borderBottomColor: "black",
-            ...(queryPublic === "true" && { borderBottomWidth: 1 }),
-          }}
-        />
-        <Ionicons
-          name="eye-off-outline"
-          size={24}
-          color="black"
-          onPress={() => setQueryPublic("false")}
-          style={{
-            padding: 5,
-            borderBottomColor: "black",
-            ...(queryPublic === "false" && { borderBottomWidth: 1 }),
-          }}
-        />
-      </View>
+        {/* Admin management button */}
+        {userInfo?.role === "Admin" && (
+          <View style={styles.buttonRow}>
+            <TouchableOpacity
+              style={styles.managementButton}
+              onPress={() => {
+                router.replace("/(admin)");
+              }}
+            >
+              <Text style={{ color: "#000", fontWeight: "bold" }}>
+                Back to Management
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
 
-      
-
-      {isLoading ? (
         <View
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+          style={{
+            paddingVertical: 5,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-around",
+          }}
         >
-          <ActivityIndicator size="large" color="black" />
-          <Text>Loading</Text>
+          <Ionicons
+            name="apps"
+            size={24}
+            color="black"
+            onPress={() => setQueryPublic("")}
+            style={{
+              padding: 5,
+              borderBottomColor: "black",
+              ...(queryPublic === "" && { borderBottomWidth: 1 }),
+            }}
+          />
+          <Ionicons
+            name="eye-outline"
+            size={24}
+            color="black"
+            onPress={() => setQueryPublic("true")}
+            style={{
+              padding: 5,
+              borderBottomColor: "black",
+              ...(queryPublic === "true" && { borderBottomWidth: 1 }),
+            }}
+          />
+          <Ionicons
+            name="eye-off-outline"
+            size={24}
+            color="black"
+            onPress={() => setQueryPublic("false")}
+            style={{
+              padding: 5,
+              borderBottomColor: "black",
+              ...(queryPublic === "false" && { borderBottomWidth: 1 }),
+            }}
+          />
         </View>
-      ) : (
-        <FlatList
-          data={postListData}
-          keyExtractor={(_, index) => index.toString()}
-          numColumns={3}
-          renderItem={({ item }) => (
-            <PostCardProfile key={item._id} post={item} />
-          )}
-        />
-      )}
-    </View>
+
+        {isLoading ? (
+          <View
+            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+          >
+            <ActivityIndicator size="large" color="black" />
+            <Text>Loading</Text>
+          </View>
+        ) : (
+          <FlatList
+            data={postListData}
+            keyExtractor={(_, index) => index.toString()}
+            numColumns={3}
+            renderItem={({ item }) => (
+              <PostCardProfile key={item._id} post={item} />
+            )}
+          />
+        )}
+      </View>
+    </SafeAreaView>
   );
 }
 
@@ -258,7 +288,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center",
   },
-
 
   dropdownMenu: {
     position: "absolute",

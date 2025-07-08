@@ -4,6 +4,7 @@ import { AuthContext } from "../../context/AuthContext";
 import PostCardGlobal from "../../components/PostCardGlobal";
 import { SavedPostContext } from "../../context/SavedPostContext";
 import { useFocusEffect } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HistoryScreen() {
   const { userId } = useContext(AuthContext);
@@ -26,7 +27,13 @@ export default function HistoryScreen() {
   }
 
   return (
-    <>
+    <SafeAreaView
+      edges={["top"]}
+      style={{
+        flex: 1,
+        backgroundColor: "white",
+      }}
+    >
       {/* Header */}
       <View
         style={{
@@ -56,6 +63,6 @@ export default function HistoryScreen() {
           contentContainerStyle={{ padding: 10 }}
         />
       )}
-    </>
+    </SafeAreaView>
   );
 }

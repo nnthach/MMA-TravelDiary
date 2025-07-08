@@ -7,58 +7,91 @@ import {
   Dimensions,
   TouchableOpacity,
   FlatList,
+  ActivityIndicator,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import LocationHomeCard from "../../components/LocationHomeCard";
+import { PostContext } from "../../context/PostContext";
+import { useCallback, useContext, useState } from "react";
+import { useFocusEffect } from "expo-router";
+import { SavedPostContext } from "../../context/SavedPostContext";
+import { AuthContext } from "../../context/AuthContext";
+import CommentModal from "../../components/CommentModal";
+import PostCardGlobal from "../../components/PostCardGlobal";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 export default function HomeScreen() {
-  const fakeDataLocationHomeCard = [
-    {
-      id: 1,
-      img: "https://cdn.xanhsm.com/2025/02/c0c9124a-vinh-ha-long-1.jpg",
-      country: "Viet Nam",
-      city: "Vinh Ha Long",
-    },
-    {
-      id: 2,
-      img: "https://suckhoedoisong.qltns.mediacdn.vn/Images/thanhloan/2020/11/28/Nam-2030-du-lich-ha-noi-phan-dau-tro-thanh-nganh-kinh-te-mui-nhon-cua-thu-do-19.jpg",
-      country: "Viet Nam",
-      city: "Ha Noi",
-    },
-    {
-      id: 3,
-      img: "https://d3pa5s1toq8zys.cloudfront.net/explore/wp-content/uploads/2023/10/Ho-Chi-Minh-city-Places-to-Visit.jpg",
-      country: "Viet Nam",
-      city: "Ho Chi Minh",
-    },
-    {
-      id: 4,
-      img: "https://dulichvietnam.com.vn/kinh-nghiem/wp-content/uploads/2018/07/khi-ban-hoi-brazil-co-gi-noi-tieng-chung-toi-se-tra-loi-ngay-lap-tuc-hinh-anh-1.jpg",
-      country: "Brazil",
-      city: "Brasilia",
-    },
-    {
-      id: 5,
-      img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Moonrise_over_kuala_lumpur.jpg/960px-Moonrise_over_kuala_lumpur.jpg",
-      country: "Malaysia",
-      city: "Kuala Lumpur",
-    },
-  ];
-  return (
-    <View style={{ flex: 1, backgroundColor: "white" }}>
-      {/*Header */}
-      <View style={styles.header}>
-        <Text>TravelDiary</Text>
-      </View>
+  const insets = useSafeAreaInsets();
+  const {
+    postListData,
+    setPostListData,
+    isLoading,
+    postDetail,
+    getAllPost,
+    getPostDetail,
+    setIsLoading,
+  } = useContext(PostContext);
+  const { savedPostData } = useContext(SavedPostContext);
+  const { userId, userInfo } = useContext(AuthContext);
+  const [openComment, setOpenComment] = useState(false);
+  const [actionPostID, setActionPostID] = useState(null);
 
-      <FlatList
-        data={fakeDataLocationHomeCard}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => <LocationHomeCard item={item} />}
-        ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
-        contentContainerStyle={{ padding: 10 }}
-      />
-    </View>
+  useFocusEffect(
+    useCallback(() => {
+      getAllPost();
+    }, [])
+  );
+
+  return (
+    <SafeAreaView
+      edges={["top"]}
+      style={{
+        flex: 1,
+        backgroundColor: "white",
+      }}
+    >
+      {/*Header */}
+      {isLoading ? (
+        <View
+          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+        >
+          <ActivityIndicator size="large" color="black" />
+          <Text>Loading</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={postListData}
+          keyExtractor={(item) => item._id.toString()}
+          renderItem={({ item }) => (
+            <PostCardGlobal
+              item={item}
+              // b1: convert mảng object của savedPostData => mảng string chứa các id
+              // b2: so sánh các id đó với id của fetchAllPost xem có trùng thì trả về true
+              isSaved={
+                userInfo && savedPostData.map((p) => p._id).includes(item._id)
+              }
+              isOwner={userInfo && userId == item.userId}
+              setOpenComment={setOpenComment}
+              setActionPostID={setActionPostID}
+            />
+          )}
+          ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+          contentContainerStyle={{ padding: 10 }}
+        />
+      )}
+
+      {openComment && (
+        <CommentModal
+          actionPostID={actionPostID}
+          setActionPostID={setActionPostID}
+          setOpenComment={setOpenComment}
+          openComment={openComment}
+        />
+      )}
+    </SafeAreaView>
   );
 }
 

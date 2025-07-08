@@ -16,6 +16,8 @@ import * as ImagePicker from "expo-image-picker";
 import postAPIs from "../../services/postAPIs";
 import { AuthContext } from "../../context/AuthContext";
 import { useNavigation } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 const CreateScreen = () => {
   const navigation = useNavigation();
@@ -122,6 +124,12 @@ const CreateScreen = () => {
     }
   };
 
+  const handleRemoveImage = (index) => {
+    const updatedImages = [...createForm.images];
+    updatedImages.splice(index, 1);
+    setCreateForm({ ...createForm, images: updatedImages });
+  };
+
   const handleSubmit = async () => {
     if (!createForm.title || !createForm.content) {
       Alert.alert("Error", "Title and content are required!");
@@ -158,7 +166,13 @@ const CreateScreen = () => {
   };
 
   return (
-    <>
+    <SafeAreaView
+      edges={["top"]}
+      style={{
+        flex: 1,
+        backgroundColor: "#f9f9f9",
+      }}
+    >
       <View style={styles.container}>
         <Text style={styles.header}>Create Your Post</Text>
 
@@ -217,19 +231,33 @@ const CreateScreen = () => {
           </Text>
         </TouchableOpacity>
 
-        {/* Add Images */}
-        <TouchableOpacity style={styles.imageButton} onPress={handleImagePick}>
-          <Text style={{ color: "black" }}>Add Images</Text>
-        </TouchableOpacity>
+        {createForm.images.length < 5 && (
+          // add image
+          <TouchableOpacity
+            style={styles.imageButton}
+            onPress={handleImagePick}
+          >
+            <Text style={{ color: "black" }}>Add Images</Text>
+          </TouchableOpacity>
+        )}
 
         {createForm.images.length > 0 && (
           <View style={styles.imagePreview}>
             {createForm.images.map((imageUri, index) => (
-              <Image
-                key={index}
-                source={{ uri: imageUri }}
-                style={styles.image}
-              />
+              <View style={styles.imageWrap}>
+                <Image
+                  key={index}
+                  source={{ uri: imageUri }}
+                  style={styles.image}
+                />
+                <Ionicons
+                  name="close"
+                  size={20}
+                  color="black"
+                  style={styles.removeImgPreview}
+                  onPress={() => handleRemoveImage(index)}
+                />
+              </View>
             ))}
           </View>
         )}
@@ -319,7 +347,7 @@ const CreateScreen = () => {
           </View>
         </View>
       )}
-    </>
+    </SafeAreaView>
   );
 };
 
@@ -349,8 +377,17 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 15,
   },
-  imagePreview: { flexDirection: "row", marginBottom: 20 },
-  image: { width: 100, height: 100, margin: 5, borderRadius: 5 },
+  imagePreview: { flexDirection: "row", marginBottom: 20, flexWrap: "wrap" },
+  imageWrap: {
+    position: "relative",
+    width: 100,
+    height: 100,
+    margin: 5,
+    borderRadius: 5,
+    overflow: "hidden",
+  },
+  image: { width: "100%", height: "100%" },
+  removeImgPreview: { position: "absolute", right: 0 },
   button: {
     backgroundColor: "#ff7733",
     padding: 15,

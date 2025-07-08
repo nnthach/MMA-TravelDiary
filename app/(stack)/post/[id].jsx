@@ -6,22 +6,21 @@ import {
   Image,
   FlatList,
   TouchableOpacity,
-  Modal,
-  TextInput,
-  Alert,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import postAPIs from "../../../services/postAPIs";
 import { SavedPostContext } from "../../../context/SavedPostContext";
 import { AuthContext } from "../../../context/AuthContext";
-import storageAPIs from "../../../services/storageAPIs";
 import {
   handleAddPostToStorage,
   handleRemovePostOutOfStorage,
 } from "../../../utils/updateStorage";
-import reportAPIs from "../../../services/reportAPIs";
+import FooterPost from "../../../components/FooterPost";
+import ReportModal from "../../../components/ReportModal";
+import CommentModal from "../../../components/CommentModal";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function PostDetail() {
   const { id } = useLocalSearchParams();
@@ -30,6 +29,11 @@ export default function PostDetail() {
   const { savedPostData, fetchStorageOfUser } = useContext(SavedPostContext);
   const { userInfo, userId } = useContext(AuthContext);
   const [openDropMenu, setOpenDropMenu] = useState(false);
+  const [openComment, setOpenComment] = useState(false);
+  const [actionPostID, setActionPostID] = useState(null);
+
+  console.log("savedPost data in detail", savedPostData);
+  console.log("post detail", postDetail);
 
   const route = useRouter();
 
@@ -51,6 +55,13 @@ export default function PostDetail() {
       getPostById();
     }, [])
   );
+
+  const isSaved =
+    userInfo &&
+    postDetail &&
+    savedPostData?.some((p) => p._id === postDetail._id);
+
+  const isOwner = userInfo && postDetail && userId === postDetail.userId;
 
   const handleChangePublic = async (id) => {
     const updatedPost = {
@@ -78,40 +89,17 @@ export default function PostDetail() {
     description: "",
   });
 
-  const handleChange = (name, value) => {
-    setReportDataForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleReportPost = async () => {
-    console.log("report data", reportDataForm);
+  const handleDeletePost = async (id) => {
     try {
-      const res = await reportAPIs.create(reportDataForm);
-      console.log("send report res", res.data);
-      setOpenReport(false);
-      setReportDataForm({
-        postId: "",
-        reporterId: userId,
-        reason: "",
-        description: "",
-      });
-      Alert.alert("Report sended");
+      const res = await postAPIs.delete(id);
+      console.log("delete post res", res);
+      route.back();
     } catch (error) {
-      console.log("send report err", error?.response?.data);
-      setOpenReport(false);
-      setReportDataForm({
-        postId: "",
-        reporterId: userId,
-        reason: "",
-        description: "",
-      });
-      Alert.alert(error?.response?.data?.message);
+      console.log("delete post err", error);
     }
   };
 
-  if (isLoading) {
+  if (isLoading && !postDetail) {
     return (
       <View>
         <Text>Loading...</Text>
@@ -119,7 +107,12 @@ export default function PostDetail() {
     );
   }
   return (
-    <>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: "white",
+      }}
+    >
       {/*Header */}
       <View style={styles.header}>
         <Ionicons
@@ -146,19 +139,21 @@ export default function PostDetail() {
               alignItems: "center",
             }}
           >
-            <Text
-              style={{
-                backgroundColor: postDetail?.public ? "green" : "#f1df00",
-                color: "white",
-                fontWeight: "bold",
-                padding: 5,
-                borderRadius: 5,
-              }}
-            >
-              {postDetail?.public ? "Public" : "Private"}
-            </Text>
+            {userId == postDetail?.userId && (
+              <Text
+                style={{
+                  backgroundColor: postDetail?.public ? "green" : "#f1df00",
+                  color: "white",
+                  fontWeight: "bold",
+                  padding: 5,
+                  borderRadius: 5,
+                }}
+              >
+                {postDetail?.public ? "Public" : "Private"}
+              </Text>
+            )}
 
-            {userInfo && userId == postDetail?.userId ? (
+            {userInfo && userId == postDetail?.userId && (
               <View style={{ position: "relative" }}>
                 <Ionicons
                   name="ellipsis-vertical"
@@ -205,54 +200,29 @@ export default function PostDetail() {
                         Edit
                       </Text>
                     </TouchableOpacity>
+                    {/*Delete menu */}
+                    <TouchableOpacity
+                      style={{
+                        padding: 5,
+                        paddingHorizontal: 10,
+                        width: "100%",
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "flex-end",
+                      }}
+                      onPress={(e) => {
+                        e.stopPropagation();
+                        handleDeletePost(postDetail._id);
+                      }}
+                    >
+                      <Ionicons name="trash-outline" size={20} color="black" />
+                      <Text style={{ textAlign: "right", marginLeft: 5 }}>
+                        Delete
+                      </Text>
+                    </TouchableOpacity>
                   </View>
                 )}
               </View>
-            ) : (
-              <>
-                {userInfo &&
-                savedPostData.map((p) => p._id).includes(postDetail?._id) ? (
-                  <Ionicons
-                    name="bookmark"
-                    size={20}
-                    color="black"
-                    onPress={() =>
-                      handleRemovePostOutOfStorage(
-                        userId,
-                        postDetail._id,
-                        fetchStorageOfUser
-                      )
-                    }
-                  />
-                ) : (
-                  <Ionicons
-                    name="bookmark-outline"
-                    size={20}
-                    color="black"
-                    onPress={() =>
-                      handleAddPostToStorage(
-                        userInfo,
-                        userId,
-                        postDetail._id,
-                        fetchStorageOfUser
-                      )
-                    }
-                  />
-                )}
-                <Ionicons
-                  name="alert-circle-outline"
-                  size={22}
-                  color="black"
-                  onPress={() => {
-                    const postId = postDetail._id;
-                    setReportDataForm((prev) => ({
-                      ...prev,
-                      postId: postId,
-                    }));
-                    setOpenReport(true);
-                  }}
-                />
-              </>
             )}
           </View>
         </View>
@@ -277,6 +247,19 @@ export default function PostDetail() {
             )}
           />
         </View>
+
+        <View style={{ paddingHorizontal: 20 }}>
+          <FooterPost
+            item={postDetail}
+            setOpenComment={setOpenComment}
+            setActionPostID={setActionPostID}
+            isSaved={isSaved}
+            isOwner={isOwner}
+            setOpenReport={setOpenReport}
+            setReportDataForm={setReportDataForm}
+          />
+        </View>
+
         {/*Post content */}
         <View style={styles.postContent}>
           <Text>{postDetail?.content}</Text>
@@ -285,53 +268,68 @@ export default function PostDetail() {
 
       {/*Modal report */}
       {openReport && (
-        <Modal
-          transparent={true}
-          visible={openReport}
-          animationType="slide"
-          onRequestClose={() => setOpenReport(false)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Report Post</Text>
+        // <Modal
+        //   transparent={true}
+        //   visible={openReport}
+        //   animationType="slide"
+        //   onRequestClose={() => setOpenReport(false)}
+        // >
+        //   <View style={styles.modalOverlay}>
+        //     <View style={styles.modalContent}>
+        //       <Text style={styles.modalTitle}>Report Post</Text>
 
-              <TextInput
-                style={styles.input}
-                placeholder="Reason (e.g., Spam, Inappropriate)"
-                value={reportDataForm.reason}
-                onChangeText={(text) => handleChange("reason", text)}
-              />
+        //       <TextInput
+        //         style={styles.input}
+        //         placeholder="Reason (e.g., Spam, Inappropriate)"
+        //         value={reportDataForm.reason}
+        //         onChangeText={(text) => handleChange("reason", text)}
+        //       />
 
-              <TextInput
-                style={[styles.input, { height: 100 }]}
-                placeholder="Description (max 200 characters)"
-                value={reportDataForm.description}
-                onChangeText={(text) => handleChange("description", text)}
-                multiline
-              />
+        //       <TextInput
+        //         style={[styles.input, { height: 100 }]}
+        //         placeholder="Description (max 200 characters)"
+        //         value={reportDataForm.description}
+        //         onChangeText={(text) => handleChange("description", text)}
+        //         multiline
+        //       />
 
-              <View style={styles.buttonRow}>
-                <TouchableOpacity
-                  style={styles.reportButton}
-                  onPress={handleReportPost}
-                >
-                  <Text style={styles.buttonText}>Report</Text>
-                </TouchableOpacity>
+        //       <View style={styles.buttonRow}>
+        //         <TouchableOpacity
+        //           style={styles.reportButton}
+        //           onPress={handleReportPost}
+        //         >
+        //           <Text style={styles.buttonText}>Report</Text>
+        //         </TouchableOpacity>
 
-                <TouchableOpacity
-                  style={styles.closeButton}
-                  onPress={() => {
-                    setOpenReport(false);
-                  }}
-                >
-                  <Text style={styles.buttonText}>Close</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </Modal>
+        //         <TouchableOpacity
+        //           style={styles.closeButton}
+        //           onPress={() => {
+        //             setOpenReport(false);
+        //           }}
+        //         >
+        //           <Text style={styles.buttonText}>Close</Text>
+        //         </TouchableOpacity>
+        //       </View>
+        //     </View>
+        //   </View>
+        // </Modal>
+        <ReportModal
+          openReport={openReport}
+          setOpenReport={setOpenReport}
+          reportDataForm={reportDataForm}
+          setReportDataForm={setReportDataForm}
+        />
       )}
-    </>
+
+      {openComment && (
+        <CommentModal
+          actionPostID={actionPostID}
+          setActionPostID={setActionPostID}
+          setOpenComment={setOpenComment}
+          openComment={openComment}
+        />
+      )}
+    </SafeAreaView>
   );
 }
 
@@ -359,13 +357,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 10,
   },
-  postContent: { paddingHorizontal: 10, paddingVertical: 10 },
+  postContent: { paddingHorizontal: 20, paddingVertical: 10 },
 
   dropdownMenu: {
     position: "absolute",
     backgroundColor: "white",
-    width: 132,
-    height: 70,
+    width: 135,
+    height: 100,
     top: 30,
     right: 0,
     zIndex: 2,
