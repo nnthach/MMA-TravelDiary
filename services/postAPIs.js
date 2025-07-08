@@ -8,6 +8,11 @@ const postAPIs = {
   create: (data) => axiosClient.post("/post", data),
   update: (id, data) => axiosClient.put(`/post/${id}`, data),
   delete: (id) => axiosClient.delete(`/post/${id}`),
+toggleLike: (postId, userId) =>
+  axiosClient.patch(`/post/like/${postId}`, { userId }),
+
+
+
 };
 
 export default postAPIs;

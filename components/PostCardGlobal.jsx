@@ -9,8 +9,8 @@ import {
   handleRemovePostOutOfStorage,
 } from "../utils/updateStorage";
 import ReportModal from "./ReportModal";
-import CommentModal from "./CommentModal";
 import { PostContext } from "../context/PostContext";
+import postAPIs from "../services/postAPIs";
 
 export default function PostCardGlobal({
   item,
@@ -23,6 +23,16 @@ export default function PostCardGlobal({
   const router = useRouter();
   const { fetchStorageOfUser } = useContext(SavedPostContext);
   const [openReport, setOpenReport] = useState(false);
+
+  // ✅ Like state riêng để cập nhật UI ngay
+  const [likes, setLikes] = useState(() =>
+    Array.isArray(item?.likes) ? item.likes : []
+  );
+
+  const isLiked = likes.includes(userId);
+
+  const { postListData, setPostListData } = useContext(PostContext);
+
   const [reportDataForm, setReportDataForm] = useState({
     postId: "",
     reporterId: userId,
@@ -30,19 +40,30 @@ export default function PostCardGlobal({
     description: "",
   });
 
-  const {
-    postListData,
-    setPostListData,
-    isLoading,
-    postDetail,
-    getAllPost,
-    getPostDetail,
-  } = useContext(PostContext);
-  console.log("post detail", item);
-
   const handleOpenComment = (id) => {
+    if (!id) return;
     setActionPostID(id);
     setOpenComment(true);
+  };
+
+  const handleToggleLike = async () => {
+    const updatedLikes = isLiked
+      ? likes.filter((id) => id !== userId)
+      : [...likes, userId];
+
+    setLikes(updatedLikes); // ✅ cập nhật UI ngay
+
+    setPostListData((prev) =>
+      prev.map((post) =>
+        post._id === item._id ? { ...post, likes: updatedLikes } : post
+      )
+    );
+
+    try {
+      await postAPIs.toggleLike(item._id, userId); // gửi lên server
+    } catch (error) {
+      console.error("Lỗi khi like/unlike bài viết:", error);
+    }
   };
 
   return (
@@ -51,22 +72,11 @@ export default function PostCardGlobal({
         <TouchableOpacity
           activeOpacity={0.8}
           style={styles.touchAbleWrap}
-          onPress={() => {
-            router.push(`/post/${item._id}`);
-          }}
+          onPress={() => router.push(`/post/${item._id}`)}
         >
-          {/*Header */}
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Text style={{ fontWeight: "bold", fontSize: 18 }}>
-              {item.username}
-            </Text>
-
+          {/* Header */}
+          <View style={styles.header}>
+            <Text style={styles.username}>{item.username}</Text>
             {isOwner && (
               <Ionicons
                 name="build-outline"
@@ -74,15 +84,14 @@ export default function PostCardGlobal({
                 color="black"
                 onPress={(e) => {
                   e.stopPropagation();
-                  console.log("edit icon");
                   router.push(`/post/edit/${item._id}`);
                 }}
               />
             )}
           </View>
 
-          {/*Create at */}
-          <Text style={{ color: "grey", fontSize: 12 }}>
+          {/* Created At */}
+          <Text style={styles.createdAt}>
             {new Date(item.createdAt).toLocaleString("vi-VN", {
               hour: "2-digit",
               minute: "2-digit",
@@ -91,65 +100,51 @@ export default function PostCardGlobal({
               year: "numeric",
             })}
           </Text>
-          {/*Content */}
-          <View
-            style={{
-              marginVertical: 5,
-              maxHeight: 54,
-              overflow: "hidden",
-            }}
-          >
-            <Text style={{ fontWeight: 600 }}>{item.title}</Text>
+
+          {/* Content */}
+          <View style={styles.content}>
+            <Text style={{ fontWeight: "600" }}>{item.title}</Text>
             <Text>{item.content}</Text>
           </View>
-          {/*Image */}
-          <View
-            style={{
-              flex: 1,
-              width: "100%",
-              borderRadius: 10,
-              overflow: "hidden",
-            }}
-          >
-            <Image
-              source={{
-                uri: item?.images[0],
-              }}
-              style={{ width: "100%", height: "100%" }}
-              resizeMode="cover"
-            />
-          </View>
-        </TouchableOpacity>
-        {/*Footer */}
-        <View style={styles.footerWrap}>
-          {/*Footer left */}
-          <View style={{ flexDirection: "row", gap: 15 }}>
-            <View
-              style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
-            >
-              <Ionicons name="heart-outline" size={24} color="black" />
 
-              <Text>120</Text>
+          {/* Image */}
+          {item?.images?.length > 0 && (
+            <View style={styles.imageWrap}>
+              <Image
+                source={{ uri: item.images[0] }}
+                style={styles.image}
+                resizeMode="cover"
+              />
             </View>
+          )}
+        </TouchableOpacity>
+
+        {/* Footer */}
+        <View style={styles.footerWrap}>
+          {/* Left */}
+          <View style={{ flexDirection: "row", gap: 15 }}>
+            <TouchableOpacity onPress={handleToggleLike}>
+              <Ionicons
+                name={isLiked ? "heart" : "heart-outline"}
+                size={24}
+                color={isLiked ? "red" : "black"}
+              />
+              <Text>{likes.length}</Text> {/* ✅ dùng state */}
+            </TouchableOpacity>
+
             <TouchableOpacity
               style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
               onPress={() => handleOpenComment(item._id)}
             >
               <Ionicons name="chatbubbles-outline" size={24} color="black" />
-              {item?.comments.length >= 1 && (
-                <Text>{item?.comments.length}</Text>
+              {Array.isArray(item?.comments) && item.comments.length > 0 && (
+                <Text>{item.comments.length}</Text>
               )}
             </TouchableOpacity>
           </View>
 
-          {/*Footer right */}
-          <View
-            style={{
-              flexDirection: "row",
-              gap: 10,
-              alignItems: "center",
-            }}
-          >
+          {/* Right */}
+          <View style={{ flexDirection: "row", gap: 10, alignItems: "center" }}>
             {!isOwner && (
               <>
                 {isSaved ? (
@@ -185,10 +180,9 @@ export default function PostCardGlobal({
                   size={22}
                   color="black"
                   onPress={() => {
-                    const postId = item._id;
                     setReportDataForm((prev) => ({
                       ...prev,
-                      postId: postId,
+                      postId: item._id,
                     }));
                     setOpenReport(true);
                   }}
@@ -199,7 +193,7 @@ export default function PostCardGlobal({
         </View>
       </View>
 
-      {/*Modal report */}
+      {/* Report Modal */}
       {openReport && (
         <ReportModal
           openReport={openReport}
@@ -224,6 +218,34 @@ const styles = StyleSheet.create({
   touchAbleWrap: {
     width: "100%",
     flex: 1,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  username: {
+    fontWeight: "bold",
+    fontSize: 18,
+  },
+  createdAt: {
+    color: "grey",
+    fontSize: 12,
+  },
+  content: {
+    marginVertical: 5,
+    maxHeight: 54,
+    overflow: "hidden",
+  },
+  imageWrap: {
+    flex: 1,
+    width: "100%",
+    borderRadius: 10,
+    overflow: "hidden",
+  },
+  image: {
+    width: "100%",
+    height: "100%",
   },
   footerWrap: {
     marginTop: 10,
