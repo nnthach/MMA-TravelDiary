@@ -1,144 +1,168 @@
 import { useContext, useState } from "react";
-import { View, Text, StyleSheet, Pressable, TouchableOpacity } from "react-native";
-import { Slot, Link, usePathname, router } from "expo-router";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  TouchableOpacity,
+} from "react-native";
+import { Slot, usePathname, router } from "expo-router";
 import { AuthContext } from "../../context/AuthContext";
- 
+import { LinearGradient } from "expo-linear-gradient";
+import { SafeAreaView } from "react-native-safe-area-context";
+
 export default function AdminLayout() {
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const { userInfo, handleLogout } = useContext(AuthContext);
-
+  const { handleLogout } = useContext(AuthContext);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  const renderNavButton = (label, path) => (
+    <TouchableOpacity
+      onPress={() => router.push(path)}
+      style={[
+        styles.navButton,
+        pathname === path && styles.activeNavButton,
+      ]}
+    >
+      <Text
+        style={[
+          styles.navButtonText,
+          pathname === path && styles.activeNavButtonText,
+        ]}
+      >
+        {label}
+      </Text>
+    </TouchableOpacity>
+  );
+
   return (
-    <View style={styles.container}>
-      {/* Sidebar */}
-      {isSidebarOpen && (
-        <View style={styles.sidebar}>
-          <Text style={styles.logo}>🛠 Admin</Text>
+    <SafeAreaView style={styles.safeContainer}>
+      <View style={styles.container}>
+        {/* Sidebar */}
+        {isSidebarOpen && (
+          <LinearGradient
+            colors={["#f9f0e1", "#f9f0e1", "#f6c169"]}
+            style={styles.sidebar}
+          >
+            <Text style={styles.logo}>🛠 Admin Panel</Text>
 
-          <Link href="/(admin)">
-            <Text
-              style={[
-                styles.link,
-                pathname === "/(admin)" && styles.activeLink,
-              ]}
-            >
-              Dashboard
-            </Text>
-          </Link>
-
-          <Link href="/(admin)/users/users">
-            <Text
-              style={[
-                styles.link,
-                pathname === "/(admin)/users/users" && styles.activeLink,
-              ]}
-            >
-              Users
-            </Text>
-          </Link>
-
-                <Link href="/(admin)/post/post">
-            <Text
-              style={[
-                styles.link,
-                pathname === "/(admin)/post/post" && styles.activeLink,
-              ]}
-            >
-              Post
-            </Text>
-          </Link>
-          <Link href="/(admin)/report/report">
-  <Text
-    style={[
-      styles.link,
-      pathname === "/(admin)/report/report" && styles.activeLink,
-    ]}
-  >
-    Report
-  </Text>
-</Link>
+            {renderNavButton("📊 Dashboard", "/(admin)")}
+            {renderNavButton("👥 Users", "/(admin)/users/users")}
+            {renderNavButton("📝 Posts", "/(admin)/post/post")}
+            {renderNavButton("📋 Reports", "/(admin)/report/report")}
 
             <TouchableOpacity
-                    onPress={() => {
-                      console.log("logout");
-                      handleLogout();
-                      router.replace("/(auth)/login")
-                    }}
-                  >
-                    <Text >Sign Out</Text>
-                  </TouchableOpacity>
+              onPress={() => {
+                handleLogout();
+                router.replace("/(auth)/login");
+              }}
+              style={styles.button}
+            >
+              <Text style={styles.buttonText}>🚪 Sign Out</Text>
+            </TouchableOpacity>
 
-                      <TouchableOpacity
-                    onPress={() => {
-                      router.replace("/(tabs)")
-                    }}
-                  >
-                    <Text >Go to HomeScreen</Text>
-                  </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => router.replace("/(tabs)")}
+              style={styles.button}
+            >
+              <Text style={styles.buttonText}>🏠 Go Home</Text>
+            </TouchableOpacity>
+          </LinearGradient>
+        )}
+
+        {/* Content */}
+        <View style={styles.content}>
+          <Pressable onPress={toggleSidebar} style={styles.toggleButton}>
+            <Text style={styles.toggleText}>{isSidebarOpen ? "✖" : "☰"}</Text>
+          </Pressable>
+          <Slot />
         </View>
-      )}
-
-      {/* Content */}
-      <View style={styles.content}>
-        {/* Toggle button */}
-        <Pressable onPress={toggleSidebar} style={styles.toggleButton}>
-          <Text style={styles.toggleText}>{isSidebarOpen ? "✖" : "☰"}</Text>
-        </Pressable>
-
-        <Slot />
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeContainer: {
+    flex: 1,
+    backgroundColor: "#f3f4f6",
+  },
   container: {
     flex: 1,
     flexDirection: "row",
   },
   sidebar: {
-    width: 100,
-    backgroundColor: "#1f2937",
-    paddingTop: 40,
-    paddingHorizontal: 10,
+    width: 160,
+    height: "100%",
+    paddingTop: 80,
+    paddingHorizontal: 15,
+    borderRightWidth: 1,
+    borderRightColor: "#e0d4b0",
   },
   logo: {
-    color: "white",
+    color: "#333",
     fontWeight: "bold",
-    fontSize: 18,
+    fontSize: 22,
     marginBottom: 30,
+    textAlign: "center",
   },
-  link: {
-    color: "#9ca3af",
-    paddingVertical: 10,
+  navButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    borderRadius: 6,
+    marginBottom: 5,
+    backgroundColor: "transparent",
+  },
+  navButtonText: {
+    color: "#444",
     fontSize: 16,
   },
-  activeLink: {
-    color: "white",
+  activeNavButton: {
+    backgroundColor: "#fff3cd",
+  },
+  activeNavButtonText: {
+    color: "#000",
+    fontWeight: "bold",
+  },
+  button: {
+    marginTop: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    backgroundColor: "#fff8dc",
+    borderRadius: 6,
+  },
+  buttonText: {
+    color: "#8b0000",
     fontWeight: "bold",
   },
   content: {
     flex: 1,
-    padding: 20,
+    paddingTop: 60,
+    paddingHorizontal: 20,
     backgroundColor: "#f3f4f6",
   },
-  toggleButton: {
-    position: "absolute",
-    top: 10,
-    left: 10,
-    zIndex: 10,
-    padding: 8,
-    backgroundColor: "#ddd",
-    borderRadius: 5,
-  },
-  toggleText: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
+toggleButton: {
+  position: "absolute",
+  top: 20,
+  left: 20,
+  zIndex: 10,
+  padding: 10,
+  backgroundColor: "#f6c169", // đổi từ #ddd sang màu chính
+  borderRadius: 10,
+  shadowColor: "#000",
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.2,
+  shadowRadius: 4,
+  elevation: 3, // đổ bóng cho Android
+},
+toggleText: {
+  fontSize: 20,
+  fontWeight: "bold",
+  color: "#fff", // chữ trắng để nổi bật
+},
 
 });

@@ -8,6 +8,7 @@ import {
   handleAddPostToStorage,
   handleRemovePostOutOfStorage,
 } from "../utils/updateStorage";
+import postAPIs from "../services/postAPIs";
 
 export default function FooterPost({
   item,
@@ -69,7 +70,7 @@ export default function FooterPost({
             size={24}
             color={isLiked ? "red" : "black"}
           />
-          <Text>{likes.length}</Text> {/* ✅ dùng state */}
+          <Text>{likes?.length}</Text> {/* ✅ dùng state */}
         </TouchableOpacity>
 
         <TouchableOpacity
