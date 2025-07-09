@@ -78,7 +78,7 @@ export default function FooterPost({
           onPress={() => handleOpenComment(item._id)}
         >
           <Ionicons name="chatbubbles-outline" size={24} color="black" />
-          {item?.comments.length >= 1 && <Text>{item?.comments.length}</Text>}
+          {item?.comments?.length >= 1 && <Text>{item?.comments?.length}</Text>}
         </TouchableOpacity>
       </View>
 

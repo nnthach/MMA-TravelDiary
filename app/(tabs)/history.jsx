@@ -46,7 +46,7 @@ export default function HistoryScreen() {
         <Text style={{}}>Saved Posts</Text>
       </View>
 
-      {!savedPostData.length || !userId ? (
+      {!savedPostData?.length || !userId ? (
         <View
           style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
         >

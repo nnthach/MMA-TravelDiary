@@ -154,7 +154,7 @@ export default function CommentModal({
               </TouchableOpacity>
             </View>
 
-            {postDetail?.comments.length < 1 ? (
+            {postDetail?.comments?.length < 1 ? (
               <View style={{ flex: 1 }}>
                 <Text>No comments</Text>
               </View>
