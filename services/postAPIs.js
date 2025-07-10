@@ -10,6 +10,9 @@ const postAPIs = {
   delete: (id) => axiosClient.delete(`/post/${id}`),
   toggleLike: (postId, userId) =>
     axiosClient.patch(`/post/like/${postId}`, { userId }),
+  search: (params) => axiosClient.get("/post/search", { params }),
+
 };
+
 
 export default postAPIs;
