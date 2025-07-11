@@ -12,7 +12,7 @@ import {
 import Ionicons from "@expo/vector-icons/Ionicons";
 import LocationHomeCard from "../../components/LocationHomeCard";
 import { PostContext } from "../../context/PostContext";
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { useFocusEffect } from "expo-router";
 import { SavedPostContext } from "../../context/SavedPostContext";
 import { AuthContext } from "../../context/AuthContext";
@@ -27,12 +27,8 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const {
     postListData,
-    setPostListData,
     isLoading,
-    postDetail,
     getAllPost,
-    getPostDetail,
-    setIsLoading,
   } = useContext(PostContext);
   const { savedPostData } = useContext(SavedPostContext);
   const { userId, userInfo } = useContext(AuthContext);
@@ -44,6 +40,14 @@ export default function HomeScreen() {
       getAllPost();
     }, [])
   );
+
+  if (isLoading) {
+    return (
+      <View>
+        <Text>...Loading</Text>
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView

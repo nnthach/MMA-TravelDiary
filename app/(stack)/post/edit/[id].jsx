@@ -125,41 +125,41 @@ export default function EditPost() {
     }
   };
 
-const getPostById = async () => {
-  setIsLoading(true);
-  try {
-    const res = await postAPIs.getById(id);
-    const { title, content, province, district, ward } = res.data;
+  const getPostById = async () => {
+    setIsLoading(true);
+    try {
+      const res = await postAPIs.getById(id);
+      const { title, content, province, district, ward } = res.data;
 
-    setEditData({ title, content, province, district, ward });
-    setImages(res.data.images);
+      setEditData({ title, content, province, district, ward });
+      setImages(res.data.images);
 
-    // Gọi thêm:
-    const selectedProvince = await axios.get("https://api.vnappmob.com/api/v2/province/");
-    const matchedProvince = selectedProvince.data.results.find(
-      (p) => p.province_name === province
-    );
-    if (matchedProvince) {
-      await fetchDistricts(matchedProvince.province_id);
-
-      const selectedDistrict = await axios.get(
-        `https://api.vnappmob.com/api/v2/province/district/${matchedProvince.province_id}`
+      // Gọi thêm:
+      const selectedProvince = await axios.get(
+        "https://api.vnappmob.com/api/v2/province/"
       );
-      const matchedDistrict = selectedDistrict.data.results.find(
-        (d) => d.district_name === district
+      const matchedProvince = selectedProvince.data.results.find(
+        (p) => p.province_name === province
       );
-      if (matchedDistrict) {
-        await fetchWards(matchedDistrict.district_id);
+      if (matchedProvince) {
+        await fetchDistricts(matchedProvince.province_id);
+
+        const selectedDistrict = await axios.get(
+          `https://api.vnappmob.com/api/v2/province/district/${matchedProvince.province_id}`
+        );
+        const matchedDistrict = selectedDistrict.data.results.find(
+          (d) => d.district_name === district
+        );
+        if (matchedDistrict) {
+          await fetchWards(matchedDistrict.district_id);
+        }
       }
+    } catch (error) {
+      console.log("error", error);
+    } finally {
+      setIsLoading(false);
     }
-
-  } catch (error) {
-    console.log("error", error);
-  } finally {
-    setIsLoading(false);
-  }
-};
-
+  };
 
   const fetchProvinces = async () => {
     try {
@@ -282,10 +282,14 @@ const getPostById = async () => {
               />
             </View>
           ))}
-
-          <TouchableOpacity style={styles.addImgBtn} onPress={handlePickImage}>
-            <Text>Add image</Text>
-          </TouchableOpacity>
+          {images.length + newImages.length < 5 && (
+            <TouchableOpacity
+              style={styles.addImgBtn}
+              onPress={handlePickImage}
+            >
+              <Text>Add image</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         <TouchableOpacity style={styles.button} onPress={handleUpdate}>

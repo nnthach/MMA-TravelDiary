@@ -18,20 +18,28 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { userInfo, handleLogout } = useContext(AuthContext);
+  const { userInfo, handleLogout, fetchUser } = useContext(AuthContext);
   const [postListData, setPostListData] = useState([]);
   const [queryPublic, setQueryPublic] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [openDropMenu, setOpenDropMenu] = useState(false);
+  // all user post (lay tat ca public n private)
+  const [allUserPostData, setAllUserPostData] = useState([]);
 
   const fetchUserPost = async () => {
     setIsLoading(true);
     try {
+      // get public / private
       const res = await postAPIs.getByUserIdAndPublic(
         userInfo._id,
         queryPublic
       );
       setPostListData(res.data);
+
+      //get public & private
+      const allUserPost = await postAPIs.getAllUserPosts(userInfo._id);
+      setAllUserPostData(allUserPost.data);
+
       setIsLoading(false);
     } catch (error) {
       console.log("error", error);
@@ -46,6 +54,7 @@ export default function ProfileScreen() {
   useFocusEffect(
     useCallback(() => {
       fetchUserPost();
+      fetchUser();
     }, [])
   );
 
@@ -98,26 +107,34 @@ export default function ProfileScreen() {
               width: 100,
               height: 100,
               borderRadius: 50,
+              overflow: "hidden",
             }}
           >
             {userInfo?.avatar && (
               <Image
                 source={{ uri: userInfo.avatar }}
                 style={{ width: "100%", height: "100%" }}
+                resizeMode="cover"
               />
             )}
           </View>
           <View style={styles.postsNumWrap}>
             <View style={{ alignItems: "left" }}>
-              <Text style={{ fontSize: 16, fontWeight: "bold" }}>120</Text>
+              <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+                {allUserPostData?.length}
+              </Text>
               <Text style={{ color: "grey" }}>Posts</Text>
             </View>
             <View style={{ alignItems: "left" }}>
-              <Text style={{ fontSize: 16, fontWeight: "bold" }}>120</Text>
+              <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+                {allUserPostData?.filter((post) => post.public === true).length}
+              </Text>
               <Text style={{ color: "grey" }}>Public posts</Text>
             </View>
             <View style={{ alignItems: "left" }}>
-              <Text style={{ fontSize: 16, fontWeight: "bold" }}>12</Text>
+              <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+                {allUserPostData.filter((post) => post.public === false).length}
+              </Text>
               <Text style={{ color: "grey" }}>Private posts</Text>
             </View>
           </View>
@@ -135,7 +152,10 @@ export default function ProfileScreen() {
 
         {/* Edit Profile / Share Profile */}
         <View style={styles.buttonActionWrap}>
-          <TouchableOpacity style={styles.buttonWrap}>
+          <TouchableOpacity
+            style={styles.buttonWrap}
+            onPress={() => router.push("/(stack)/editProfile")}
+          >
             <Text style={{ color: "#000", fontWeight: "bold" }}>
               Edit Profile
             </Text>

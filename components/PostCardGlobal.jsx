@@ -101,6 +101,10 @@ export default function PostCardGlobal({
               year: "numeric",
             })}
           </Text>
+          {/* Location */}
+          <Text style={styles.createdAt}>
+            {item.ward}, {item.district}, {item.province}
+          </Text>
 
           {/* Content */}
           <View style={styles.content}>

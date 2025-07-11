@@ -18,6 +18,7 @@ import { AuthContext } from "../../context/AuthContext";
 import { useNavigation } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { PostContext } from "../../context/PostContext";
 
 const CreateScreen = () => {
   const navigation = useNavigation();
@@ -38,6 +39,7 @@ const CreateScreen = () => {
   const [error, setError] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [currentPicker, setCurrentPicker] = useState("province");
+  const { getAllPost } = useContext(PostContext);
 
   useEffect(() => {
     fetchProvinces();
@@ -157,6 +159,7 @@ const CreateScreen = () => {
         ward: "",
         images: [],
       });
+      getAllPost();
     } catch (err) {
       setError("Error creating post");
       console.error(err);
@@ -244,7 +247,7 @@ const CreateScreen = () => {
         {createForm.images.length > 0 && (
           <View style={styles.imagePreview}>
             {createForm.images.map((imageUri, index) => (
-              <View style={styles.imageWrap}>
+              <View key={index} style={styles.imageWrap}>
                 <Image
                   key={index}
                   source={{ uri: imageUri }}

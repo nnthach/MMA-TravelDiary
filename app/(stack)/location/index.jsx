@@ -23,12 +23,8 @@ export default function LocationScreen() {
   const [actionPostID, setActionPostID] = useState(null);
   const {
     postListData,
-    setPostListData,
     isLoading,
-    postDetail,
     getAllPost,
-    getPostDetail,
-    setIsLoading,
   } = useContext(PostContext);
 
   const route = useRouter();

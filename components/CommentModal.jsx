@@ -17,7 +17,6 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import commentAPIs from "../services/commentAPIs";
-import postAPIs from "../services/postAPIs";
 import { useFocusEffect } from "expo-router";
 import { PostContext } from "../context/PostContext";
 

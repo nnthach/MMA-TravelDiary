@@ -18,16 +18,16 @@ export const AuthProvider = ({ children }) => {
     router.replace("/");
   };
 
+  const fetchUser = async () => {
+    if (!userId) return;
+    try {
+      const user = await userApi.getById(userId);
+      setUserInfo(user.data);
+    } catch (error) {
+      console.error("Error take user", error);
+    }
+  };
   useEffect(() => {
-    const fetchUser = async () => {
-      if (!userId) return;
-      try {
-        const user = await userApi.getById(userId);
-        setUserInfo(user.data);
-      } catch (error) {
-        console.error("Error take user", error);
-      }
-    };
     fetchUser();
   }, [userId]);
 
@@ -41,6 +41,7 @@ export const AuthProvider = ({ children }) => {
         userId,
         emailResetPassword,
         setEmailResetPassword,
+        fetchUser,
       }}
     >
       {children}

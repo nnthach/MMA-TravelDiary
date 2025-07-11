@@ -29,6 +29,7 @@ export default function RegisterScreen() {
   };
 
   const handleRegister = async () => {
+    console.log("register", registerForm);
     try {
       const res = await userApi.register(registerForm);
 

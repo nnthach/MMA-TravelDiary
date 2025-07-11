@@ -13,10 +13,6 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import postAPIs from "../../../services/postAPIs";
 import { SavedPostContext } from "../../../context/SavedPostContext";
 import { AuthContext } from "../../../context/AuthContext";
-import {
-  handleAddPostToStorage,
-  handleRemovePostOutOfStorage,
-} from "../../../utils/updateStorage";
 import FooterPost from "../../../components/FooterPost";
 import ReportModal from "../../../components/ReportModal";
 import CommentModal from "../../../components/CommentModal";
@@ -268,51 +264,6 @@ export default function PostDetail() {
 
       {/*Modal report */}
       {openReport && (
-        // <Modal
-        //   transparent={true}
-        //   visible={openReport}
-        //   animationType="slide"
-        //   onRequestClose={() => setOpenReport(false)}
-        // >
-        //   <View style={styles.modalOverlay}>
-        //     <View style={styles.modalContent}>
-        //       <Text style={styles.modalTitle}>Report Post</Text>
-
-        //       <TextInput
-        //         style={styles.input}
-        //         placeholder="Reason (e.g., Spam, Inappropriate)"
-        //         value={reportDataForm.reason}
-        //         onChangeText={(text) => handleChange("reason", text)}
-        //       />
-
-        //       <TextInput
-        //         style={[styles.input, { height: 100 }]}
-        //         placeholder="Description (max 200 characters)"
-        //         value={reportDataForm.description}
-        //         onChangeText={(text) => handleChange("description", text)}
-        //         multiline
-        //       />
-
-        //       <View style={styles.buttonRow}>
-        //         <TouchableOpacity
-        //           style={styles.reportButton}
-        //           onPress={handleReportPost}
-        //         >
-        //           <Text style={styles.buttonText}>Report</Text>
-        //         </TouchableOpacity>
-
-        //         <TouchableOpacity
-        //           style={styles.closeButton}
-        //           onPress={() => {
-        //             setOpenReport(false);
-        //           }}
-        //         >
-        //           <Text style={styles.buttonText}>Close</Text>
-        //         </TouchableOpacity>
-        //       </View>
-        //     </View>
-        //   </View>
-        // </Modal>
         <ReportModal
           openReport={openReport}
           setOpenReport={setOpenReport}
