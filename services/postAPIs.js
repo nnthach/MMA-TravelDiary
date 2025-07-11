@@ -12,6 +12,8 @@ const postAPIs = {
   toggleLike: (postId, userId) =>
     axiosClient.patch(`/post/like/${postId}`, { userId }),
   search: (params) => axiosClient.get("/post/search", { params }),
+    getRandomPosts: (limit = 20) => axiosClient.get(`/post/random?limit=${limit}`),
+
 };
 
 export default postAPIs;
