@@ -25,11 +25,7 @@ import {
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
-  const {
-    postListData,
-    isLoading,
-    getAllPost,
-  } = useContext(PostContext);
+  const { postListData, isLoading, getAllPost } = useContext(PostContext);
   const { savedPostData } = useContext(SavedPostContext);
   const { userId, userInfo } = useContext(AuthContext);
   const [openComment, setOpenComment] = useState(false);
@@ -43,9 +39,17 @@ export default function HomeScreen() {
 
   if (isLoading) {
     return (
-      <View>
-        <Text>...Loading</Text>
-      </View>
+      <SafeAreaView
+        edges={["top"]}
+        style={{
+          flex: 1,
+          backgroundColor: "white",
+        }}
+      >
+        <View style={{ alignItems: "center", justifyContent: "center" }}>
+          <Text>...Loading</Text>
+        </View>
+      </SafeAreaView>
     );
   }
 

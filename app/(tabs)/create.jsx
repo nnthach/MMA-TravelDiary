@@ -19,6 +19,8 @@ import { useNavigation } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { PostContext } from "../../context/PostContext";
+import { pickImage, removeImage } from "../../utils/imagePickerUtils";
+import { Video } from "expo-av";
 
 const CreateScreen = () => {
   const navigation = useNavigation();
@@ -110,26 +112,49 @@ const CreateScreen = () => {
     setModalVisible(false);
   };
 
-  const handleImagePick = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
+  // const handleImagePick = async () => {
+  //   let result = await ImagePicker.launchImageLibraryAsync({
+  //     mediaTypes: ImagePicker.MediaTypeOptions.Images,
+  //     allowsEditing: true,
+  //     aspect: [4, 3],
+  //     quality: 1,
+  //   });
 
-    if (!result.canceled) {
-      setCreateForm({
-        ...createForm,
-        images: [...createForm.images, result.assets[0].uri],
-      });
+  //   if (!result.canceled) {
+  //     setCreateForm({
+  //       ...createForm,
+  //       images: [...createForm.images, result.assets[0].uri],
+  //     });
+  //   }
+  // };
+
+  // const handleRemoveImage = (index) => {
+  //   const updatedImages = [...createForm.images];
+  //   updatedImages.splice(index, 1);
+  //   setCreateForm({ ...createForm, images: updatedImages });
+  // };
+
+  const handleImagePick = async () => {
+    const selectedAssets = await pickImage();
+    if (selectedAssets.length > 0) {
+      setCreateForm((prev) => ({
+        ...prev,
+        images: [
+          ...prev.images,
+          ...selectedAssets.map((asset) => ({
+            uri: asset.uri,
+            type: asset.type, // 'image' or 'video'
+          })),
+        ],
+      }));
     }
   };
 
   const handleRemoveImage = (index) => {
-    const updatedImages = [...createForm.images];
-    updatedImages.splice(index, 1);
-    setCreateForm({ ...createForm, images: updatedImages });
+    setCreateForm((prev) => ({
+      ...prev,
+      images: removeImage(prev.images, index),
+    }));
   };
 
   const handleSubmit = async () => {
@@ -246,13 +271,19 @@ const CreateScreen = () => {
 
         {createForm.images.length > 0 && (
           <View style={styles.imagePreview}>
-            {createForm.images.map((imageUri, index) => (
+            {createForm.images.map((media, index) => (
               <View key={index} style={styles.imageWrap}>
-                <Image
-                  key={index}
-                  source={{ uri: imageUri }}
-                  style={styles.image}
-                />
+                {media.type.startsWith("image") ? (
+                  <Image source={{ uri: media.uri }} style={styles.image} />
+                ) : (
+                  <Video
+                    source={{ uri: media.uri }}
+                    style={styles.image} // dùng lại style image để khung giống nhau
+                    useNativeControls
+                    resizeMode="cover"
+                    isLooping
+                  />
+                )}
                 <Ionicons
                   name="close"
                   size={20}

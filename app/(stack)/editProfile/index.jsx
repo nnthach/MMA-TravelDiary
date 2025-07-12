@@ -128,6 +128,27 @@ export default function Index() {
                 Change Avatar
               </Text>
             </TouchableOpacity>
+            {updateData.avatar && (
+              <TouchableOpacity
+                onPress={() =>
+                  setUpdateData((prev) => ({
+                    ...prev,
+                    avatar: "",
+                  }))
+                }
+              >
+                <Text
+                  style={{
+                    textAlign: "center",
+                    marginTop: 5,
+                    color: "white",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Remove Avatar
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
 
           <TextInput

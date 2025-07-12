@@ -25,8 +25,10 @@ export default function ProfileScreen() {
   const [openDropMenu, setOpenDropMenu] = useState(false);
   // all user post (lay tat ca public n private)
   const [allUserPostData, setAllUserPostData] = useState([]);
+  console.log("userinfo", userInfo);
 
   const fetchUserPost = async () => {
+    console.log("fetch user posts");
     setIsLoading(true);
     try {
       // get public / private
@@ -35,6 +37,7 @@ export default function ProfileScreen() {
         queryPublic
       );
       setPostListData(res.data);
+      console.log("fetch user posts", res.data);
 
       //get public & private
       const allUserPost = await postAPIs.getAllUserPosts(userInfo._id);
@@ -53,8 +56,10 @@ export default function ProfileScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      fetchUserPost();
-      fetchUser();
+      if (userInfo) {
+        fetchUserPost();
+        fetchUser();
+      }
     }, [])
   );
 

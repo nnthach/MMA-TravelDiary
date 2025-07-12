@@ -17,6 +17,7 @@ import FooterPost from "../../../components/FooterPost";
 import ReportModal from "../../../components/ReportModal";
 import CommentModal from "../../../components/CommentModal";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Video } from "expo-av";
 
 export default function PostDetail() {
   const { id } = useLocalSearchParams();
@@ -125,9 +126,20 @@ export default function PostDetail() {
       <View style={{ flex: 1, backgroundColor: "white" }}>
         {/*Post header */}
         <View style={styles.postHeader}>
-          <Text style={{ fontWeight: 500, fontSize: 18 }}>
-            {postDetail?.username}
-          </Text>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
+            <Image
+              source={{ uri: postDetail?.avatar }}
+              style={{
+                width: 30,
+                height: 30,
+                borderRadius: 100,
+              }}
+              resizeMode="cover"
+            />
+            <Text style={{ fontWeight: 500, fontSize: 18 }}>
+              {postDetail?.username}
+            </Text>
+          </View>
           <View
             style={{
               flexDirection: "row",
@@ -232,14 +244,29 @@ export default function PostDetail() {
             showsHorizontalScrollIndicator={false}
             keyExtractor={(_, index) => index.toString()}
             renderItem={({ item }) => (
-              <Image
-                source={{ uri: item }}
-                style={{
-                  width: Dimensions.get("window").width,
-                  height: Dimensions.get("window").width,
-                }}
-                resizeMode="cover"
-              />
+              <View>
+                {item.type === "image" ? (
+                  <Image
+                    source={{ uri: item.uri }}
+                    style={{
+                      width: Dimensions.get("window").width,
+                      height: Dimensions.get("window").width,
+                    }}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <Video
+                    source={{ uri: item.uri }}
+                    style={{
+                      width: Dimensions.get("window").width,
+                      height: Dimensions.get("window").width,
+                    }}
+                    useNativeControls
+                    resizeMode="cover"
+                    isLooping
+                  />
+                )}
+              </View>
             )}
           />
         </View>

@@ -1,3 +1,4 @@
+import { Video } from "expo-av";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -28,16 +29,28 @@ export default function PostCardProfile({ post }) {
       <TouchableOpacity
         onPress={() => router.push(`/(stack)/post/${post._id}`)}
       >
-        <Image
-          source={{
-            uri: post.images[0],
-          }}
-          style={{
-            width: itemSize,
-            height: itemSize,
-          }}
-          resizeMode="cover"
-        />
+        {post.images?.[0]?.type === "video" ? (
+          <Video
+            source={{ uri: post.images[0].uri }}
+            style={{
+              width: itemSize,
+              height: itemSize,
+            }}
+            resizeMode="cover"
+            isLooping
+            useNativeControls={false}
+            shouldPlay={false}
+          />
+        ) : (
+          <Image
+            source={{ uri: post.images?.[0]?.uri }}
+            style={{
+              width: itemSize,
+              height: itemSize,
+            }}
+            resizeMode="cover"
+          />
+        )}
       </TouchableOpacity>
     </View>
   );

@@ -7,6 +7,7 @@ import {
   Image,
   FlatList,
   Modal,
+  ActivityIndicator,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {
@@ -23,6 +24,7 @@ import { pickImage, removeImage } from "../../../../utils/imagePickerUtils";
 import uploadImage from "../../../../utils/uploadImage";
 import { SafeAreaView } from "react-native-safe-area-context";
 import axios from "axios";
+import { Video } from "expo-av";
 
 export default function EditPost() {
   const route = useRouter();
@@ -30,6 +32,7 @@ export default function EditPost() {
   const { userId } = useContext(AuthContext);
 
   const [isLoading, setIsLoading] = useState(false);
+  const [updateLoading, setUpdateLoading] = useState(false);
   const [images, setImages] = useState([]);
   const [newImages, setNewImages] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -87,9 +90,18 @@ export default function EditPost() {
 
   const handlePickImage = async () => {
     const newAssets = await pickImage();
-    setNewImages((prev) => [...prev, ...newAssets]);
-  };
+    console.log("new asset edit", newAssets);
+    if (newAssets?.length > 0) {
+      const formattedAssets = newAssets.map((asset) => ({
+        uri: asset.uri,
+        type: asset.type?.startsWith("video") ? "video" : "image",
+      }));
+      console.log("formatt asset", formattedAssets);
 
+      setNewImages((prev) => [...prev, ...formattedAssets]);
+    }
+  };
+  // Xoá ảnh/video (cũ hoặc mới)
   const handleRemoveImage = (index, type = "old") => {
     if (type === "old") {
       setImages((prev) => removeImage(prev, index));
@@ -99,15 +111,20 @@ export default function EditPost() {
   };
 
   const handleUpdate = async () => {
+    setUpdateLoading(true);
     try {
       const imageUrlList = [];
 
       for (const img of newImages) {
         const url = await uploadImage(img);
-        imageUrlList.push(url);
+        imageUrlList.push({
+          uri: url,
+          type: img.type,
+        });
       }
 
       const allImages = [...images, ...imageUrlList];
+      console.log("all img", allImages);
 
       const newEditData = {
         ...editData,
@@ -117,11 +134,13 @@ export default function EditPost() {
 
       await postAPIs.update(id, newEditData);
       alert("Update successfully");
+      setUpdateLoading(false);
       setTimeout(() => {
         router.back();
-      }, 3000);
+      }, 1000);
     } catch (error) {
       console.log("update error", error);
+      setUpdateLoading(false);
     }
   };
 
@@ -176,6 +195,41 @@ export default function EditPost() {
       getPostById();
     }, [])
   );
+
+  if (updateLoading) {
+    return (
+      <View
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: "rgba(0,0,0,0.3)",
+          justifyContent: "center",
+          alignItems: "center",
+          zIndex: 999,
+        }}
+      >
+        <View
+          style={{
+            paddingVertical: 20,
+            paddingHorizontal: 30,
+            backgroundColor: "white",
+            borderRadius: 10,
+            elevation: 5,
+          }}
+        >
+          <ActivityIndicator
+            size="large"
+            color="orange"
+            style={{ marginBottom: 10 }}
+          />
+          <Text style={{ fontSize: 16, fontWeight: "bold" }}>Updating...</Text>
+        </View>
+      </View>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -250,10 +304,20 @@ export default function EditPost() {
           {images.map((img, index) => (
             <View key={index} style={styles.imageWrap}>
               <TouchableOpacity onPress={() => console.log("img open")}>
-                <Image
-                  source={{ uri: img }}
-                  style={{ width: "100%", height: "100%" }}
-                />
+                {img.type.startsWith("image") ? (
+                  <Image
+                    source={{ uri: img.uri }}
+                    style={{ width: "100%", height: "100%" }}
+                  />
+                ) : (
+                  <Video
+                    source={{ uri: img.uri }}
+                    style={{ width: "100%", height: "100%" }} // dùng lại style image để khung giống nhau
+                    useNativeControls
+                    resizeMode="cover"
+                    isLooping
+                  />
+                )}
               </TouchableOpacity>
               <Ionicons
                 name="close-sharp"
@@ -268,10 +332,20 @@ export default function EditPost() {
           {newImages.map((img, index) => (
             <View key={index} style={styles.imageWrap}>
               <TouchableOpacity onPress={() => console.log("img open")}>
-                <Image
-                  source={{ uri: img.uri }}
-                  style={{ width: "100%", height: "100%" }}
-                />
+                {img.type.startsWith("image") ? (
+                  <Image
+                    source={{ uri: img.uri }}
+                    style={{ width: "100%", height: "100%" }}
+                  />
+                ) : (
+                  <Video
+                    source={{ uri: img.uri }}
+                    style={{ width: "100%", height: "100%" }} // dùng lại style image để khung giống nhau
+                    useNativeControls
+                    resizeMode="cover"
+                    isLooping
+                  />
+                )}
               </TouchableOpacity>
               <Ionicons
                 name="close-sharp"

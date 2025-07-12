@@ -12,6 +12,7 @@ import ReportModal from "./ReportModal";
 import { PostContext } from "../context/PostContext";
 import postAPIs from "../services/postAPIs";
 import FooterPost from "./FooterPost";
+import { Video } from "expo-av";
 
 export default function PostCardGlobal({
   item,
@@ -22,17 +23,16 @@ export default function PostCardGlobal({
 }) {
   const { userId, userInfo } = useContext(AuthContext);
   const router = useRouter();
-  const { fetchStorageOfUser } = useContext(SavedPostContext);
   const [openReport, setOpenReport] = useState(false);
 
   // ✅ Like state riêng để cập nhật UI ngay
-  const [likes, setLikes] = useState(() =>
-    Array.isArray(item?.likes) ? item.likes : []
-  );
+  // const [likes, setLikes] = useState(() =>
+  //   Array.isArray(item?.likes) ? item.likes : []
+  // );
 
-  const isLiked = likes.includes(userId);
+  // const isLiked = likes.includes(userId);
 
-  const { postListData, setPostListData } = useContext(PostContext);
+  // const { postListData, setPostListData } = useContext(PostContext);
 
   const [reportDataForm, setReportDataForm] = useState({
     postId: "",
@@ -41,31 +41,31 @@ export default function PostCardGlobal({
     description: "",
   });
 
-  const handleOpenComment = (id) => {
-    if (!id) return;
-    setActionPostID(id);
-    setOpenComment(true);
-  };
+  // const handleOpenComment = (id) => {
+  //   if (!id) return;
+  //   setActionPostID(id);
+  //   setOpenComment(true);
+  // };
 
-  const handleToggleLike = async () => {
-    const updatedLikes = isLiked
-      ? likes.filter((id) => id !== userId)
-      : [...likes, userId];
+  // const handleToggleLike = async () => {
+  //   const updatedLikes = isLiked
+  //     ? likes.filter((id) => id !== userId)
+  //     : [...likes, userId];
 
-    setLikes(updatedLikes); // ✅ cập nhật UI ngay
+  //   setLikes(updatedLikes); // ✅ cập nhật UI ngay
 
-    setPostListData((prev) =>
-      prev.map((post) =>
-        post._id === item._id ? { ...post, likes: updatedLikes } : post
-      )
-    );
+  //   setPostListData((prev) =>
+  //     prev.map((post) =>
+  //       post._id === item._id ? { ...post, likes: updatedLikes } : post
+  //     )
+  //   );
 
-    try {
-      await postAPIs.toggleLike(item._id, userId); // gửi lên server
-    } catch (error) {
-      console.error("Lỗi khi like/unlike bài viết:", error);
-    }
-  };
+  //   try {
+  //     await postAPIs.toggleLike(item._id, userId); // gửi lên server
+  //   } catch (error) {
+  //     console.error("Lỗi khi like/unlike bài viết:", error);
+  //   }
+  // };
 
   return (
     <>
@@ -77,7 +77,20 @@ export default function PostCardGlobal({
         >
           {/* Header */}
           <View style={styles.header}>
-            <Text style={styles.username}>{item.username}</Text>
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
+            >
+              <Image
+                source={{ uri: item.avatar }}
+                style={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: 100,
+                }}
+                resizeMode="cover"
+              />
+              <Text style={styles.username}>{item.username}</Text>
+            </View>
             {isOwner && (
               <Ionicons
                 name="build-outline"
@@ -115,11 +128,21 @@ export default function PostCardGlobal({
           {/* Image */}
           {item?.images?.length > 0 && (
             <View style={styles.imageWrap}>
-              <Image
-                source={{ uri: item.images[0] }}
-                style={styles.image}
-                resizeMode="cover"
-              />
+              {item.images[0].type === "image" ? (
+                <Image
+                  source={{ uri: item.images[0].uri }}
+                  style={styles.image}
+                  resizeMode="cover"
+                />
+              ) : (
+                <Video
+                  source={{ uri: item.images[0].uri }}
+                  style={styles.image}
+                  useNativeControls
+                  resizeMode="cover"
+                  isLooping
+                />
+              )}
             </View>
           )}
         </TouchableOpacity>
@@ -166,6 +189,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: 5,
   },
   username: {
     fontWeight: "bold",
