@@ -7,7 +7,6 @@ export default function StackLayout() {
         headerShown: false,
       }}
     >
-      <Stack.Screen name="location/index" options={{ headerShown: false }} />
       <Stack.Screen name="post/[id]" options={{ headerShown: false }} />
       <Stack.Screen name="editProfile/index" options={{ headerShown: false }} />
     </Stack>

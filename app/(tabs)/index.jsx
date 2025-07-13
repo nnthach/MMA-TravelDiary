@@ -10,7 +10,6 @@ import {
   ActivityIndicator,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import LocationHomeCard from "../../components/LocationHomeCard";
 import { PostContext } from "../../context/PostContext";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useFocusEffect } from "expo-router";
@@ -29,13 +28,10 @@ export default function HomeScreen() {
   const { savedPostData } = useContext(SavedPostContext);
   const { userId, userInfo } = useContext(AuthContext);
   const [openComment, setOpenComment] = useState(false);
-  const [actionPostID, setActionPostID] = useState(null);
 
-  useFocusEffect(
-    useCallback(() => {
-      getAllPost();
-    }, [])
-  );
+  useEffect(() => {
+    getAllPost();
+  }, []);
 
   if (isLoading) {
     return (
@@ -83,7 +79,6 @@ export default function HomeScreen() {
               }
               isOwner={userInfo && userId == item.userId}
               setOpenComment={setOpenComment}
-              setActionPostID={setActionPostID}
             />
           )}
           ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
@@ -93,8 +88,6 @@ export default function HomeScreen() {
 
       {openComment && (
         <CommentModal
-          actionPostID={actionPostID}
-          setActionPostID={setActionPostID}
           setOpenComment={setOpenComment}
           openComment={openComment}
         />

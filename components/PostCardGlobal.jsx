@@ -3,36 +3,58 @@ import { useRouter } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { SavedPostContext } from "../context/SavedPostContext";
-import {
-  handleAddPostToStorage,
-  handleRemovePostOutOfStorage,
-} from "../utils/updateStorage";
 import ReportModal from "./ReportModal";
 import { PostContext } from "../context/PostContext";
-import postAPIs from "../services/postAPIs";
 import FooterPost from "./FooterPost";
 import { Video } from "expo-av";
+import { SavedPostContext } from "../context/SavedPostContext";
 
 export default function PostCardGlobal({
   item,
   isSaved = false,
   isOwner = false,
   setOpenComment,
-  setActionPostID,
 }) {
   const { userId, userInfo } = useContext(AuthContext);
   const router = useRouter();
   const [openReport, setOpenReport] = useState(false);
+  const { setPostId } = useContext(PostContext);
+  const { fetchStorageOfUser } = useContext(SavedPostContext);
 
   // ✅ Like state riêng để cập nhật UI ngay
-  // const [likes, setLikes] = useState(() =>
-  //   Array.isArray(item?.likes) ? item.likes : []
-  // );
+  const [likes, setLikes] = useState(() =>
+    Array.isArray(item?.likes) ? item.likes : []
+  );
 
-  // const isLiked = likes.includes(userId);
+  const isLiked = likes.includes(userId);
 
-  // const { postListData, setPostListData } = useContext(PostContext);
+  const { setPostListData } = useContext(PostContext);
+
+  const handleOpenComment = (id) => {
+    if (!id) return;
+    setPostId(id);
+    setOpenComment(true);
+  };
+
+  const handleToggleLike = async () => {
+    const updatedLikes = isLiked
+      ? likes.filter((id) => id !== userId)
+      : [...likes, userId];
+
+    setLikes(updatedLikes); // ✅ cập nhật UI ngay
+
+    setPostListData((prev) =>
+      prev.map((post) =>
+        post._id === item._id ? { ...post, likes: updatedLikes } : post
+      )
+    );
+
+    try {
+      await postAPIs.toggleLike(item._id, userId); // gửi lên server
+    } catch (error) {
+      console.error("Lỗi khi like/unlike bài viết:", error);
+    }
+  };
 
   const [reportDataForm, setReportDataForm] = useState({
     postId: "",
@@ -40,32 +62,6 @@ export default function PostCardGlobal({
     reason: "",
     description: "",
   });
-
-  // const handleOpenComment = (id) => {
-  //   if (!id) return;
-  //   setActionPostID(id);
-  //   setOpenComment(true);
-  // };
-
-  // const handleToggleLike = async () => {
-  //   const updatedLikes = isLiked
-  //     ? likes.filter((id) => id !== userId)
-  //     : [...likes, userId];
-
-  //   setLikes(updatedLikes); // ✅ cập nhật UI ngay
-
-  //   setPostListData((prev) =>
-  //     prev.map((post) =>
-  //       post._id === item._id ? { ...post, likes: updatedLikes } : post
-  //     )
-  //   );
-
-  //   try {
-  //     await postAPIs.toggleLike(item._id, userId); // gửi lên server
-  //   } catch (error) {
-  //     console.error("Lỗi khi like/unlike bài viết:", error);
-  //   }
-  // };
 
   return (
     <>
@@ -150,10 +146,10 @@ export default function PostCardGlobal({
         {/* Footer */}
         <FooterPost
           item={item}
+          setOpenComment={setOpenComment}
+          setPostId={setPostId}
           isSaved={isSaved}
           isOwner={isOwner}
-          setOpenComment={setOpenComment}
-          setActionPostID={setActionPostID}
           setOpenReport={setOpenReport}
           setReportDataForm={setReportDataForm}
         />

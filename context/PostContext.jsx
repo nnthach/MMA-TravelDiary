@@ -23,7 +23,7 @@ export const PostProvider = ({ children }) => {
   };
 
   const getPostDetail = async (id) => {
-    setIsLoading(true);
+    if (!id) return;
     try {
       const res = await postAPIs.getById(id);
       console.log("get pos dtetail res", res.data);
@@ -32,7 +32,6 @@ export const PostProvider = ({ children }) => {
     } catch (error) {
       console.log("get post detail error", error);
       setPostDetail(null);
-      setIsLoading(false);
     }
   };
 
@@ -46,7 +45,8 @@ export const PostProvider = ({ children }) => {
         postDetail,
         getAllPost,
         getPostDetail,
-        postId, setPostId
+        postId,
+        setPostId,
       }}
     >
       {children}

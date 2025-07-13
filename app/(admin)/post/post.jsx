@@ -146,13 +146,6 @@ const fetchPosts = async () => {
     <View style={styles.container}>
       <Text style={styles.title}> Post List</Text>
 
-      {/* <TouchableOpacity
-        style={styles.addButton}
-        onPress={() => setShowAddModal(true)}
-      >
-        <Text style={styles.addButtonText}>➕ Add Post</Text>
-      </TouchableOpacity> */}
-
       <View style={styles.table}>
         <View style={styles.tableHeader}>
           <Text style={styles.tableHeaderText}>Username</Text>
@@ -173,9 +166,6 @@ const fetchPosts = async () => {
                 <TouchableOpacity onPress={() => showPostDetails(item)}>
                   <Text style={styles.detailBtn}>Details</Text>
                 </TouchableOpacity>
-                {/* <TouchableOpacity onPress={() => showPostEdit(item)}>
-                  <Text style={styles.editBtn}> Edit</Text>
-                </TouchableOpacity> */}
                 <TouchableOpacity onPress={() => handleDeletePost(item._id)}>
                   <Text style={styles.deleteBtn}> Delete</Text>
                 </TouchableOpacity>

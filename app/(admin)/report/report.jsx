@@ -99,32 +99,50 @@ export default function Report() {
       />
 
       {/* Details Modal */}
-      <Modal visible={showDetailsModal} animationType="slide" transparent={true}>
+      <Modal
+        visible={showDetailsModal}
+        animationType="slide"
+        transparent={true}
+      >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-             <TouchableOpacity
-        onPress={() => setShowDetailsModal(false)}
-        style={styles.closeButton}
-      >
-        <Text style={styles.closeButtonText}>✖</Text>
-      </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setShowDetailsModal(false)}
+              style={styles.closeButton}
+            >
+              <Text style={styles.closeButtonText}>✖</Text>
+            </TouchableOpacity>
             <Text style={styles.modalTitle}>Report Details</Text>
 
             {reportDetails && (
               <>
-                <Text style={styles.detailsText}>Post ID: {reportDetails.postId}</Text>
-                <Text style={styles.detailsText}>Reporter ID: {reportDetails.reporterId}</Text>
-                <Text style={styles.detailsText}>Status: {reportDetails.status}</Text>
-                <Text style={styles.detailsText}>Reason: {reportDetails.reason}</Text>
-                <Text style={styles.detailsText}>Description: {reportDetails.description}</Text>
+                <Text style={styles.detailsText}>
+                  Post ID: {reportDetails.postId}
+                </Text>
+                <Text style={styles.detailsText}>
+                  Reporter ID: {reportDetails.reporterId}
+                </Text>
+                <Text style={styles.detailsText}>
+                  Status: {reportDetails.status}
+                </Text>
+                <Text style={styles.detailsText}>
+                  Reason: {reportDetails.reason}
+                </Text>
+                <Text style={styles.detailsText}>
+                  Description: {reportDetails.description}
+                </Text>
               </>
             )}
 
             {postDetails && (
               <>
                 <Text style={styles.detailsText}>--- Post Details ---</Text>
-                <Text style={styles.detailsText}>Title: {postDetails.title}</Text>
-                <Text style={styles.detailsText}>Content: {postDetails.content}</Text>
+                <Text style={styles.detailsText}>
+                  Title: {postDetails.title}
+                </Text>
+                <Text style={styles.detailsText}>
+                  Content: {postDetails.content}
+                </Text>
 
                 <View style={styles.imageContainer}>
                   {postDetails.images && postDetails.images.length > 0 ? (
@@ -156,8 +174,6 @@ export default function Report() {
               >
                 <Text style={styles.statusBtnText}>Reject</Text>
               </TouchableOpacity>
-
-     
             </View>
           </View>
         </View>

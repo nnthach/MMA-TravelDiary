@@ -10,15 +10,19 @@ import {
   TextInput,
   Modal,
 } from "react-native";
-import { Picker } from "@react-native-picker/picker"; 
-import userApi from "../../../services/userApi"; 
+import { Picker } from "@react-native-picker/picker";
+import userApi from "../../../services/userApi";
 
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
-  const [userData, setUserData] = useState({ username: "", email: "", role: "User" });
+  const [userData, setUserData] = useState({
+    username: "",
+    email: "",
+    role: "User",
+  });
 
   // Fetch users from API
   const fetchUsers = async () => {
@@ -106,7 +110,12 @@ export default function AdminUsers() {
 
   if (loading) {
     return (
-      <View style={[styles.container, { justifyContent: "center", alignItems: "center" }]}>
+      <View
+        style={[
+          styles.container,
+          { justifyContent: "center", alignItems: "center" },
+        ]}
+      >
         <ActivityIndicator size="large" color="#007bff" />
       </View>
     );
@@ -116,21 +125,13 @@ export default function AdminUsers() {
     <View style={styles.container}>
       <Text style={styles.title}> User List</Text>
 
-      {/* <TouchableOpacity
-        style={styles.addButton}
-        onPress={() => setShowModal(true)}
-      >
-        <Text style={styles.addButtonText}> Add User</Text>
-      </TouchableOpacity> */}
-
       <View style={styles.table}>
         <View style={styles.tableHeader}>
           <Text style={styles.tableHeaderText}>Username</Text>
           <Text style={styles.tableHeaderText}>Email</Text>
           <Text style={styles.tableHeaderText}>Role</Text>
           <Text style={styles.tableHeaderText}>Actions</Text>
-                    <Text style={styles.tableHeaderText}>UpdateTime</Text>
-
+          <Text style={styles.tableHeaderText}>UpdateTime</Text>
         </View>
 
         <FlatList
@@ -141,13 +142,18 @@ export default function AdminUsers() {
               <Text style={styles.tableCell}>{item.username}</Text>
               <Text style={styles.tableCell}>{item.email}</Text>
               <Text style={styles.tableCell}>{item.role}</Text>
-                            <Text style={styles.tableCell}>{item.updatedAt}</Text>
+              <Text style={styles.tableCell}>{item.updatedAt}</Text>
 
               <View style={styles.tableActions}>
                 <TouchableOpacity
                   onPress={() => {
                     setCurrentUser(item);
-                    setUserData({ username: item.username, email: item.email, role: item.role, updatedAt: item.updatedAt });
+                    setUserData({
+                      username: item.username,
+                      email: item.email,
+                      role: item.role,
+                      updatedAt: item.updatedAt,
+                    });
                     setShowModal(true);
                   }}
                 >
@@ -187,14 +193,14 @@ export default function AdminUsers() {
 
             <Picker
               selectedValue={userData.role}
-              onValueChange={(value) => setUserData({ ...userData, role: value })}
+              onValueChange={(value) =>
+                setUserData({ ...userData, role: value })
+              }
               style={styles.input}
             >
               <Picker.Item label="User" value="User" />
               <Picker.Item label="Admin" value="Admin" />
             </Picker>
-
-
 
             <View style={styles.modalActions}>
               <TouchableOpacity

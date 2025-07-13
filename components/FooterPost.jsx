@@ -15,12 +15,12 @@ export default function FooterPost({
   isOwner,
   isSaved,
   setOpenComment,
-  setActionPostID,
   setOpenReport,
   setReportDataForm,
 }) {
   const { userId, userInfo } = useContext(AuthContext);
   const { fetchStorageOfUser } = useContext(SavedPostContext);
+  const { setPostId,getPostDetail } = useContext(PostContext);
 
   // ✅ Like state riêng để cập nhật UI ngay
   const [likes, setLikes] = useState(() =>
@@ -31,9 +31,12 @@ export default function FooterPost({
 
   const { setPostListData } = useContext(PostContext);
 
-  const handleOpenComment = (id) => {
+  const handleOpenComment = async (id) => {
     if (!id) return;
-    setActionPostID(id);
+
+    setPostId(id);
+    console.log("get post detail in footer",id);
+    await getPostDetail(id);
     setOpenComment(true);
   };
 

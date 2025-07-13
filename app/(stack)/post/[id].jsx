@@ -18,16 +18,17 @@ import ReportModal from "../../../components/ReportModal";
 import CommentModal from "../../../components/CommentModal";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Video } from "expo-av";
+import { PostContext } from "../../../context/PostContext";
 
 export default function PostDetail() {
   const { id } = useLocalSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [postDetail, setPostDetail] = useState(null);
   const { savedPostData, fetchStorageOfUser } = useContext(SavedPostContext);
+  const { postId, setPostId } = useContext(PostContext);
   const { userInfo, userId } = useContext(AuthContext);
   const [openDropMenu, setOpenDropMenu] = useState(false);
   const [openComment, setOpenComment] = useState(false);
-  const [actionPostID, setActionPostID] = useState(null);
 
   console.log("savedPost data in detail", savedPostData);
   console.log("post detail", postDetail);
@@ -275,7 +276,7 @@ export default function PostDetail() {
           <FooterPost
             item={postDetail}
             setOpenComment={setOpenComment}
-            setActionPostID={setActionPostID}
+            setPostId={setPostId}
             isSaved={isSaved}
             isOwner={isOwner}
             setOpenReport={setOpenReport}
@@ -301,8 +302,6 @@ export default function PostDetail() {
 
       {openComment && (
         <CommentModal
-          actionPostID={actionPostID}
-          setActionPostID={setActionPostID}
           setOpenComment={setOpenComment}
           openComment={openComment}
         />

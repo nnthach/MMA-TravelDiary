@@ -20,23 +20,19 @@ import commentAPIs from "../services/commentAPIs";
 import { useFocusEffect } from "expo-router";
 import { PostContext } from "../context/PostContext";
 
-export default function CommentModal({
-  actionPostID,
-  setActionPostID,
-  setOpenComment,
-  openComment,
-}) {
+export default function CommentModal({ setOpenComment, openComment }) {
+  const { isLoading, postDetail, getAllPost, getPostDetail } =
+    useContext(PostContext);
   const { userId, userInfo } = useContext(AuthContext);
+  const { postId, setPostId } = useContext(PostContext);
   const [commentDataForm, setCommentDataForm] = useState({
     userId: userId,
     content: "",
-    postId: actionPostID,
+    postId: postId,
   });
   const [openDropMenuCommentId, setOpenDropMenuCommentId] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editingCommentId, setEditingCommentId] = useState(null);
-  const { isLoading, postDetail, getAllPost, getPostDetail } =
-    useContext(PostContext);
 
   const handleGetCommentDetail = async (id) => {
     try {
@@ -69,7 +65,7 @@ export default function CommentModal({
         content: "",
       }));
 
-      await getPostDetail(actionPostID);
+      await getPostDetail(postId);
     } catch (error) {
       console.log("update comment error", error);
       Alert.alert("Error", "Update failed");
@@ -81,20 +77,12 @@ export default function CommentModal({
       const res = await commentAPIs.delete(id);
       console.log("delete comment res", res.data);
 
-      await getPostDetail(actionPostID);
+      await getPostDetail(postId);
       await getAllPost();
     } catch (error) {
       console.log("delete comment errro", error);
     }
   };
-
-  useFocusEffect(
-    useCallback(() => {
-      if (actionPostID) {
-        getPostDetail(actionPostID);
-      }
-    }, [actionPostID])
-  );
 
   const handleCreateComment = async () => {
     try {
@@ -106,7 +94,7 @@ export default function CommentModal({
         content: "",
       }));
 
-      await getPostDetail(actionPostID);
+      await getPostDetail(postId);
       await getAllPost();
 
       setIsEditing(false);
@@ -131,7 +119,7 @@ export default function CommentModal({
       animationType="slide"
       transparent
       onRequestClose={() => {
-        setActionPostID("");
+        setPostId(null);
         setOpenComment(false);
       }}
     >
@@ -158,7 +146,6 @@ export default function CommentModal({
                 <Text>No comments</Text>
               </View>
             ) : (
-              // <ScrollView style={{ flex: 1, zIndex: 0 }}>
               <FlatList
                 data={postDetail?.comments}
                 keyExtractor={(item) => item._id}
@@ -192,21 +179,33 @@ export default function CommentModal({
                           {comment?.authorName || "user"}
                         </Text>
                         <Text style={{ color: "grey" }}>
-                          {comment?.createdAt || "24/4/2025"}
+                          {comment?.createdAt &&
+                            new Date(comment.createdAt).toLocaleString(
+                              "vi-VN",
+                              {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "numeric",
+                              }
+                            )}
                         </Text>
                       </View>
                       {/*Right */}
                       <View style={{ position: "relative" }}>
-                        <Ionicons
-                          name="ellipsis-vertical"
-                          size={18}
-                          color="black"
-                          onPress={() =>
-                            setOpenDropMenuCommentId((prev) =>
-                              prev === comment._id ? null : comment._id
-                            )
-                          }
-                        />
+                        {comment?.author.toString() === userId && (
+                          <Ionicons
+                            name="ellipsis-vertical"
+                            size={18}
+                            color="black"
+                            onPress={() =>
+                              setOpenDropMenuCommentId((prev) =>
+                                prev === comment._id ? null : comment._id
+                              )
+                            }
+                          />
+                        )}
 
                         {openDropMenuCommentId === comment._id && (
                           <View style={styles.dropdownMenu}>
