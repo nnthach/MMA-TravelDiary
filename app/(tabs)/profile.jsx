@@ -25,10 +25,8 @@ export default function ProfileScreen() {
   const [openDropMenu, setOpenDropMenu] = useState(false);
   // all user post (lay tat ca public n private)
   const [allUserPostData, setAllUserPostData] = useState([]);
-  console.log("userinfo", userInfo);
 
   const fetchUserPost = async () => {
-    console.log("fetch user posts");
     setIsLoading(true);
     try {
       // get public / private
@@ -37,7 +35,6 @@ export default function ProfileScreen() {
         queryPublic
       );
       setPostListData(res.data);
-      console.log("fetch user posts", res.data);
 
       //get public & private
       const allUserPost = await postAPIs.getAllUserPosts(userInfo._id);
@@ -45,7 +42,6 @@ export default function ProfileScreen() {
 
       setIsLoading(false);
     } catch (error) {
-      console.log("error", error);
       setIsLoading(false);
     }
   };
@@ -108,6 +104,7 @@ export default function ProfileScreen() {
       <View style={styles.container}>
         {/* Profile Header */}
         <View style={styles.profileHeader}>
+          {/*avatar */}
           <View
             style={{
               backgroundColor: "lightgrey",
@@ -125,36 +122,32 @@ export default function ProfileScreen() {
               />
             )}
           </View>
+
+          <Text style={{ fontWeight: "bold", fontSize: 22 }}>
+            {userInfo?.username}
+          </Text>
+
+          {/*Number post */}
           <View style={styles.postsNumWrap}>
-            <View style={{ alignItems: "left" }}>
+            <View style={{ alignItems: "center", width: "30%" }}>
               <Text style={{ fontSize: 16, fontWeight: "bold" }}>
                 {allUserPostData?.length}
               </Text>
               <Text style={{ color: "grey" }}>Posts</Text>
             </View>
-            <View style={{ alignItems: "left" }}>
+            <View style={{ alignItems: "center", width: "30%" }}>
               <Text style={{ fontSize: 16, fontWeight: "bold" }}>
                 {allUserPostData?.filter((post) => post.public === true).length}
               </Text>
               <Text style={{ color: "grey" }}>Public posts</Text>
             </View>
-            <View style={{ alignItems: "left" }}>
+            <View style={{ alignItems: "center", width: "30%" }}>
               <Text style={{ fontSize: 16, fontWeight: "bold" }}>
                 {allUserPostData.filter((post) => post.public === false).length}
               </Text>
               <Text style={{ color: "grey" }}>Private posts</Text>
             </View>
           </View>
-        </View>
-
-        {/* Username and bio */}
-        <View style={{ marginBottom: 12, paddingHorizontal: 16 }}>
-          <Text style={{ fontWeight: "bold", fontSize: 18 }}>
-            {userInfo?.username}
-          </Text>
-          <Text style={{ color: "gray", marginTop: 4 }}>
-            These are the places I have been to!
-          </Text>
         </View>
 
         {/* Edit Profile / Share Profile */}
@@ -279,7 +272,6 @@ const styles = StyleSheet.create({
   },
 
   profileHeader: {
-    flexDirection: "row",
     alignItems: "center",
     padding: 16,
     gap: 15,
@@ -288,7 +280,7 @@ const styles = StyleSheet.create({
   postsNumWrap: {
     flexDirection: "row",
     justifyContent: "space-between",
-    flex: 1,
+    width: "100%",
   },
 
   buttonActionWrap: {

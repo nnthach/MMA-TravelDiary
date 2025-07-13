@@ -8,10 +8,11 @@ import {
   SafeAreaView,
   TouchableWithoutFeedback,
   Keyboard,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import { useRouter } from "expo-router";
 import userApi from "../../services/userApi";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthContext } from "../../context/AuthContext";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -21,6 +22,7 @@ export default function ForgotPasswordScreen() {
   const [forgotPasswordForm, setForgotPasswordForm] = useState({
     email: "",
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (value, name) => {
     setForgotPasswordForm((prev) => ({
@@ -30,15 +32,20 @@ export default function ForgotPasswordScreen() {
   };
 
   const handleSendEmail = async () => {
+    console.log("run forger password");
+    setIsLoading(true);
     try {
       const res = await userApi.forgotPassword(forgotPasswordForm);
       console.log("res forget pw", res.data);
       setEmailResetPassword(forgotPasswordForm.email);
+      setIsLoading(false);
       setTimeout(() => {
         router.push("/resetPassword");
       }, 2000);
     } catch (error) {
-      console.log("forgot password error", error);
+      console.log("forgot password error", error.response.data);
+      Alert.alert(error?.response?.data?.message);
+      setIsLoading(false);
     }
   };
 
@@ -60,8 +67,18 @@ export default function ForgotPasswordScreen() {
             keyboardType="email-address"
           />
 
-          <TouchableOpacity style={styles.button} onPress={handleSendEmail}>
-            <Text style={styles.buttonText}>Send</Text>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleSendEmail}
+            disabled={isLoading}
+          >
+            <Text style={styles.buttonText}>
+              {isLoading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.buttonText}>Send</Text>
+              )}
+            </Text>
           </TouchableOpacity>
 
           <View style={styles.subFooterLink}>
@@ -96,6 +113,12 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     padding: 12,
     marginBottom: 16,
+  },
+  errorMsg: {
+    color: "red",
+    marginTop: -14,
+    marginBottom: 10,
+    fontSize: 12,
   },
   forgotPassword: {
     alignSelf: "flex-end",

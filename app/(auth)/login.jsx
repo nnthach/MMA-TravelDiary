@@ -23,8 +23,30 @@ export default function LoginScreen() {
     account: "",
     password: "",
   });
+  const [error, setError] = useState({
+    account: "",
+    password: "",
+  });
   const [isLoading, setIsLoading] = useState(false);
   const { setUserId } = useContext(AuthContext);
+
+  const validateInput = () => {
+    const newError = { account: "", password: "" };
+    let isValid = true;
+
+    if (loginForm.account.length < 6 || loginForm.account.length > 20) {
+      newError.account = "Account must be 6-20 characters.";
+      isValid = false;
+    }
+
+    if (loginForm.password.length < 6 || loginForm.password.length > 20) {
+      newError.password = "Password must be 6-20 characters.";
+      isValid = false;
+    }
+
+    setError(newError);
+    return isValid;
+  };
 
   const handleChange = (value, name) => {
     setLoginForm((prev) => ({
@@ -34,6 +56,7 @@ export default function LoginScreen() {
   };
 
   const handleLogin = async () => {
+    if (!validateInput()) return;
     setIsLoading(true);
     try {
       const res = await userApi.login(loginForm);
@@ -57,8 +80,9 @@ export default function LoginScreen() {
         }
       }, 1500);
     } catch (error) {
-      console.log("login error", error);
-      Alert.alert("Fail to login");
+      console.log("login error", error.response.data);
+      setLoginForm({ account: "", password: "" });
+      Alert.alert(error?.response?.data?.message || "Fail to login");
       setIsLoading(false);
     }
   };
@@ -80,6 +104,9 @@ export default function LoginScreen() {
             autoCapitalize="none"
             keyboardType="email-address"
           />
+          {error.account && (
+            <Text style={styles.errorMsg}>{error.account}</Text>
+          )}
 
           <TextInput
             placeholder="Password"
@@ -88,6 +115,9 @@ export default function LoginScreen() {
             onChangeText={(text) => handleChange(text, "password")}
             secureTextEntry
           />
+          {error.password && (
+            <Text style={styles.errorMsg}>{error.password}</Text>
+          )}
 
           <TouchableOpacity
             onPress={() => router.push("/forgotPassword")}
@@ -104,7 +134,7 @@ export default function LoginScreen() {
             {isLoading ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <Text style={styles.buttonText}>Login</Text>
+              <Text style={styles.buttonText}>Sign In</Text>
             )}
           </TouchableOpacity>
 
@@ -156,6 +186,12 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     padding: 12,
     marginBottom: 16,
+  },
+  errorMsg: {
+    color: "red",
+    marginTop: -14,
+    marginBottom: 10,
+    fontSize: 12,
   },
   forgotPassword: {
     alignSelf: "flex-end",

@@ -11,6 +11,7 @@ const userApi = {
   register: (data) => axiosClient.post("/users/register", data),
   refreshToken: (data) => axiosClient.post("/users/refresh-token", data),
   forgotPassword: (data) => axiosClient.post("/users/forgot-password", data),
+  resendOtp: (data) => axiosClient.post("/users/resend-otp", data),
   resetPassword: (data) => axiosClient.post("/users/reset-password", data),
 };
 

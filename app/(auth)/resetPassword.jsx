@@ -9,6 +9,7 @@ import {
   Alert,
   Keyboard,
   TouchableWithoutFeedback,
+  ActivityIndicator,
 } from "react-native";
 import { useRouter } from "expo-router";
 import userApi from "../../services/userApi";
@@ -19,8 +20,7 @@ import { LinearGradient } from "expo-linear-gradient";
 export default function ResetPasswordScreen() {
   const router = useRouter();
   const { emailResetPassword } = useContext(AuthContext);
-
-  console.log("email in reset", emailResetPassword);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [resetPasswordForm, setResetPasswordForm] = useState({
     email: emailResetPassword,
@@ -29,6 +29,42 @@ export default function ResetPasswordScreen() {
     confirmPassword: "",
   });
 
+  const [error, setError] = useState({
+    otp: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const validateInput = () => {
+    const newError = {
+      otp: "",
+      password: "",
+      confirmPassword: "",
+    };
+    let isValid = true;
+
+    if (resetPasswordForm.otp.length != 6) {
+      newError.otp = "OTP have only 6 characters.";
+      isValid = false;
+    }
+
+    if (
+      resetPasswordForm.password.length < 6 ||
+      resetPasswordForm.password.length > 20
+    ) {
+      newError.password = "Password must be 6-20 characters.";
+      isValid = false;
+    }
+
+    if (resetPasswordForm.confirmPassword != resetPasswordForm.password) {
+      newError.confirmPassword = "Confirm password not match.";
+      isValid = false;
+    }
+
+    setError(newError);
+    return isValid;
+  };
+
   const handleChange = (value, name) => {
     setResetPasswordForm((prev) => ({
       ...prev,
@@ -36,17 +72,35 @@ export default function ResetPasswordScreen() {
     }));
   };
 
+  const handleResendOtp = async () => {
+    console.log("run resend otp ");
+
+    try {
+      const res = await userApi.resendOtp({ email: emailResetPassword });
+      console.log("resend otp res", res);
+      Alert.alert("Check your email");
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+
   const handleResetPassword = async () => {
+    if (!validateInput()) return;
+    setIsLoading(true);
     try {
       const { confirmPassword, ...newForm } = resetPasswordForm;
       const res = await userApi.resetPassword(newForm);
       console.log("res reset pw", res);
       Alert.alert("Reset password successfully");
+      setIsLoading(false);
+
       setTimeout(() => {
         router.replace("/login");
       }, 1000);
     } catch (error) {
       console.log("reset password error", error);
+      Alert.alert(error?.response?.data?.message);
+      setIsLoading(false);
     }
   };
 
@@ -71,6 +125,7 @@ export default function ResetPasswordScreen() {
             onChangeText={(text) => handleChange(text, "otp")}
             autoCapitalize="none"
           />
+          {error.otp && <Text style={styles.errorMsg}>{error.otp}</Text>}
 
           <TextInput
             placeholder="Password"
@@ -79,6 +134,9 @@ export default function ResetPasswordScreen() {
             onChangeText={(text) => handleChange(text, "password")}
             secureTextEntry
           />
+          {error.password && (
+            <Text style={styles.errorMsg}>{error.password}</Text>
+          )}
 
           <TextInput
             placeholder="Confirm Password"
@@ -87,9 +145,29 @@ export default function ResetPasswordScreen() {
             onChangeText={(text) => handleChange(text, "confirmPassword")}
             secureTextEntry
           />
+          {error.confirmPassword && (
+            <Text style={styles.errorMsg}>{error.confirmPassword}</Text>
+          )}
 
-          <TouchableOpacity style={styles.button} onPress={handleResetPassword}>
-            <Text style={styles.buttonText}>Send</Text>
+          <TouchableOpacity
+            onPress={() => handleResendOtp()}
+            style={styles.forgotPassword}
+          >
+            <Text style={styles.linkText}>Resend OTP</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleResetPassword}
+            disabled={isLoading}
+          >
+            <Text style={styles.buttonText}>
+              {isLoading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.buttonText}>Send</Text>
+              )}
+            </Text>
           </TouchableOpacity>
 
           <View style={styles.subFooterLink}>
@@ -124,6 +202,12 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     padding: 12,
     marginBottom: 16,
+  },
+  errorMsg: {
+    color: "red",
+    marginTop: -14,
+    marginBottom: 10,
+    fontSize: 12,
   },
   forgotPassword: {
     alignSelf: "flex-end",

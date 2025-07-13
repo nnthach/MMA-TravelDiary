@@ -8,6 +8,8 @@ import {
   SafeAreaView,
   TouchableWithoutFeedback,
   Keyboard,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import { useRouter } from "expo-router";
 import userApi from "../../services/userApi";
@@ -15,13 +17,47 @@ import { LinearGradient } from "expo-linear-gradient";
 
 export default function RegisterScreen() {
   const router = useRouter();
-
+  const [error, setError] = useState({
+    username: "",
+    password: "",
+    email: "",
+    confirm_password: "",
+  });
   const [registerForm, setLoginForm] = useState({
     username: "",
     password: "",
     email: "",
     confirm_password: "",
   });
+  const [isLoading, setIsLoading] = useState(false);
+
+  const validateInput = () => {
+    const newError = {
+      username: "",
+      password: "",
+      email: "",
+      confirm_password: "",
+    };
+    let isValid = true;
+
+    if (registerForm.username.length < 6 || registerForm.username.length > 20) {
+      newError.username = "Username must be 6-20 characters.";
+      isValid = false;
+    }
+
+    if (registerForm.password.length < 6 || registerForm.password.length > 20) {
+      newError.password = "Password must be 6-20 characters.";
+      isValid = false;
+    }
+
+    if (registerForm.confirm_password != registerForm.password) {
+      newError.confirm_password = "Confirm password not match.";
+      isValid = false;
+    }
+
+    setError(newError);
+    return isValid;
+  };
 
   const handleChange = (value, name) => {
     setLoginForm((prev) => ({
@@ -31,18 +67,21 @@ export default function RegisterScreen() {
   };
 
   const handleRegister = async () => {
-    console.log("register", registerForm);
+    if (!validateInput()) return;
+    setIsLoading(true);
     try {
       const res = await userApi.register(registerForm);
 
-      alert("Register success");
+      Alert.alert("Register successfully");
+      setIsLoading(false);
 
       setTimeout(() => {
         router.push("/(auth)/login");
       }, 3000);
     } catch (error) {
       console.log(error);
-      alert("fail to register");
+      Alert.alert(error?.response?.data?.message || "Fail to register");
+      setIsLoading(false);
     }
   };
 
@@ -61,6 +100,9 @@ export default function RegisterScreen() {
             value={registerForm.username}
             onChangeText={(text) => handleChange(text, "username")}
           />
+          {error.username && (
+            <Text style={styles.errorMsg}>{error.username}</Text>
+          )}
 
           <TextInput
             placeholder="Email"
@@ -70,6 +112,7 @@ export default function RegisterScreen() {
             keyboardType="email-address"
             autoCapitalize="none"
           />
+          {error.email && <Text style={styles.errorMsg}>{error.email}</Text>}
 
           <TextInput
             placeholder="Password"
@@ -78,6 +121,9 @@ export default function RegisterScreen() {
             onChangeText={(text) => handleChange(text, "password")}
             secureTextEntry
           />
+          {error.password && (
+            <Text style={styles.errorMsg}>{error.password}</Text>
+          )}
 
           <TextInput
             placeholder="Confirm Password"
@@ -86,15 +132,28 @@ export default function RegisterScreen() {
             onChangeText={(text) => handleChange(text, "confirm_password")}
             secureTextEntry
           />
+          {error.confirm_password && (
+            <Text style={styles.errorMsg}>{error.confirm_password}</Text>
+          )}
 
-          <TouchableOpacity style={styles.button} onPress={handleRegister}>
-            <Text style={styles.buttonText}>Sign Up</Text>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleRegister}
+            disabled={isLoading}
+          >
+            <Text style={styles.buttonText}>
+              {isLoading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.buttonText}>Sign Up</Text>
+              )}
+            </Text>
           </TouchableOpacity>
 
           <View style={styles.row}>
             <Text style={{ color: "#f3997c" }}>Already have an account?</Text>
             <TouchableOpacity onPress={() => router.push("/login")}>
-              <Text style={styles.link}>Login</Text>
+              <Text style={styles.link}>Sign In</Text>
             </TouchableOpacity>
           </View>
 
@@ -139,6 +198,12 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     padding: 12,
     marginBottom: 16,
+  },
+  errorMsg: {
+    color: "red",
+    marginTop: -14,
+    marginBottom: 10,
+    fontSize: 12,
   },
   button: {
     backgroundColor: "#f3997c",
