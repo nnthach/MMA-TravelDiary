@@ -51,7 +51,9 @@ export default function ProfileScreen() {
   };
 
   useEffect(() => {
-    fetchUserPost();
+    if (userInfo) {
+      fetchUserPost();
+    }
   }, [userInfo?._id, queryPublic]);
 
   useFocusEffect(

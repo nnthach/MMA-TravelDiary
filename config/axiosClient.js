@@ -4,7 +4,7 @@ import userApi from "../services/userApi";
 
 const axiosClient = axios.create({
   // baseURL: "http://10.0.2.2:3000/v1", // Thay đổi URL thành 10.0.2.2 cho Android Emulator
-  baseURL: "http://192.168.1.4:3000/v1",
+  baseURL: "http://192.168.1.7:3000/v1",
   timeout: 10000, // Timeout thời gian yêu cầu
   headers: {
     "Content-Type": "application/json",
@@ -35,53 +35,38 @@ axiosClient.interceptors.request.use(
 );
 
 // Xử lý refresh token khi accessToken hết hạn
+const rawAxios = axios.create(); // Axios không interceptor
+
 axiosClient.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
     if (error?.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      console.log("🔁 Token expired. Attempting refresh...");
 
       const refreshToken = await AsyncStorage.getItem("refreshToken");
-      if (!refreshToken) {
-        console.log("⚠️ No refresh token available.");
-        return Promise.reject(error);
-      }
+      if (!refreshToken) return Promise.reject(error);
 
       try {
-        const res = await userApi.refreshToken({ refreshToken });
+        const res = await rawAxios.post(
+          "http://192.168.1.7:3000/v1/user/refresh-token",
+          {
+            refreshToken,
+          }
+        );
+
         const newAccessToken = res.data.accessToken;
 
-        console.log("✅ Token refreshed:", newAccessToken);
-
-        // Cập nhật lại token và retry request cũ
         await AsyncStorage.setItem("accessToken", newAccessToken);
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
         return axiosClient(originalRequest);
-      } catch (refreshErr) {
-        console.log("❌ Refresh token failed:", refreshErr.response?.data || refreshErr.message);
-
-        // Clear token → logout
+      } catch (err) {
         await AsyncStorage.removeItem("accessToken");
         await AsyncStorage.removeItem("refreshToken");
-
-        // 👉 Có thể thêm navigation.navigate('Login') tại đây nếu dùng React Navigation
-
-        return Promise.reject(refreshErr); // DỪNG lặp
+        return Promise.reject(err);
       }
-    }
-
-    // Các lỗi khác (không phải 401)
-    if (error.response) {
-      const { status, data } = error.response;
-      console.log("Axios Error:", status, data?.message || data);
-    } else {
-      console.log("Axios Unknown Error:", error.message);
     }
 
     return Promise.reject(error);

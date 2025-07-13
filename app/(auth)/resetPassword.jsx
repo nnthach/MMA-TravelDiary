@@ -7,6 +7,8 @@ import {
   StyleSheet,
   SafeAreaView,
   Alert,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { useRouter } from "expo-router";
 import userApi from "../../services/userApi";
@@ -49,55 +51,59 @@ export default function ResetPasswordScreen() {
   };
 
   return (
-    <LinearGradient
-      colors={["#f9f0e1", "#f9f0e1", "#f6c169"]}
-      style={{ flex: 1, justifyContent: "center" }}
-    >
-      <View style={styles.container}>
-        <Text style={styles.title}>Reset Password</Text>
-        <Text style={{ color: "grey", textAlign: "center", marginBottom: 10 }}>
-          OTP sent to your email, please check it!
-        </Text>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <LinearGradient
+        colors={["#f9f0e1", "#f9f0e1", "#f6c169"]}
+        style={{ flex: 1, justifyContent: "center" }}
+      >
+        <View style={styles.container}>
+          <Text style={styles.title}>Reset Password</Text>
+          <Text
+            style={{ color: "grey", textAlign: "center", marginBottom: 10 }}
+          >
+            OTP sent to your email, please check it!
+          </Text>
 
-        <TextInput
-          placeholder="Enter OTP"
-          style={styles.input}
-          value={resetPasswordForm.otp}
-          onChangeText={(text) => handleChange(text, "otp")}
-          autoCapitalize="none"
-        />
+          <TextInput
+            placeholder="Enter OTP"
+            style={styles.input}
+            value={resetPasswordForm.otp}
+            onChangeText={(text) => handleChange(text, "otp")}
+            autoCapitalize="none"
+          />
 
-        <TextInput
-          placeholder="Password"
-          style={styles.input}
-          value={resetPasswordForm.password}
-          onChangeText={(text) => handleChange(text, "password")}
-          secureTextEntry
-        />
+          <TextInput
+            placeholder="Password"
+            style={styles.input}
+            value={resetPasswordForm.password}
+            onChangeText={(text) => handleChange(text, "password")}
+            secureTextEntry
+          />
 
-        <TextInput
-          placeholder="Confirm Password"
-          style={styles.input}
-          value={resetPasswordForm.confirmPassword}
-          onChangeText={(text) => handleChange(text, "confirmPassword")}
-          secureTextEntry
-        />
+          <TextInput
+            placeholder="Confirm Password"
+            style={styles.input}
+            value={resetPasswordForm.confirmPassword}
+            onChangeText={(text) => handleChange(text, "confirmPassword")}
+            secureTextEntry
+          />
 
-        <TouchableOpacity style={styles.button} onPress={handleResetPassword}>
-          <Text style={styles.buttonText}>Send</Text>
-        </TouchableOpacity>
-
-        <View style={styles.subFooterLink}>
-          <TouchableOpacity onPress={() => router.replace("/")}>
-            <Text
-              style={{ fontSize: 14, color: "#f3997c", textAlign: "center" }}
-            >
-              Back
-            </Text>
+          <TouchableOpacity style={styles.button} onPress={handleResetPassword}>
+            <Text style={styles.buttonText}>Send</Text>
           </TouchableOpacity>
+
+          <View style={styles.subFooterLink}>
+            <TouchableOpacity onPress={() => router.replace("/")}>
+              <Text
+                style={{ fontSize: 14, color: "#f3997c", textAlign: "center" }}
+              >
+                Back
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-    </LinearGradient>
+      </LinearGradient>
+    </TouchableWithoutFeedback>
   );
 }
 

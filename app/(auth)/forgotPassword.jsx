@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import { useRouter } from "expo-router";
 import userApi from "../../services/userApi";
@@ -41,37 +43,39 @@ export default function ForgotPasswordScreen() {
   };
 
   return (
-    <LinearGradient
-      colors={["#f9f0e1", "#f9f0e1", "#f6c169"]}
-      style={{ flex: 1, justifyContent: "center" }}
-    >
-      <View style={styles.container}>
-        <Text style={styles.title}>Forgot Password</Text>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <LinearGradient
+        colors={["#f9f0e1", "#f9f0e1", "#f6c169"]}
+        style={{ flex: 1, justifyContent: "center" }}
+      >
+        <View style={styles.container}>
+          <Text style={styles.title}>Forgot Password</Text>
 
-        <TextInput
-          placeholder="Enter email"
-          style={styles.input}
-          value={forgotPasswordForm.email}
-          onChangeText={(text) => handleChange(text, "email")}
-          autoCapitalize="none"
-          keyboardType="email-address"
-        />
+          <TextInput
+            placeholder="Enter email"
+            style={styles.input}
+            value={forgotPasswordForm.email}
+            onChangeText={(text) => handleChange(text, "email")}
+            autoCapitalize="none"
+            keyboardType="email-address"
+          />
 
-        <TouchableOpacity style={styles.button} onPress={handleSendEmail}>
-          <Text style={styles.buttonText}>Send</Text>
-        </TouchableOpacity>
-
-        <View style={styles.subFooterLink}>
-          <TouchableOpacity onPress={() => router.replace("/")}>
-            <Text
-              style={{ fontSize: 14, color: "#f3997c", textAlign: "center" }}
-            >
-              Back
-            </Text>
+          <TouchableOpacity style={styles.button} onPress={handleSendEmail}>
+            <Text style={styles.buttonText}>Send</Text>
           </TouchableOpacity>
+
+          <View style={styles.subFooterLink}>
+            <TouchableOpacity onPress={() => router.replace("/")}>
+              <Text
+                style={{ fontSize: 14, color: "#f3997c", textAlign: "center" }}
+              >
+                Back
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-    </LinearGradient>
+      </LinearGradient>
+    </TouchableWithoutFeedback>
   );
 }
 

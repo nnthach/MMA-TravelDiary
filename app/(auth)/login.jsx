@@ -6,6 +6,10 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
+  TouchableWithoutFeedback,
+  Keyboard,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import { useRouter } from "expo-router";
 import userApi from "../../services/userApi";
@@ -19,6 +23,7 @@ export default function LoginScreen() {
     account: "",
     password: "",
   });
+  const [isLoading, setIsLoading] = useState(false);
   const { setUserId } = useContext(AuthContext);
 
   const handleChange = (value, name) => {
@@ -29,6 +34,7 @@ export default function LoginScreen() {
   };
 
   const handleLogin = async () => {
+    setIsLoading(true);
     try {
       const res = await userApi.login(loginForm);
       const { accessToken, refreshToken } = res.data;
@@ -39,7 +45,9 @@ export default function LoginScreen() {
       AsyncStorage.setItem("refreshToken", refreshToken);
       AsyncStorage.setItem("userId", res.data.userId);
 
-      alert("login success");
+      Alert.alert("Login successfully");
+
+      setIsLoading(false);
 
       setTimeout(() => {
         if (res.data.role == "Admin") {
@@ -47,76 +55,87 @@ export default function LoginScreen() {
         } else {
           router.replace("/(tabs)");
         }
-      }, 3000);
+      }, 1500);
     } catch (error) {
       console.log("login error", error);
-      alert("fail to login");
+      Alert.alert("Fail to login");
+      setIsLoading(false);
     }
   };
 
   return (
-    <LinearGradient
-      colors={["#f9f0e1", "#f9f0e1", "#f6c169"]}
-      style={{ flex: 1, justifyContent: "center" }}
-    >
-      <View style={styles.container}>
-        <Text style={styles.title}>Welcome back</Text>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <LinearGradient
+        colors={["#f9f0e1", "#f9f0e1", "#f6c169"]}
+        style={{ flex: 1, justifyContent: "center" }}
+      >
+        <View style={styles.container}>
+          <Text style={styles.title}>Welcome back</Text>
 
-        <TextInput
-          placeholder="Email or username"
-          style={styles.input}
-          value={loginForm.account}
-          onChangeText={(text) => handleChange(text, "account")}
-          autoCapitalize="none"
-          keyboardType="email-address"
-        />
+          <TextInput
+            placeholder="Email or username"
+            style={styles.input}
+            value={loginForm.account}
+            onChangeText={(text) => handleChange(text, "account")}
+            autoCapitalize="none"
+            keyboardType="email-address"
+          />
 
-        <TextInput
-          placeholder="Password"
-          style={styles.input}
-          value={loginForm.password}
-          onChangeText={(text) => handleChange(text, "password")}
-          secureTextEntry
-        />
+          <TextInput
+            placeholder="Password"
+            style={styles.input}
+            value={loginForm.password}
+            onChangeText={(text) => handleChange(text, "password")}
+            secureTextEntry
+          />
 
-        <TouchableOpacity
-          onPress={() => router.push("/forgotPassword")}
-          style={styles.forgotPassword}
-        >
-          <Text style={styles.linkText}>Forgot your password?</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity>
-
-        <View style={styles.row}>
-          <Text style={{ color: "#f3997c" }}>Don’t have an account? </Text>
-          <TouchableOpacity onPress={() => router.push("/register")}>
-            <Text style={styles.link}>Sign up</Text>
+          <TouchableOpacity
+            onPress={() => router.push("/forgotPassword")}
+            style={styles.forgotPassword}
+          >
+            <Text style={styles.linkText}>Forgot your password?</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleLogin}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>Login</Text>
+            )}
+          </TouchableOpacity>
+
+          <View style={styles.row}>
+            <Text style={{ color: "#f3997c" }}>Don’t have an account? </Text>
+            <TouchableOpacity onPress={() => router.push("/register")}>
+              <Text style={styles.link}>Sign up</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.subFooterLink}>
+            <TouchableOpacity onPress={() => router.replace("/(tabs)")}>
+              <Text
+                style={{ fontSize: 14, color: "#f3997c", textAlign: "center" }}
+              >
+                Continue as Guest
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => router.replace("/(tabs)")}>
+              <Text
+                style={{ fontSize: 14, color: "#f3997c", textAlign: "center" }}
+                onPress={() => router.replace("/")}
+              >
+                Back
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
-
-        <View style={styles.subFooterLink}>
-          <TouchableOpacity onPress={() => router.replace("/(tabs)")}>
-            <Text
-              style={{ fontSize: 14, color: "#f3997c", textAlign: "center" }}
-            >
-              Continue as Guest
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => router.replace("/(tabs)")}>
-            <Text
-              style={{ fontSize: 14, color: "#f3997c", textAlign: "center" }}
-              onPress={() => router.replace("/")}
-            >
-              Back
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </LinearGradient>
+      </LinearGradient>
+    </TouchableWithoutFeedback>
   );
 }
 

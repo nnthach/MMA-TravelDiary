@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import { useRouter } from "expo-router";
 import userApi from "../../services/userApi";
@@ -45,76 +47,78 @@ export default function RegisterScreen() {
   };
 
   return (
-    <LinearGradient
-      colors={["#f9f0e1", "#f9f0e1", "#f6c169"]}
-      style={{ flex: 1, justifyContent: "center" }}
-    >
-      <View style={styles.container}>
-        <Text style={styles.title}>Create Account</Text>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <LinearGradient
+        colors={["#f9f0e1", "#f9f0e1", "#f6c169"]}
+        style={{ flex: 1, justifyContent: "center" }}
+      >
+        <View style={styles.container}>
+          <Text style={styles.title}>Create Account</Text>
 
-        <TextInput
-          placeholder="Username"
-          style={styles.input}
-          value={registerForm.username}
-          onChangeText={(text) => handleChange(text, "username")}
-        />
+          <TextInput
+            placeholder="Username"
+            style={styles.input}
+            value={registerForm.username}
+            onChangeText={(text) => handleChange(text, "username")}
+          />
 
-        <TextInput
-          placeholder="Email"
-          style={styles.input}
-          value={registerForm.email}
-          onChangeText={(text) => handleChange(text, "email")}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
+          <TextInput
+            placeholder="Email"
+            style={styles.input}
+            value={registerForm.email}
+            onChangeText={(text) => handleChange(text, "email")}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
 
-        <TextInput
-          placeholder="Password"
-          style={styles.input}
-          value={registerForm.password}
-          onChangeText={(text) => handleChange(text, "password")}
-          secureTextEntry
-        />
+          <TextInput
+            placeholder="Password"
+            style={styles.input}
+            value={registerForm.password}
+            onChangeText={(text) => handleChange(text, "password")}
+            secureTextEntry
+          />
 
-        <TextInput
-          placeholder="Confirm Password"
-          style={styles.input}
-          value={registerForm.confirm_password}
-          onChangeText={(text) => handleChange(text, "confirm_password")}
-          secureTextEntry
-        />
+          <TextInput
+            placeholder="Confirm Password"
+            style={styles.input}
+            value={registerForm.confirm_password}
+            onChangeText={(text) => handleChange(text, "confirm_password")}
+            secureTextEntry
+          />
 
-        <TouchableOpacity style={styles.button} onPress={handleRegister}>
-          <Text style={styles.buttonText}>Sign Up</Text>
-        </TouchableOpacity>
-
-        <View style={styles.row}>
-          <Text style={{ color: "#f3997c" }}>Already have an account?</Text>
-          <TouchableOpacity onPress={() => router.push("/login")}>
-            <Text style={styles.link}>Login</Text>
+          <TouchableOpacity style={styles.button} onPress={handleRegister}>
+            <Text style={styles.buttonText}>Sign Up</Text>
           </TouchableOpacity>
+
+          <View style={styles.row}>
+            <Text style={{ color: "#f3997c" }}>Already have an account?</Text>
+            <TouchableOpacity onPress={() => router.push("/login")}>
+              <Text style={styles.link}>Login</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.subFooterLink}>
+            <TouchableOpacity onPress={() => router.replace("/(tabs)")}>
+              <Text
+                style={{ fontSize: 14, color: "#f3997c", textAlign: "center" }}
+              >
+                Continue as Guest
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => router.replace("/(tabs)")}>
+              <Text
+                style={{ fontSize: 14, color: "#f3997c", textAlign: "center" }}
+                onPress={() => router.replace("/")}
+              >
+                Back
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
-
-        <View style={styles.subFooterLink}>
-          <TouchableOpacity onPress={() => router.replace("/(tabs)")}>
-            <Text
-              style={{ fontSize: 14, color: "#f3997c", textAlign: "center" }}
-            >
-              Continue as Guest
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => router.replace("/(tabs)")}>
-            <Text
-              style={{ fontSize: 14, color: "#f3997c", textAlign: "center" }}
-              onPress={() => router.replace("/")}
-            >
-              Back
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </LinearGradient>
+      </LinearGradient>
+    </TouchableWithoutFeedback>
   );
 }
 

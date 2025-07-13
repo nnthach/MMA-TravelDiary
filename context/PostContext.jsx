@@ -7,6 +7,7 @@ export const PostProvider = ({ children }) => {
   const [postListData, setPostListData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [postDetail, setPostDetail] = useState(null);
+  const [postId, setPostId] = useState(null);
 
   const getAllPost = async () => {
     setIsLoading(true);
@@ -45,6 +46,7 @@ export const PostProvider = ({ children }) => {
         postDetail,
         getAllPost,
         getPostDetail,
+        postId, setPostId
       }}
     >
       {children}
