@@ -185,20 +185,21 @@ export default function ProfileScreen() {
         </View>
 
         {/* Admin management button */}
-        {userInfo?.role === "Admin" && (
-          <View style={styles.buttonRow}>
-            <TouchableOpacity
-              style={styles.managementButton}
-              onPress={() => {
-                router.replace("/(admin)");
-              }}
-            >
-              <Text style={{ color: "#000", fontWeight: "bold" }}>
-                Back to Management
-              </Text>
-            </TouchableOpacity>
-          </View>
-        )}
+     {userInfo?.role === "Admin" && (
+  <View style={styles.buttonRow}>
+    <TouchableOpacity
+      style={styles.managementButton}
+      onPress={() => {
+        router.replace("/(admin)");
+      }}
+    >
+      <Text style={{ color: "#000", fontWeight: "bold" }}>
+        Back to Management
+      </Text>
+    </TouchableOpacity>
+  </View>
+)}
+
 
         <View
           style={{
@@ -305,14 +306,28 @@ const styles = StyleSheet.create({
     marginRight: 8,
     alignItems: "center",
   },
+buttonRow: {
+  flexDirection: "row",
+  justifyContent: "center",
+  paddingHorizontal: 16,
+  marginBottom: 12,
+  marginTop: 4, // thêm khoảng cách phía trên
+},
 
-  managementButton: {
-    flex: 1,
-    backgroundColor: "#ffcc00", // Highlight color for admin button
-    padding: 10,
-    borderRadius: 8,
-    alignItems: "center",
-  },
+managementButton: {
+  flex: 1,
+  backgroundColor: "#f6c169", // vàng
+  paddingVertical: 12, // tăng chiều cao
+  paddingHorizontal: 10,
+  borderRadius: 8,
+  alignItems: "center",
+  justifyContent: "center", // căn giữa
+  elevation: 3, // Android shadow
+  shadowColor: "#000", // iOS shadow
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.2,
+  shadowRadius: 4,
+},
 
   dropdownMenu: {
     position: "absolute",

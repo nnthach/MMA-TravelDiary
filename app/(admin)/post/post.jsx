@@ -11,8 +11,9 @@ import {
   Modal,
   Image,
 } from "react-native";
-import { AuthContext } from "../../../context/AuthContext"; // Assuming you have AuthContext
-import postAPIs from "../../../services/postAPIs"; // Import the postAPIs
+import { Video } from "expo-av";
+import { AuthContext } from "../../../context/AuthContext";
+import postAPIs from "../../../services/postAPIs";
 
 export default function Post() {
   const [posts, setPosts] = useState([]);
@@ -20,39 +21,33 @@ export default function Post() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [postDetails, setPostDetails] = useState(null); // To store the details of the clicked post
+  const [postDetails, setPostDetails] = useState(null);
   const [newPost, setNewPost] = useState({
     title: "",
     content: "",
     images: [],
   });
 
-  // Access the logged-in user's data from AuthContext
   const { userId, username } = useContext(AuthContext);
 
-  // Fetch posts from API
-const fetchPosts = async () => {
-  try {
-    setLoading(true);
-    const response = await postAPIs.getAllPost(); // Using postAPIs here
-    setPosts(response.data);
-  } catch (error) {
-    // Log error details to the console for debugging
-    console.error('Error fetching posts:', error.response || error.message);
-    Alert.alert('Error', 'Unable to load posts');
-  } finally {
-    setLoading(false);
-  }
-};
+  const fetchPosts = async () => {
+    try {
+      setLoading(true);
+      const response = await postAPIs.getAllPost();
+      setPosts(response.data);
+    } catch (error) {
+      console.error("Error fetching posts:", error.response || error.message);
+      Alert.alert("Error", "Unable to load posts");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-
-  // Open the details modal
   const showPostDetails = (post) => {
     setPostDetails(post);
     setShowDetailsModal(true);
   };
 
-  // Open the edit modal
   const showPostEdit = (post) => {
     setPostDetails(post);
     setNewPost({
@@ -63,7 +58,6 @@ const fetchPosts = async () => {
     setShowEditModal(true);
   };
 
-  // Handle Change in Form Inputs
   const handleChange = (name, value) => {
     setNewPost((prev) => ({
       ...prev,
@@ -71,29 +65,27 @@ const fetchPosts = async () => {
     }));
   };
 
-  // Create Post
   const handleCreatePost = async () => {
     const postToCreate = {
-      userId: userId,
-      username: username,
+      userId,
+      username,
       title: newPost.title,
       content: newPost.content,
       images: newPost.images,
     };
 
     try {
-      const { data } = await postAPIs.create(postToCreate); // Using postAPIs here
+      const { data } = await postAPIs.create(postToCreate);
       setPosts((prevPosts) => [data, ...prevPosts]);
       Alert.alert("Success", "Post has been added");
       setShowAddModal(false);
       setNewPost({ title: "", content: "", images: [] });
     } catch (error) {
       Alert.alert("Error", "Unable to add post");
-      console.error("Error creating post:", error.response || error.message || error);
+      console.error("Error creating post:", error.response || error.message);
     }
   };
 
-  // Edit Post
   const handleEditPost = async (id) => {
     const updatedPost = {
       userId: postDetails.userId,
@@ -104,24 +96,21 @@ const fetchPosts = async () => {
     };
 
     try {
-      const { data } = await postAPIs.update(id, updatedPost); // Using postAPIs here
+      const { data } = await postAPIs.update(id, updatedPost);
       setPosts((prevPosts) =>
-        prevPosts.map((post) =>
-          post._id === id ? { ...post, ...updatedPost } : post
-        )
+        prevPosts.map((post) => (post._id === id ? { ...post, ...updatedPost } : post))
       );
       Alert.alert("Success", "Post updated");
       setShowEditModal(false);
     } catch (error) {
       Alert.alert("Error", "Unable to update post");
-      console.error("Error updating post:", error.response || error.message || error);
+      console.error("Error updating post:", error.response || error.message);
     }
   };
 
-  // Delete Post
   const handleDeletePost = async (id) => {
     try {
-      await postAPIs.delete(id); // Using postAPIs here
+      await postAPIs.delete(id);
       setPosts((prevPosts) => prevPosts.filter((post) => post._id !== id));
       Alert.alert("Success", "Post has been deleted");
     } catch (error) {
@@ -144,7 +133,7 @@ const fetchPosts = async () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}> Post List</Text>
+      <Text style={styles.title}>Post List</Text>
 
       <View style={styles.table}>
         <View style={styles.tableHeader}>
@@ -160,117 +149,19 @@ const fetchPosts = async () => {
             <View style={styles.tableRow}>
               <Text style={styles.tableCell}>{item.username}</Text>
               <Text style={styles.tableCell}>{item.title}</Text>
-
-              {/* Actions */}
               <View style={styles.tableActions}>
                 <TouchableOpacity onPress={() => showPostDetails(item)}>
                   <Text style={styles.detailBtn}>Details</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleDeletePost(item._id)}>
-                  <Text style={styles.deleteBtn}> Delete</Text>
-                </TouchableOpacity>
+           
               </View>
             </View>
           )}
         />
       </View>
 
-      {/* Add Post Modal */}
-      <Modal visible={showAddModal} animationType="slide" transparent={false}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Create Post</Text>
-
-            {/* Input Fields for Creating a Post */}
-            <TextInput
-              style={styles.input}
-              placeholder="Title"
-              value={newPost.title}
-              onChangeText={(text) => handleChange("title", text)}
-            />
-
-            <TextInput
-              style={[styles.input, { height: 150 }]} // Make it multiline
-              placeholder="Content"
-              value={newPost.content}
-              onChangeText={(text) => handleChange("content", text)}
-              multiline
-            />
-
-            <TextInput
-              style={styles.input}
-              placeholder="Images (comma separated)"
-              value={newPost.images.join(", ")}
-              onChangeText={(text) => handleChange("images", text.split(", "))}
-            />
-
-            <View style={styles.modalActions}>
-              <TouchableOpacity
-                style={styles.cancelButton}
-                onPress={() => setShowAddModal(false)}
-              >
-                <Text style={styles.cancelButtonText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.submitButton}
-                onPress={handleCreatePost}
-              >
-                <Text style={styles.submitButtonText}>Create Post</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
-
-      {/* Edit Post Modal */}
-      <Modal visible={showEditModal} animationType="slide" transparent={false}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Edit Post</Text>
-
-            {/* Input Fields for Editing a Post */}
-            <TextInput
-              style={styles.input}
-              placeholder="Title"
-              value={newPost.title}
-              onChangeText={(text) => handleChange("title", text)}
-            />
-
-            <TextInput
-              style={[styles.input, { height: 150 }]} // Make it multiline
-              placeholder="Content"
-              value={newPost.content}
-              onChangeText={(text) => handleChange("content", text)}
-              multiline
-            />
-
-            <TextInput
-              style={styles.input}
-              placeholder="Images (comma separated)"
-              value={newPost.images.join(", ")}
-              onChangeText={(text) => handleChange("images", text.split(", "))}
-            />
-
-            <View style={styles.modalActions}>
-              <TouchableOpacity
-                style={styles.cancelButton}
-                onPress={() => setShowEditModal(false)}
-              >
-                <Text style={styles.cancelButtonText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.submitButton}
-                onPress={() => handleEditPost(postDetails._id)}
-              >
-                <Text style={styles.submitButtonText}>Update Post</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
-
-      {/* Details Post Modal */}
-      <Modal visible={showDetailsModal} animationType="slide" transparent={true}>
+      {/* Post Details Modal */}
+      <Modal visible={showDetailsModal} animationType="slide" transparent>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Post Details</Text>
@@ -278,19 +169,37 @@ const fetchPosts = async () => {
             <Text style={styles.detailsText}>Title: {postDetails?.title}</Text>
             <Text style={styles.detailsText}>Content: {postDetails?.content}</Text>
 
-            {/* Displaying images if they exist */}
             <View style={styles.imageContainer}>
-              {postDetails?.images && postDetails.images.length > 0 ? (
-                postDetails.images.map((img, index) => (
-                  <Image
-                    key={index}
-                    source={{ uri: img }}
-                    style={styles.image}
-                  />
-                ))
-              ) : (
-                <Text>No images uploaded</Text>
-              )}
+        {Array.isArray(postDetails?.images) && postDetails.images.length > 0 ? (
+  postDetails.images.map((media, index) => {
+    if (!media || typeof media !== "object" || !media.uri) return null;
+
+    const isVideo = media.type === "video";
+
+    return (
+      <View key={index} style={{ margin: 5 }}>
+        {isVideo ? (
+          <Video
+            source={{ uri: media.uri }}
+            style={{ width: 150, height: 150 }}
+            useNativeControls
+            resizeMode="cover"
+            isLooping
+          />
+        ) : (
+          <Image
+            source={{ uri: media.uri }}
+            style={{ width: 150, height: 150 }}
+            resizeMode="cover"
+          />
+        )}
+      </View>
+    );
+  })
+) : (
+  <Text>No media</Text>
+)}
+
             </View>
 
             <TouchableOpacity
@@ -306,7 +215,6 @@ const fetchPosts = async () => {
   );
 }
 
-// Styles go here...
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -364,10 +272,6 @@ const styles = StyleSheet.create({
     color: "#1d4ed8",
     fontWeight: "bold",
   },
-  editBtn: {
-    color: "#059669",
-    fontWeight: "bold",
-  },
   deleteBtn: {
     color: "#dc2626",
     fontWeight: "bold",
@@ -392,14 +296,10 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     textAlign: "center",
   },
-  input: {
-    height: 45,
-    borderColor: "#e5c77e",
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    marginBottom: 15,
-    backgroundColor: "#fff",
+  detailsText: {
+    fontSize: 14,
+    marginBottom: 5,
+    color: "#444",
   },
   imageContainer: {
     flexDirection: "row",
@@ -415,30 +315,24 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ddd",
   },
-  modalActions: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 10,
+  video: {
+    width: 150,
+    height: 150,
+    borderRadius: 10,
+    margin: 5,
+    borderWidth: 1,
+    borderColor: "#ddd",
   },
   cancelButton: {
     backgroundColor: "#ccc",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
+    marginTop: 15,
+    alignSelf: "center",
   },
   cancelButtonText: {
     color: "#333",
     fontWeight: "600",
   },
-  submitButton: {
-    backgroundColor: "#f6c169",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-  },
-  submitButtonText: {
-    color: "#000",
-    fontWeight: "600",
-  },
 });
-

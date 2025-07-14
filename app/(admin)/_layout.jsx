@@ -43,36 +43,42 @@ export default function AdminLayout() {
     <SafeAreaView style={styles.safeContainer}>
       <View style={styles.container}>
         {/* Sidebar */}
-        {isSidebarOpen && (
-          <LinearGradient
-            colors={["#f9f0e1", "#f9f0e1", "#f6c169"]}
-            style={styles.sidebar}
-          >
-            <Text style={styles.logo}>🛠 Admin Panel</Text>
+       {isSidebarOpen && (
+  <LinearGradient
+    colors={["#f9f0e1", "#f9f0e1", "#f6c169"]}
+    style={styles.sidebar}
+  >
+    <Text style={styles.logo}>🛠 Admin</Text>
 
-            {renderNavButton("📊 Dashboard", "/(admin)")}
-            {renderNavButton("👥 Users", "/(admin)/users/users")}
-            {renderNavButton("📝 Posts", "/(admin)/post/post")}
-            {renderNavButton("📋 Reports", "/(admin)/report/report")}
+    {/* Navigation Section */}
+    <View style={styles.navSection}>
+      {renderNavButton("👥 Users", "/(admin)/users/users")}
+      {renderNavButton("📝 Posts", "/(admin)/post/post")}
+      {renderNavButton("📋 Reports", "/(admin)/report/report")}
+    </View>
 
-            <TouchableOpacity
-              onPress={() => {
-                handleLogout();
-                router.replace("/(auth)/login");
-              }}
-              style={styles.button}
-            >
-              <Text style={styles.buttonText}>🚪 Sign Out</Text>
-            </TouchableOpacity>
+    {/* Bottom Buttons Section */}
+    <View style={styles.bottomButtons}>
+      <TouchableOpacity
+        onPress={() => router.replace("/(tabs)")}
+        style={styles.button}
+      >
+        <Text style={styles.buttonText}>🏠 Go Home</Text>
+      </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={() => router.replace("/(tabs)")}
-              style={styles.button}
-            >
-              <Text style={styles.buttonText}>🏠 Go Home</Text>
-            </TouchableOpacity>
-          </LinearGradient>
-        )}
+      <TouchableOpacity
+        onPress={() => {
+          handleLogout();
+          router.replace("/(auth)/login");
+        }}
+        style={styles.button}
+      >
+        <Text style={styles.buttonText}>🚪 Sign Out</Text>
+      </TouchableOpacity>
+    </View>
+  </LinearGradient>
+)}
+
 
         {/* Content */}
         <View style={styles.content}>
@@ -95,14 +101,24 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
   },
-  sidebar: {
-    width: 160,
-    height: "100%",
-    paddingTop: 80,
-    paddingHorizontal: 15,
-    borderRightWidth: 1,
-    borderRightColor: "#e0d4b0",
-  },
+ sidebar: {
+  width: 138,
+  height: "100%",
+  paddingTop: 80,
+  paddingHorizontal: 15,
+  borderRightWidth: 1,
+  borderRightColor: "#e0d4b0",
+  justifyContent: "space-between", // thêm dòng này nếu bạn không chia View như trên
+},
+navSection: {
+  flex: 1,
+},
+bottomButtons: {
+  marginBottom: 30, // để cách đáy một chút
+  alignItems: "flex-start",
+  gap: 10,
+},
+
   logo: {
     color: "#333",
     fontWeight: "bold",

@@ -12,6 +12,7 @@ import {
 import reportAPIs from "../../../services/reportAPIs";
 import postAPIs from "../../../services/postAPIs";
 import { AuthContext } from "../../../context/AuthContext";
+import { Video } from "expo-av"; // ✅ Import Video
 
 export default function Report() {
   const [reports, setReports] = useState([]);
@@ -146,26 +147,30 @@ export default function Report() {
 
                 <View style={styles.imageContainer}>
                   {postDetails.images && postDetails.images.length > 0 ? (
-                    postDetails.images.map((img, idx) => (
-                      <View key={idx} style={styles.imageWrap}>
-                        {img.type.startsWith("image") ? (
-                          <Image
-                            source={{ uri: img.uri }}
-                            style={styles.image}
-                          />
-                        ) : (
-                          <Video
-                            source={{ uri: img.uri }}
-                            style={styles.image}
-                            useNativeControls
-                            resizeMode="cover"
-                            isLooping
-                          />
-                        )}
-                      </View>
-                    ))
+                    postDetails.images.map((media, idx) => {
+                      if (!media || !media.uri) return null;
+
+                      return (
+                        <View key={idx} style={styles.imageWrap}>
+                          {media.type === "image" ? (
+                            <Image
+                              source={{ uri: media.uri }}
+                              style={styles.image}
+                            />
+                          ) : (
+                            <Video
+                              source={{ uri: media.uri }}
+                              style={styles.video}
+                              useNativeControls
+                              resizeMode="cover"
+                              isLooping
+                            />
+                          )}
+                        </View>
+                      );
+                    })
                   ) : (
-                    <Text style={styles.detailsText}>No images</Text>
+                    <Text style={styles.detailsText}>No images or videos</Text>
                   )}
                 </View>
               </>
@@ -287,6 +292,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: "#ddd",
+  },
+  video: {
+    width: 160,
+    height: 90,
+    margin: 5,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#ccc",
   },
   modalActions: {
     flexDirection: "row",

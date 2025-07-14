@@ -13,6 +13,7 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from "react-native";
+import { Platform } from "react-native";
 import axios from "axios";
 import * as ImagePicker from "expo-image-picker";
 import postAPIs from "../../services/postAPIs";
@@ -433,6 +434,7 @@ const styles = StyleSheet.create({
   },
   textarea: { height: 100, textAlignVertical: "top" },
   pickerButton: {
+    paddingTop: 15,
     padding: 15,
     borderWidth: 1,
     borderColor: "#ccc",
@@ -466,7 +468,13 @@ const styles = StyleSheet.create({
   },
   buttonText: { color: "#fff", fontSize: 18, fontWeight: "bold" },
   errorText: { color: "red", marginBottom: 10 },
-  modalContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
+modalContainer: {
+  flex: 1,
+  justifyContent: "center",
+  alignItems: "center",
+  paddingBottom: Platform.OS === "ios" ? 40 : 20, // thêm khoảng cách dưới
+  paddingTop: Platform.OS === "ios" ? 50 : 20, // thêm khoảng cách trên
+},
   modalItem: { padding: 20, borderBottomWidth: 1, borderBottomColor: "#ccc" },
   closeModal: { padding: 10, color: "blue" },
   overlay: {
