@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { Video } from "expo-av";
 import {
   View,
   Text,
@@ -67,18 +68,32 @@ export default function BlogScreen() {
     setRefreshing(false);
   }, []);
 
-  const renderItem = ({ item }) => (
+const renderItem = ({ item }) => {
+  const media = item.images?.[0];
+
+  return (
     <TouchableOpacity
       style={styles.imageContainer}
       onPress={() => router.push(`/post/${item._id}`)}
     >
-      <Image
-        source={{ uri: item.images?.[0] || "https://via.placeholder.com/150" }}
-        style={styles.image}
-        resizeMode="cover"
-      />
+      {media?.type === "video" ? (
+        <Video
+          source={{ uri: media.uri }}
+          style={styles.image}
+          resizeMode="cover"
+          isMuted
+          shouldPlay={false}
+        />
+      ) : (
+        <Image
+          source={{ uri: media?.uri || "https://via.placeholder.com/150" }}
+          style={styles.image}
+          resizeMode="cover"
+        />
+      )}
     </TouchableOpacity>
   );
+};
 
   return (
     <SafeAreaView style={styles.container}>
