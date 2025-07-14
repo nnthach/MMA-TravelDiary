@@ -65,6 +65,9 @@ export default function CommentModal({ setOpenComment, openComment }) {
         content: "",
       }));
 
+      setOpenComment(false);
+      Alert.alert("Update successfully");
+
       await getPostDetail(postId);
     } catch (error) {
       console.log("update comment error", error);
@@ -76,7 +79,9 @@ export default function CommentModal({ setOpenComment, openComment }) {
     try {
       const res = await commentAPIs.delete(id);
       console.log("delete comment res", res.data);
+      setOpenComment(false);
 
+      Alert.alert("Delete successfully");
       await getPostDetail(postId);
       await getAllPost();
     } catch (error) {
@@ -87,22 +92,22 @@ export default function CommentModal({ setOpenComment, openComment }) {
   const handleCreateComment = async () => {
     try {
       const res = await commentAPIs.create(commentDataForm);
-      console.log("create comment res data", res.data);
 
       setCommentDataForm((prev) => ({
         ...prev,
         content: "",
       }));
 
+      setIsEditing(false);
+      setOpenComment(false);
+      Alert.alert("Create successfully");
       await getPostDetail(postId);
       await getAllPost();
-
-      setIsEditing(false);
     } catch (error) {
       if (error.response && error.response.data?.message) {
-        Alert.alert("Error", error.response.data.message);
+        Alert.alert(error.response.data.message);
       } else {
-        Alert.alert("Error", "Something wrong");
+        Alert.alert("Something wrong");
       }
       console.log("create comment err", error);
       setCommentDataForm((prev) => ({
@@ -234,7 +239,11 @@ export default function CommentModal({ setOpenComment, openComment }) {
                                 handleDeleteComment(comment._id);
                               }}
                             >
-                              <Ionicons name="trash" size={20} color="black" />
+                              <Ionicons
+                                name="trash-outline"
+                                size={20}
+                                color="black"
+                              />
                               <Text
                                 style={{ textAlign: "right", marginLeft: 5 }}
                               >
@@ -264,11 +273,14 @@ export default function CommentModal({ setOpenComment, openComment }) {
                   paddingBottom: Platform.OS === "ios" ? 20 : 10,
                 }}
               >
-                <View style={{ maxWidth: 45, overflow: "hidden" }}>
-                  <Text style={{ fontWeight: "bold", fontSize: 16 }}>
+                {/* <View style={{ maxWidth: 45, overflow: "hidden" }}>
+                  <Text
+                    style={{ fontWeight: "bold", fontSize: 16 }}
+                    numberOfLines={1}
+                  >
                     {userInfo?.username || "guest"}
                   </Text>
-                </View>
+                </View> */}
                 <TextInput
                   style={styles.input}
                   placeholder="Type here"

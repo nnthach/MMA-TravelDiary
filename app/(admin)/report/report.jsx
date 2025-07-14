@@ -147,11 +147,22 @@ export default function Report() {
                 <View style={styles.imageContainer}>
                   {postDetails.images && postDetails.images.length > 0 ? (
                     postDetails.images.map((img, idx) => (
-                      <Image
-                        key={idx}
-                        source={{ uri: img }}
-                        style={styles.image}
-                      />
+                      <View key={idx} style={styles.imageWrap}>
+                        {img.type.startsWith("image") ? (
+                          <Image
+                            source={{ uri: img.uri }}
+                            style={styles.image}
+                          />
+                        ) : (
+                          <Video
+                            source={{ uri: img.uri }}
+                            style={styles.image}
+                            useNativeControls
+                            resizeMode="cover"
+                            isLooping
+                          />
+                        )}
+                      </View>
                     ))
                   ) : (
                     <Text style={styles.detailsText}>No images</Text>

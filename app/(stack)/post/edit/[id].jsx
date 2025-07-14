@@ -8,6 +8,8 @@ import {
   FlatList,
   Modal,
   ActivityIndicator,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {
@@ -254,122 +256,129 @@ export default function EditPost() {
       </View>
 
       {/*Body */}
-      <View style={{ justifyContent: "center", alignItems: "center" }}>
-        <TextInput
-          style={styles.input}
-          placeholder="Title"
-          value={editData.title}
-          onChangeText={(text) => handleChange(text, "title")}
-        />
-        <TextInput
-          style={[styles.input, styles.textarea]}
-          placeholder="Content"
-          value={editData.content}
-          multiline
-          onChangeText={(text) => handleChange(text, "content")}
-        />
-
-        <TouchableOpacity
-          style={styles.input}
-          onPress={() => {
-            setCurrentPicker("province");
-            setModalVisible(true);
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <View
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
           }}
         >
-          <Text>{editData.province || "Select Province"}</Text>
-        </TouchableOpacity>
+          <TextInput
+            style={styles.input}
+            placeholder="Title"
+            value={editData.title}
+            onChangeText={(text) => handleChange(text, "title")}
+          />
+          <TextInput
+            style={[styles.input, styles.textarea]}
+            placeholder="Content"
+            value={editData.content}
+            multiline
+            onChangeText={(text) => handleChange(text, "content")}
+          />
 
-        <TouchableOpacity
-          style={styles.input}
-          onPress={() => {
-            setCurrentPicker("district");
-            setModalVisible(true);
-          }}
-        >
-          <Text>{editData.district || "Select District"}</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.input}
+            onPress={() => {
+              setCurrentPicker("province");
+              setModalVisible(true);
+            }}
+          >
+            <Text>{editData.province || "Select Province"}</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.input}
-          onPress={() => {
-            setCurrentPicker("ward");
-            setModalVisible(true);
-          }}
-        >
-          <Text>{editData.ward || "Select Ward"}</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.input}
+            onPress={() => {
+              setCurrentPicker("district");
+              setModalVisible(true);
+            }}
+          >
+            <Text>{editData.district || "Select District"}</Text>
+          </TouchableOpacity>
 
-        {/*Add img */}
-        <View style={styles.addImgWrapArea}>
-          {images.map((img, index) => (
-            <View key={index} style={styles.imageWrap}>
-              <TouchableOpacity onPress={() => console.log("img open")}>
-                {img.type.startsWith("image") ? (
-                  <Image
-                    source={{ uri: img.uri }}
-                    style={{ width: "100%", height: "100%" }}
-                  />
-                ) : (
-                  <Video
-                    source={{ uri: img.uri }}
-                    style={{ width: "100%", height: "100%" }} // dùng lại style image để khung giống nhau
-                    useNativeControls
-                    resizeMode="cover"
-                    isLooping
-                  />
-                )}
+          <TouchableOpacity
+            style={styles.input}
+            onPress={() => {
+              setCurrentPicker("ward");
+              setModalVisible(true);
+            }}
+          >
+            <Text>{editData.ward || "Select Ward"}</Text>
+          </TouchableOpacity>
+
+          {/*Add img */}
+          <View style={styles.addImgWrapArea}>
+            {images.map((img, index) => (
+              <View key={index} style={styles.imageWrap}>
+                <TouchableOpacity onPress={() => console.log("img open")}>
+                  {img.type.startsWith("image") ? (
+                    <Image
+                      source={{ uri: img.uri }}
+                      style={{ width: "100%", height: "100%" }}
+                    />
+                  ) : (
+                    <Video
+                      source={{ uri: img.uri }}
+                      style={{ width: "100%", height: "100%" }} // dùng lại style image để khung giống nhau
+                      useNativeControls
+                      resizeMode="cover"
+                      isLooping
+                    />
+                  )}
+                </TouchableOpacity>
+                <Ionicons
+                  name="close-sharp"
+                  size={24}
+                  color="black"
+                  style={{ position: "absolute", top: 0, right: 0 }}
+                  onPress={() => handleRemoveImage(index, "old")}
+                />
+              </View>
+            ))}
+
+            {newImages.map((img, index) => (
+              <View key={index} style={styles.imageWrap}>
+                <TouchableOpacity onPress={() => console.log("img open")}>
+                  {img.type.startsWith("image") ? (
+                    <Image
+                      source={{ uri: img.uri }}
+                      style={{ width: "100%", height: "100%" }}
+                    />
+                  ) : (
+                    <Video
+                      source={{ uri: img.uri }}
+                      style={{ width: "100%", height: "100%" }} // dùng lại style image để khung giống nhau
+                      useNativeControls
+                      resizeMode="cover"
+                      isLooping
+                    />
+                  )}
+                </TouchableOpacity>
+                <Ionicons
+                  name="close-sharp"
+                  size={24}
+                  color="black"
+                  style={{ position: "absolute", top: 0, right: 0 }}
+                  onPress={() => handleRemoveImage(index, "new")}
+                />
+              </View>
+            ))}
+            {images.length + newImages.length < 5 && (
+              <TouchableOpacity
+                style={styles.addImgBtn}
+                onPress={handlePickImage}
+              >
+                <Text>Add image</Text>
               </TouchableOpacity>
-              <Ionicons
-                name="close-sharp"
-                size={24}
-                color="black"
-                style={{ position: "absolute", top: 0, right: 0 }}
-                onPress={() => handleRemoveImage(index, "old")}
-              />
-            </View>
-          ))}
+            )}
+          </View>
 
-          {newImages.map((img, index) => (
-            <View key={index} style={styles.imageWrap}>
-              <TouchableOpacity onPress={() => console.log("img open")}>
-                {img.type.startsWith("image") ? (
-                  <Image
-                    source={{ uri: img.uri }}
-                    style={{ width: "100%", height: "100%" }}
-                  />
-                ) : (
-                  <Video
-                    source={{ uri: img.uri }}
-                    style={{ width: "100%", height: "100%" }} // dùng lại style image để khung giống nhau
-                    useNativeControls
-                    resizeMode="cover"
-                    isLooping
-                  />
-                )}
-              </TouchableOpacity>
-              <Ionicons
-                name="close-sharp"
-                size={24}
-                color="black"
-                style={{ position: "absolute", top: 0, right: 0 }}
-                onPress={() => handleRemoveImage(index, "new")}
-              />
-            </View>
-          ))}
-          {images.length + newImages.length < 5 && (
-            <TouchableOpacity
-              style={styles.addImgBtn}
-              onPress={handlePickImage}
-            >
-              <Text>Add image</Text>
-            </TouchableOpacity>
-          )}
+          <TouchableOpacity style={styles.button} onPress={handleUpdate}>
+            <Text style={styles.buttonText}>Update</Text>
+          </TouchableOpacity>
         </View>
-
-        <TouchableOpacity style={styles.button} onPress={handleUpdate}>
-          <Text style={styles.buttonText}>Update</Text>
-        </TouchableOpacity>
-      </View>
+      </TouchableWithoutFeedback>
 
       {/* Modal */}
       <Modal visible={modalVisible} animationType="slide">
@@ -432,17 +441,19 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 10,
     zIndex: 1,
+    color: "#f3997c",
   },
   headerTitle: {
     width: "100%",
     textAlign: "center",
-    fontWeight: "500",
-    fontSize: 16,
+    fontWeight: "bold",
+    fontSize: 18,
+    color: "#f3997c",
   },
   input: {
     width: "80%",
     borderWidth: 1,
-    borderColor: "black",
+    borderColor: "#f3997c",
     padding: 10,
     margin: 10,
     borderRadius: 5,
@@ -453,8 +464,8 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
   },
   button: {
-    backgroundColor: "pink",
-    padding: 8,
+    backgroundColor: "#f3997c",
+    padding: 10,
     margin: 10,
     borderRadius: 5,
     alignItems: "center",
@@ -463,6 +474,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "white",
     fontWeight: "bold",
+    fontSize: 18,
   },
   imageWrap: {
     position: "relative",

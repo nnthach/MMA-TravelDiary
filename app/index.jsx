@@ -68,8 +68,8 @@ export default function Index() {
 
           {/*Google */}
           <TouchableOpacity
-            onPress={() => router.push("/(auth)/register")}
             style={{ width: "100%", alignItems: "center" }}
+            disabled={true}
           >
             <View style={[styles.authButtonWrap, styles.authButtonOtherOption]}>
               <Image
@@ -83,7 +83,7 @@ export default function Index() {
 
           {/*GUEST */}
           <TouchableOpacity onPress={() => router.replace("/(tabs)")}>
-            <Text style={{ fontSize: 16, color: "white" }}>
+            <Text style={{ fontSize: 16, color: "white", fontWeight: "600" }}>
               Continue as Guest
             </Text>
           </TouchableOpacity>

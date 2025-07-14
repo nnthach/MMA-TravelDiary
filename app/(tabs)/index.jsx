@@ -29,9 +29,15 @@ export default function HomeScreen() {
   const { userId, userInfo } = useContext(AuthContext);
   const [openComment, setOpenComment] = useState(false);
 
-  useEffect(() => {
-    getAllPost();
-  }, []);
+  // useEffect(() => {
+  //   getAllPost();
+  // }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      getAllPost();
+    }, [])
+  );
 
   if (isLoading) {
     return (

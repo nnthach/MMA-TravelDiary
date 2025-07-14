@@ -10,6 +10,8 @@ import {
   Alert,
   Modal,
   FlatList,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from "react-native";
 import axios from "axios";
 import * as ImagePicker from "expo-image-picker";
@@ -198,159 +200,161 @@ const CreateScreen = () => {
       edges={["top"]}
       style={{
         flex: 1,
-        backgroundColor: "#f9f9f9",
+        backgroundColor: "white",
       }}
     >
-      <View style={styles.container}>
-        <Text style={styles.header}>Create Your Post</Text>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <View style={styles.container}>
+          <Text style={styles.header}>Create Your Post</Text>
 
-        {error && <Text style={styles.errorText}>{error}</Text>}
+          {error && <Text style={styles.errorText}>{error}</Text>}
 
-        <TextInput
-          style={styles.input}
-          placeholder="Title"
-          value={createForm.title}
-          onChangeText={(text) => handleChange(text, "title")}
-        />
-        <TextInput
-          style={[styles.input, styles.textarea]}
-          placeholder="Content"
-          value={createForm.content}
-          multiline
-          onChangeText={(text) => handleChange(text, "content")}
-        />
+          <TextInput
+            style={styles.input}
+            placeholder="Title"
+            value={createForm.title}
+            onChangeText={(text) => handleChange(text, "title")}
+          />
+          <TextInput
+            style={[styles.input, styles.textarea]}
+            placeholder="Content"
+            value={createForm.content}
+            multiline
+            onChangeText={(text) => handleChange(text, "content")}
+          />
 
-        {/* Select Province */}
-        <TouchableOpacity
-          style={styles.pickerButton}
-          onPress={() => {
-            setCurrentPicker("province");
-            setModalVisible(true);
-          }}
-        >
-          <Text style={styles.pickerText}>
-            {createForm.province || "Select Province"}
-          </Text>
-        </TouchableOpacity>
-
-        {/* Select District */}
-        <TouchableOpacity
-          style={styles.pickerButton}
-          onPress={() => {
-            setCurrentPicker("district");
-            setModalVisible(true);
-          }}
-        >
-          <Text style={styles.pickerText}>
-            {createForm.district || "Select District"}
-          </Text>
-        </TouchableOpacity>
-
-        {/* Select Ward */}
-        <TouchableOpacity
-          style={styles.pickerButton}
-          onPress={() => {
-            setCurrentPicker("ward");
-            setModalVisible(true);
-          }}
-        >
-          <Text style={styles.pickerText}>
-            {createForm.ward || "Select Ward"}
-          </Text>
-        </TouchableOpacity>
-
-        {createForm.images.length < 5 && (
-          // add image
+          {/* Select Province */}
           <TouchableOpacity
-            style={styles.imageButton}
-            onPress={handleImagePick}
+            style={styles.pickerButton}
+            onPress={() => {
+              setCurrentPicker("province");
+              setModalVisible(true);
+            }}
           >
-            <Text style={{ color: "black" }}>Add Images</Text>
+            <Text style={styles.pickerText}>
+              {createForm.province || "Select Province"}
+            </Text>
           </TouchableOpacity>
-        )}
 
-        {createForm.images.length > 0 && (
-          <View style={styles.imagePreview}>
-            {createForm.images.map((media, index) => (
-              <View key={index} style={styles.imageWrap}>
-                {media.type.startsWith("image") ? (
-                  <Image source={{ uri: media.uri }} style={styles.image} />
-                ) : (
-                  <Video
-                    source={{ uri: media.uri }}
-                    style={styles.image} // dùng lại style image để khung giống nhau
-                    useNativeControls
-                    resizeMode="cover"
-                    isLooping
-                  />
-                )}
-                <Ionicons
-                  name="close"
-                  size={20}
-                  color="black"
-                  style={styles.removeImgPreview}
-                  onPress={() => handleRemoveImage(index)}
-                />
-              </View>
-            ))}
-          </View>
-        )}
+          {/* Select District */}
+          <TouchableOpacity
+            style={styles.pickerButton}
+            onPress={() => {
+              setCurrentPicker("district");
+              setModalVisible(true);
+            }}
+          >
+            <Text style={styles.pickerText}>
+              {createForm.district || "Select District"}
+            </Text>
+          </TouchableOpacity>
 
-        {/* Submit Button */}
-        <TouchableOpacity
-          style={styles.button}
-          onPress={handleSubmit}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator size="small" color="#fff" />
-          ) : (
-            <Text style={styles.buttonText}>Create Post</Text>
-          )}
-        </TouchableOpacity>
+          {/* Select Ward */}
+          <TouchableOpacity
+            style={styles.pickerButton}
+            onPress={() => {
+              setCurrentPicker("ward");
+              setModalVisible(true);
+            }}
+          >
+            <Text style={styles.pickerText}>
+              {createForm.ward || "Select Ward"}
+            </Text>
+          </TouchableOpacity>
 
-        {/* Modal for Picker */}
-        <Modal visible={modalVisible} animationType="slide">
-          <View style={styles.modalContainer}>
-            <FlatList
-              data={
-                currentPicker === "province"
-                  ? provinces
-                  : currentPicker === "district"
-                  ? districts
-                  : wards
-              }
-              keyExtractor={(item) =>
-                item[
-                  currentPicker === "province"
-                    ? "province_id"
-                    : currentPicker === "district"
-                    ? "district_id"
-                    : "ward_id"
-                ]
-              }
-              renderItem={({ item }) => (
-                <TouchableOpacity onPress={() => handlePickerSelect(item)}>
-                  <Text style={styles.modalItem}>
-                    {
-                      item[
-                        currentPicker === "province"
-                          ? "province_name"
-                          : currentPicker === "district"
-                          ? "district_name"
-                          : "ward_name"
-                      ]
-                    }
-                  </Text>
-                </TouchableOpacity>
-              )}
-            />
-            <TouchableOpacity onPress={() => setModalVisible(false)}>
-              <Text style={styles.closeModal}>Close</Text>
+          {createForm.images.length < 5 && (
+            // add image
+            <TouchableOpacity
+              style={styles.imageButton}
+              onPress={handleImagePick}
+            >
+              <Text style={{ color: "black" }}>Add Images</Text>
             </TouchableOpacity>
-          </View>
-        </Modal>
-      </View>
+          )}
+
+          {createForm.images.length > 0 && (
+            <View style={styles.imagePreview}>
+              {createForm.images.map((media, index) => (
+                <View key={index} style={styles.imageWrap}>
+                  {media.type.startsWith("image") ? (
+                    <Image source={{ uri: media.uri }} style={styles.image} />
+                  ) : (
+                    <Video
+                      source={{ uri: media.uri }}
+                      style={styles.image} // dùng lại style image để khung giống nhau
+                      useNativeControls
+                      resizeMode="cover"
+                      isLooping
+                    />
+                  )}
+                  <Ionicons
+                    name="close"
+                    size={20}
+                    color="black"
+                    style={styles.removeImgPreview}
+                    onPress={() => handleRemoveImage(index)}
+                  />
+                </View>
+              ))}
+            </View>
+          )}
+
+          {/* Submit Button */}
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleSubmit}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>Create Post</Text>
+            )}
+          </TouchableOpacity>
+
+          {/* Modal for Picker */}
+          <Modal visible={modalVisible} animationType="slide">
+            <View style={styles.modalContainer}>
+              <FlatList
+                data={
+                  currentPicker === "province"
+                    ? provinces
+                    : currentPicker === "district"
+                    ? districts
+                    : wards
+                }
+                keyExtractor={(item) =>
+                  item[
+                    currentPicker === "province"
+                      ? "province_id"
+                      : currentPicker === "district"
+                      ? "district_id"
+                      : "ward_id"
+                  ]
+                }
+                renderItem={({ item }) => (
+                  <TouchableOpacity onPress={() => handlePickerSelect(item)}>
+                    <Text style={styles.modalItem}>
+                      {
+                        item[
+                          currentPicker === "province"
+                            ? "province_name"
+                            : currentPicker === "district"
+                            ? "district_name"
+                            : "ward_name"
+                        ]
+                      }
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              />
+              <TouchableOpacity onPress={() => setModalVisible(false)}>
+                <Text style={styles.closeModal}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </Modal>
+        </View>
+      </TouchableWithoutFeedback>
 
       {!userInfo && (
         // Modal require login before use
@@ -386,8 +390,14 @@ const CreateScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#f9f9f9" },
-  header: { fontSize: 24, fontWeight: "bold", marginBottom: 20 },
+  container: { flex: 1, padding: 20, backgroundColor: "white" },
+  header: {
+    fontSize: 26,
+    fontWeight: "bold",
+    marginBottom: 20,
+    color: "#f3997c",
+    textAlign: "center",
+  },
   input: {
     width: "100%",
     padding: 10,
@@ -423,13 +433,13 @@ const styles = StyleSheet.create({
   image: { width: "100%", height: "100%" },
   removeImgPreview: { position: "absolute", right: 0 },
   button: {
-    backgroundColor: "#ff7733",
-    padding: 15,
+    backgroundColor: "#f3997c",
+    padding: 10,
     alignItems: "center",
     marginTop: 20,
     borderRadius: 5,
   },
-  buttonText: { color: "#fff", fontSize: 18 },
+  buttonText: { color: "#fff", fontSize: 18, fontWeight: "bold" },
   errorText: { color: "red", marginBottom: 10 },
   modalContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
   modalItem: { padding: 20, borderBottomWidth: 1, borderBottomColor: "#ccc" },

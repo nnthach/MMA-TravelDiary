@@ -6,6 +6,7 @@ import {
   Image,
   FlatList,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
@@ -25,7 +26,7 @@ export default function PostDetail() {
   const [isLoading, setIsLoading] = useState(false);
   const [postDetail, setPostDetail] = useState(null);
   const { savedPostData, fetchStorageOfUser } = useContext(SavedPostContext);
-  const { postId, setPostId } = useContext(PostContext);
+  const { postId, setPostId, getAllPost } = useContext(PostContext);
   const { userInfo, userId } = useContext(AuthContext);
   const [openDropMenu, setOpenDropMenu] = useState(false);
   const [openComment, setOpenComment] = useState(false);
@@ -54,6 +55,10 @@ export default function PostDetail() {
     }, [])
   );
 
+  useEffect(() => {
+    getPostById();
+  }, [openComment]);
+
   const isSaved =
     userInfo &&
     postDetail &&
@@ -74,8 +79,10 @@ export default function PostDetail() {
 
       setOpenDropMenu(false);
       alert("Update success");
+      await getAllPost();
     } catch (error) {
-      console.log("error update public", error);
+      console.log("error update public", error.response.data);
+      Alert.alert(error?.response?.data?.message || "Change error");
     }
   };
 
@@ -128,15 +135,24 @@ export default function PostDetail() {
         {/*Post header */}
         <View style={styles.postHeader}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
-            <Image
-              source={{ uri: postDetail?.avatar }}
+            <View
               style={{
                 width: 30,
                 height: 30,
                 borderRadius: 100,
+                overflow: "hidden",
+                backgroundColor: "lightgrey",
               }}
-              resizeMode="cover"
-            />
+            >
+              <Image
+                source={{ uri: postDetail?.avatar }}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                }}
+                resizeMode="cover"
+              />
+            </View>
             <Text style={{ fontWeight: 500, fontSize: 18 }}>
               {postDetail?.username}
             </Text>
@@ -148,18 +164,32 @@ export default function PostDetail() {
               alignItems: "center",
             }}
           >
-            {userId == postDetail?.userId && (
+            {postDetail?.isBanned ? (
               <Text
                 style={{
-                  backgroundColor: postDetail?.public ? "green" : "#f1df00",
+                  backgroundColor: "red",
                   color: "white",
                   fontWeight: "bold",
                   padding: 5,
                   borderRadius: 5,
                 }}
               >
-                {postDetail?.public ? "Public" : "Private"}
+                Banned
               </Text>
+            ) : (
+              userId == postDetail?.userId && (
+                <Text
+                  style={{
+                    backgroundColor: postDetail?.public ? "green" : "#f1df00",
+                    color: "white",
+                    fontWeight: "bold",
+                    padding: 5,
+                    borderRadius: 5,
+                  }}
+                >
+                  {postDetail?.public ? "Public" : "Private"}
+                </Text>
+              )
             )}
 
             {userInfo && userId == postDetail?.userId && (

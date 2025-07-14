@@ -74,17 +74,30 @@ export default function PostCardGlobal({
           {/* Header */}
           <View style={styles.header}>
             <View
-              style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 5,
+              }}
             >
-              <Image
-                source={{ uri: item.avatar }}
+              <View
                 style={{
                   width: 30,
                   height: 30,
                   borderRadius: 100,
+                  overflow: "hidden",
+                  backgroundColor: "lightgrey",
                 }}
-                resizeMode="cover"
-              />
+              >
+                <Image
+                  source={{ uri: item.avatar }}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                  }}
+                  resizeMode="cover"
+                />
+              </View>
               <Text style={styles.username}>{item.username}</Text>
             </View>
             {isOwner && (
