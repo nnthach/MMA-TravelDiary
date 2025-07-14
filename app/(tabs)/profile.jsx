@@ -250,7 +250,7 @@ export default function ProfileScreen() {
             <ActivityIndicator size="large" color="black" />
             <Text>Loading</Text>
           </View>
-        ) : (
+        ) : postListData.length > 0 ? (
           <FlatList
             data={postListData}
             keyExtractor={(_, index) => index.toString()}
@@ -259,6 +259,12 @@ export default function ProfileScreen() {
               <PostCardProfile key={item._id} post={item} />
             )}
           />
+        ) : (
+          <View>
+            <Text style={{ textAlign: "center", marginTop: 20 }}>
+              No posts found
+            </Text>
+          </View>
         )}
       </View>
     </SafeAreaView>

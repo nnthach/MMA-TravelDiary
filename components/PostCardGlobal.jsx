@@ -20,6 +20,7 @@ export default function PostCardGlobal({
   const [openReport, setOpenReport] = useState(false);
   const { setPostId } = useContext(PostContext);
   const { fetchStorageOfUser } = useContext(SavedPostContext);
+  console.log("item", item);
 
   // ✅ Like state riêng để cập nhật UI ngay
   const [likes, setLikes] = useState(() =>

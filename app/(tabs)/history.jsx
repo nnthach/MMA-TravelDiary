@@ -1,21 +1,28 @@
-import { useCallback, useContext } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, Text, View } from "react-native";
 import { AuthContext } from "../../context/AuthContext";
 import PostCardGlobal from "../../components/PostCardGlobal";
 import { SavedPostContext } from "../../context/SavedPostContext";
 import { useFocusEffect } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+import CommentModal from "../../components/CommentModal";
 
 export default function HistoryScreen() {
   const { userId } = useContext(AuthContext);
   const { savedPostData, isLoading, fetchStorageOfUser } =
     useContext(SavedPostContext);
+  const [openComment, setOpenComment] = useState(false);
+  console.log("saved pos data", savedPostData);
 
   useFocusEffect(
     useCallback(() => {
       fetchStorageOfUser();
     }, [])
   );
+
+  useEffect(() => {
+    fetchStorageOfUser();
+  }, [openComment]);
 
   if (isLoading) {
     return (
@@ -43,7 +50,7 @@ export default function HistoryScreen() {
           justifyContent: "center",
         }}
       >
-        <Text style={{}}>Saved Posts</Text>
+        <Text style={{ fontSize: 18, fontWeight: "bold" }}>Saved Posts</Text>
       </View>
 
       {!savedPostData?.length || !userId ? (
@@ -57,10 +64,21 @@ export default function HistoryScreen() {
           data={savedPostData}
           keyExtractor={(item) => item._id.toString()}
           renderItem={({ item }) => (
-            <PostCardGlobal item={item} isSaved={true} />
+            <PostCardGlobal
+              item={item}
+              isSaved={true}
+              setOpenComment={setOpenComment}
+            />
           )}
           ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
           contentContainerStyle={{ padding: 10 }}
+        />
+      )}
+
+      {openComment && (
+        <CommentModal
+          setOpenComment={setOpenComment}
+          openComment={openComment}
         />
       )}
     </SafeAreaView>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import {
   View,
   Text,
@@ -17,7 +17,7 @@ import axios from "axios";
 import * as ImagePicker from "expo-image-picker";
 import postAPIs from "../../services/postAPIs";
 import { AuthContext } from "../../context/AuthContext";
-import { useNavigation } from "expo-router";
+import { useFocusEffect, useNavigation } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { PostContext } from "../../context/PostContext";
@@ -35,6 +35,10 @@ const CreateScreen = () => {
     ward: "",
     images: [],
   });
+  const [errorForm, setErrorForm] = useState({
+    title: "",
+    content: "",
+  });
 
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
@@ -48,6 +52,38 @@ const CreateScreen = () => {
   useEffect(() => {
     fetchProvinces();
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      console.log("create");
+      setCreateForm({
+        title: "",
+        content: "",
+        province: "",
+        district: "",
+        ward: "",
+        images: [],
+      });
+    }, [])
+  );
+
+  const validateInput = () => {
+    const newError = { title: "", content: "" };
+    let isValid = true;
+
+    if (createForm.title.length < 6 || createForm.title.length > 50) {
+      newError.title = "Title must be 6-50 characters.";
+      isValid = false;
+    }
+
+    if (createForm.content.length > 1000) {
+      newError.content = "Content max long 1000 characters.";
+      isValid = false;
+    }
+
+    setErrorForm(newError);
+    return isValid;
+  };
 
   const fetchProvinces = async () => {
     setLoading(true);
@@ -114,28 +150,6 @@ const CreateScreen = () => {
     setModalVisible(false);
   };
 
-  // const handleImagePick = async () => {
-  //   let result = await ImagePicker.launchImageLibraryAsync({
-  //     mediaTypes: ImagePicker.MediaTypeOptions.Images,
-  //     allowsEditing: true,
-  //     aspect: [4, 3],
-  //     quality: 1,
-  //   });
-
-  //   if (!result.canceled) {
-  //     setCreateForm({
-  //       ...createForm,
-  //       images: [...createForm.images, result.assets[0].uri],
-  //     });
-  //   }
-  // };
-
-  // const handleRemoveImage = (index) => {
-  //   const updatedImages = [...createForm.images];
-  //   updatedImages.splice(index, 1);
-  //   setCreateForm({ ...createForm, images: updatedImages });
-  // };
-
   const handleImagePick = async () => {
     const selectedAssets = await pickImage();
     if (selectedAssets.length > 0) {
@@ -160,8 +174,10 @@ const CreateScreen = () => {
   };
 
   const handleSubmit = async () => {
+    if (!validateInput()) return;
+
     if (!createForm.title || !createForm.content) {
-      Alert.alert("Error", "Title and content are required!");
+      Alert.alert("Title and content are required!");
       return;
     }
 
@@ -188,8 +204,7 @@ const CreateScreen = () => {
       });
       getAllPost();
     } catch (err) {
-      setError("Error creating post");
-      console.error(err);
+      console.error("create post err", err);
     } finally {
       setLoading(false);
     }
@@ -207,14 +222,15 @@ const CreateScreen = () => {
         <View style={styles.container}>
           <Text style={styles.header}>Create Your Post</Text>
 
-          {error && <Text style={styles.errorText}>{error}</Text>}
-
           <TextInput
             style={styles.input}
             placeholder="Title"
             value={createForm.title}
             onChangeText={(text) => handleChange(text, "title")}
           />
+          {errorForm.title && (
+            <Text style={styles.errorMsg}>{errorForm.title}</Text>
+          )}
           <TextInput
             style={[styles.input, styles.textarea]}
             placeholder="Content"
@@ -222,6 +238,9 @@ const CreateScreen = () => {
             multiline
             onChangeText={(text) => handleChange(text, "content")}
           />
+          {errorForm.content && (
+            <Text style={styles.errorMsg}>{errorForm.content}</Text>
+          )}
 
           {/* Select Province */}
           <TouchableOpacity
@@ -405,6 +424,12 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     marginBottom: 20,
     backgroundColor: "#fff",
+  },
+  errorMsg: {
+    color: "red",
+    marginTop: -14,
+    marginBottom: 10,
+    fontSize: 12,
   },
   textarea: { height: 100, textAlignVertical: "top" },
   pickerButton: {
