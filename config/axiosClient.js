@@ -4,7 +4,7 @@ import userApi from "../services/userApi";
 
 const axiosClient = axios.create({
   // baseURL: "http://10.0.2.2:3000/v1", // Thay đổi URL thành 10.0.2.2 cho Android Emulator
-  baseURL: "http://192.168.1.2:3000/v1",
+  baseURL: "http://192.168.1.3:3000/v1",
   timeout: 10000, // Timeout thời gian yêu cầu
   headers: {
     "Content-Type": "application/json",
@@ -50,7 +50,7 @@ axiosClient.interceptors.response.use(
 
       try {
         const res = await rawAxios.post(
-          "http://192.168.1.7:3000/v1/user/refresh-token",
+          `${axiosClient.defaults.baseURL}/user/refresh-token`,
           {
             refreshToken,
           }

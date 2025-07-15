@@ -10,14 +10,13 @@ const RootLayout = () => {
       <PostProvider>
         <SavedPostProvider>
           <SafeAreaProvider>
-            {/* <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}> */}
-              <Stack
-                screenOptions={{
-                  headerTitleAlign: "center",
-                  headerShown: false,
-                }}
-              />
-            {/* </SafeAreaView> */}
+            <Stack
+              screenOptions={{
+                headerTitleAlign: "center",
+                headerShown: false,
+                gestureEnabled: false,
+              }}
+            />
           </SafeAreaProvider>
         </SavedPostProvider>
       </PostProvider>

@@ -68,32 +68,32 @@ export default function BlogScreen() {
     setRefreshing(false);
   }, []);
 
-const renderItem = ({ item }) => {
-  const media = item.images?.[0];
+  const renderItem = ({ item }) => {
+    const media = item.images?.[0];
 
-  return (
-    <TouchableOpacity
-      style={styles.imageContainer}
-      onPress={() => router.push(`/post/${item._id}`)}
-    >
-      {media?.type === "video" ? (
-        <Video
-          source={{ uri: media.uri }}
-          style={styles.image}
-          resizeMode="cover"
-          isMuted
-          shouldPlay={false}
-        />
-      ) : (
-        <Image
-          source={{ uri: media?.uri || "https://via.placeholder.com/150" }}
-          style={styles.image}
-          resizeMode="cover"
-        />
-      )}
-    </TouchableOpacity>
-  );
-};
+    return (
+      <TouchableOpacity
+        style={styles.imageContainer}
+        onPress={() => router.push(`/post/${item._id}`)}
+      >
+        {media?.type === "video" ? (
+          <Video
+            source={{ uri: media.uri }}
+            style={styles.image}
+            resizeMode="cover"
+            isMuted
+            shouldPlay={false}
+          />
+        ) : (
+          <Image
+            source={{ uri: media?.uri || "https://via.placeholder.com/150" }}
+            style={styles.image}
+            resizeMode="cover"
+          />
+        )}
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -109,7 +109,11 @@ const renderItem = ({ item }) => {
 
       {/* Hiển thị kết quả */}
       {loading ? (
-        <ActivityIndicator size="large" color="#555" style={{ marginTop: 20 }} />
+        <ActivityIndicator
+          size="large"
+          color="#555"
+          style={{ marginTop: 20 }}
+        />
       ) : posts.length > 0 ? (
         <FlatList
           data={posts}
@@ -149,6 +153,7 @@ const styles = StyleSheet.create({
     width: imageSize,
     height: imageSize,
     padding: 1,
+    backgroundColor: "lightgrey",
   },
   image: {
     width: "100%",

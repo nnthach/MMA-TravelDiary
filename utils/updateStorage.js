@@ -1,3 +1,4 @@
+import { Alert } from "react-native";
 import storageAPIs from "../services/storageAPIs";
 
 export const handleAddPostToStorage = async (
@@ -7,12 +8,12 @@ export const handleAddPostToStorage = async (
   fetchStorageOfUser
 ) => {
   if (!userInfo) {
-    alert("You need to login");
+    Alert.alert("You need to login");
     return
   }
   try {
     const result = await storageAPIs.create(userId, { postId });
-    alert(result.data.message);
+    Alert.alert(result?.data?.message);
     fetchStorageOfUser();
   } catch (error) {
     console.log("add post to storage err", error);

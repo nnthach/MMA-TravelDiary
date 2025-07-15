@@ -15,15 +15,56 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { AuthContext } from "../../../context/AuthContext";
 import userApi from "../../../services/userApi";
 import * as ImagePicker from "expo-image-picker";
+import { useRouter } from "expo-router";
 
 export default function Index() {
-  const { userId, userInfo, fetchUser } = useContext(AuthContext);
+  const route = useRouter();
+  const { userId, userInfo, fetchUser, handleLogout } = useContext(AuthContext);
   const [updateData, setUpdateData] = useState({
     password: "",
-    email: "",
+    email: userInfo.email,
     oldPassword: "",
     avatar: userInfo.avatar,
   });
+  const [error, setError] = useState({
+    password: "",
+    oldPassword: "",
+    email: "",
+  });
+
+  const validateInput = () => {
+    const newError = {
+      password: "",
+      oldPassword: "",
+      email: "",
+    };
+    let isValid = true;
+
+    if (!updateData.email) {
+      newError.email = "Email is required";
+      isValid = false;
+    }
+
+    if (updateData.password !== "") {
+      if (updateData.password.length < 6 || updateData.password.length > 20) {
+        newError.password = "Password must be 6-20 characters.";
+        isValid = false;
+      }
+    }
+
+    if (updateData.oldPassword !== "") {
+      if (
+        updateData.oldPassword.length < 6 ||
+        updateData.oldPassword.length > 20
+      ) {
+        newError.oldPassword = "Password must be 6-20 characters.";
+        isValid = false;
+      }
+    }
+
+    setError(newError);
+    return isValid;
+  };
 
   const handleChange = (value, name) => {
     setUpdateData((prev) => ({
@@ -49,9 +90,13 @@ export default function Index() {
   };
 
   const handleUpdateUser = async () => {
-    if (updateData.oldPassword != updateData.password) {
-      Alert.alert("Password not match");
-      return;
+    if (!validateInput()) return;
+
+    if (updateData.oldPassword != "" || updateData.password != "") {
+      if (updateData.oldPassword === updateData.password) {
+        Alert.alert("Your new password same with old password");
+        return;
+      }
     }
 
     try {
@@ -59,7 +104,6 @@ export default function Index() {
 
       for (const key in updateData) {
         if (
-          key !== "oldPassword" && // loại bỏ oldPassword
           updateData[key] !== "" && // bỏ qua field rỗng
           updateData[key] !== userInfo[key] // bỏ qua nếu không thay đổi
         ) {
@@ -69,9 +113,11 @@ export default function Index() {
 
       // Nếu không có gì thay đổi thì không gọi API
       if (Object.keys(dataToUpdate).length === 0) {
-        Alert.alert("No changes detected");
+        Alert.alert("No changes");
         return;
       }
+
+      console.log("update data", dataToUpdate);
 
       const updateRes = await userApi.update(userId, dataToUpdate);
       await fetchUser();
@@ -82,9 +128,13 @@ export default function Index() {
         email: "",
         oldPassword: "",
       }));
+      if ("password" in dataToUpdate) {
+        handleLogout();
+        route.replace("/(auth)/login");
+      }
     } catch (error) {
       console.log("update error", error);
-      Alert.alert("Update fail!");
+      Alert.alert(error.response.data.message || "Update fail!");
     }
   };
   return (
@@ -154,11 +204,21 @@ export default function Index() {
           <TextInput
             placeholder="Email"
             style={styles.input}
-            value={userInfo.email}
+            value={updateData.email}
             onChangeText={(text) => handleChange(text, "email")}
             autoCapitalize="none"
             keyboardType="email-address"
           />
+          {error.email && (
+            <View
+              style={{
+                justifyContent: "flex-start",
+                width: 300,
+              }}
+            >
+              <Text style={styles.errorMsg}>{error.email}</Text>
+            </View>
+          )}
 
           <TextInput
             placeholder="Old Password"
@@ -167,6 +227,16 @@ export default function Index() {
             onChangeText={(text) => handleChange(text, "oldPassword")}
             secureTextEntry
           />
+          {error.oldPassword && (
+            <View
+              style={{
+                justifyContent: "flex-start",
+                width: 300,
+              }}
+            >
+              <Text style={styles.errorMsg}>{error.oldPassword}</Text>
+            </View>
+          )}
 
           <TextInput
             placeholder="New Password"
@@ -175,6 +245,16 @@ export default function Index() {
             onChangeText={(text) => handleChange(text, "password")}
             secureTextEntry
           />
+          {error.password && (
+            <View
+              style={{
+                justifyContent: "flex-start",
+                width: 300,
+              }}
+            >
+              <Text style={styles.errorMsg}>{error.password}</Text>
+            </View>
+          )}
 
           <TouchableOpacity style={styles.button} onPress={handleUpdateUser}>
             <Text style={styles.buttonText}>Save Changes</Text>
@@ -205,6 +285,12 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     padding: 12,
     width: 300,
+  },
+  errorMsg: {
+    color: "red",
+    marginTop: -14,
+    marginBottom: 0,
+    fontSize: 12,
   },
   button: {
     backgroundColor: "white",

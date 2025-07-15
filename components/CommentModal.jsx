@@ -90,6 +90,10 @@ export default function CommentModal({ setOpenComment, openComment }) {
   };
 
   const handleCreateComment = async () => {
+    if (!userInfo) {
+      Alert.alert("You need to login");
+      return;
+    }
     try {
       const res = await commentAPIs.create(commentDataForm);
 

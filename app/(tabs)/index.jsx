@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   FlatList,
   ActivityIndicator,
+  RefreshControl,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { PostContext } from "../../context/PostContext";
@@ -28,6 +29,7 @@ export default function HomeScreen() {
   const { savedPostData } = useContext(SavedPostContext);
   const { userId, userInfo } = useContext(AuthContext);
   const [openComment, setOpenComment] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   // useEffect(() => {
   //   getAllPost();
@@ -39,6 +41,12 @@ export default function HomeScreen() {
     }, [])
   );
 
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await getAllPost();
+    setRefreshing(false);
+  }, []);
+
   if (isLoading) {
     return (
       <SafeAreaView
@@ -48,8 +56,10 @@ export default function HomeScreen() {
           backgroundColor: "white",
         }}
       >
-        <View style={{ alignItems: "center", justifyContent: "center" }}>
-          <Text>...Loading</Text>
+        <View
+          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+        >
+          <ActivityIndicator size="large" color="black" />
         </View>
       </SafeAreaView>
     );
@@ -89,6 +99,9 @@ export default function HomeScreen() {
           )}
           ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
           contentContainerStyle={{ padding: 10 }}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
         />
       )}
 

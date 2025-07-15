@@ -12,11 +12,12 @@ export default function HistoryScreen() {
   const { savedPostData, isLoading, fetchStorageOfUser } =
     useContext(SavedPostContext);
   const [openComment, setOpenComment] = useState(false);
-  console.log("saved pos data", savedPostData);
 
   useFocusEffect(
     useCallback(() => {
-      fetchStorageOfUser();
+      if (userId) {
+        fetchStorageOfUser();
+      }
     }, [])
   );
 
