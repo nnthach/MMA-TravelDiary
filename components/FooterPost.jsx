@@ -61,78 +61,76 @@ export default function FooterPost({
   };
 
   return (
-    <View style={styles.footerWrap}>
-      {/* Left */}
-      <View style={{ flexDirection: "row", gap: 15 }}>
-        <TouchableOpacity
-          onPress={handleToggleLike}
-          style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
-        >
-          <Ionicons
-            name={isLiked ? "heart" : "heart-outline"}
-            size={24}
-            color={isLiked ? "red" : "black"}
-          />
-          <Text>{likes?.length}</Text> {/* ✅ dùng state */}
-        </TouchableOpacity>
+   <View style={styles.footerWrap}>
+  {/* Left */}
+  <View style={{ flexDirection: "row", alignItems: "center" }}>
+    <TouchableOpacity
+      onPress={handleToggleLike}
+      style={{ flexDirection: "row", alignItems: "center", marginRight: 15 }}
+    >
+      <Ionicons
+        name={isLiked ? "heart" : "heart-outline"}
+        size={24}
+        color={isLiked ? "red" : "black"}
+      />
+      <Text>{likes?.length}</Text>
+    </TouchableOpacity>
 
-        <TouchableOpacity
-          style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
-          onPress={() => handleOpenComment(item._id)}
-        >
-          <Ionicons name="chatbubbles-outline" size={24} color="black" />
-          {item?.comments?.length >= 1 && <Text>{item?.comments?.length}</Text>}
-        </TouchableOpacity>
-      </View>
+    <TouchableOpacity
+      onPress={() => handleOpenComment(item._id)}
+      style={{ flexDirection: "row", alignItems: "center" }}
+    >
+      <Ionicons name="chatbubbles-outline" size={24} color="black" />
+      {item?.comments?.length >= 1 && (
+        <Text style={{ marginLeft: 5 }}>{item?.comments?.length}</Text>
+      )}
+    </TouchableOpacity>
+  </View>
 
-      {/* Right */}
-      <View style={{ flexDirection: "row", gap: 10, alignItems: "center" }}>
-        {!isOwner && (
-          <>
-            {isSaved ? (
-              <Ionicons
-                name="bookmark"
-                size={20}
-                color="black"
-                onPress={() =>
-                  handleRemovePostOutOfStorage(
-                    userId,
-                    item._id,
-                    fetchStorageOfUser
-                  )
-                }
-              />
-            ) : (
-              <Ionicons
-                name="bookmark-outline"
-                size={20}
-                color="black"
-                onPress={() =>
-                  handleAddPostToStorage(
-                    userInfo,
-                    userId,
-                    item._id,
-                    fetchStorageOfUser
-                  )
-                }
-              />
-            )}
-            <Ionicons
-              name="alert-circle-outline"
-              size={22}
-              color="black"
-              onPress={() => {
-                setReportDataForm((prev) => ({
-                  ...prev,
-                  postId: item._id,
-                }));
-                setOpenReport(true);
-              }}
-            />
-          </>
+  {/* Right */}
+  <View style={{ flexDirection: "row", alignItems: "center" }}>
+    {!isOwner && (
+      <>
+        {isSaved ? (
+          <TouchableOpacity
+            onPress={() =>
+              handleRemovePostOutOfStorage(userId, item._id, fetchStorageOfUser)
+            }
+            style={{ marginRight: 10 }}
+          >
+            <Ionicons name="bookmark" size={20} color="black" />
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            onPress={() =>
+              handleAddPostToStorage(
+                userInfo,
+                userId,
+                item._id,
+                fetchStorageOfUser
+              )
+            }
+            style={{ marginRight: 10 }}
+          >
+            <Ionicons name="bookmark-outline" size={20} color="black" />
+          </TouchableOpacity>
         )}
-      </View>
-    </View>
+        <TouchableOpacity
+          onPress={() => {
+            setReportDataForm((prev) => ({
+              ...prev,
+              postId: item._id,
+            }));
+            setOpenReport(true);
+          }}
+        >
+          <Ionicons name="alert-circle-outline" size={22} color="black" />
+        </TouchableOpacity>
+      </>
+    )}
+  </View>
+</View>
+
   );
 }
 

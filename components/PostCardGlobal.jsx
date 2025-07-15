@@ -66,108 +66,98 @@ export default function PostCardGlobal({
 
   return (
     <>
-      <View style={styles.container}>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          style={styles.touchAbleWrap}
-          onPress={() => router.push(`/post/${item._id}`)}
+     <View style={styles.container}>
+  <TouchableOpacity
+    activeOpacity={0.8}
+    style={styles.touchAbleWrap}
+    onPress={() => router.push(`/post/${item._id}`)}
+  >
+    {/* Header */}
+    <View style={styles.header}>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
+        <View
+          style={{
+            width: 30,
+            height: 30,
+            borderRadius: 100,
+            overflow: "hidden",
+            backgroundColor: "lightgrey",
+          }}
         >
-          {/* Header */}
-          <View style={styles.header}>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 5,
-              }}
-            >
-              <View
-                style={{
-                  width: 30,
-                  height: 30,
-                  borderRadius: 100,
-                  overflow: "hidden",
-                  backgroundColor: "lightgrey",
-                }}
-              >
-                <Image
-                  source={{ uri: item.avatar }}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                  }}
-                  resizeMode="cover"
-                />
-              </View>
-              <Text style={styles.username}>{item.username}</Text>
-            </View>
-            {isOwner && (
-              <Ionicons
-                name="build-outline"
-                size={22}
-                color="black"
-                onPress={(e) => {
-                  e.stopPropagation();
-                  router.push(`/post/edit/${item._id}`);
-                }}
-              />
-            )}
-          </View>
-
-          {/* Created At */}
-          <Text style={styles.createdAt}>
-            {new Date(item.createdAt).toLocaleString("vi-VN", {
-              hour: "2-digit",
-              minute: "2-digit",
-              day: "2-digit",
-              month: "2-digit",
-              year: "numeric",
-            })}
-          </Text>
-          {/* Location */}
-          <Text style={styles.createdAt}>
-            {item.ward}, {item.district}, {item.province}
-          </Text>
-
-          {/* Content */}
-          <View style={styles.content}>
-            <Text style={{ fontWeight: "600" }}>{item.title}</Text>
-            <Text>{item.content}</Text>
-          </View>
-
-          {/* Image */}
-          {item?.images?.length > 0 && (
-            <View style={styles.imageWrap}>
-              {item.images[0].type === "image" ? (
-                <Image
-                  source={{ uri: item.images[0].uri }}
-                  style={styles.image}
-                  resizeMode="cover"
-                />
-              ) : (
-                <Video
-                  source={{ uri: item.images[0].uri }}
-                  style={styles.image}
-                  useNativeControls
-                  resizeMode="cover"
-                  isLooping
-                />
-              )}
-            </View>
-          )}
-        </TouchableOpacity>
-
-        {/* Footer */}
-        <FooterPost
-          item={item}
-          setOpenComment={setOpenComment}
-          setPostId={setPostId}
-          isSaved={isSaved}
-          isOwner={isOwner}
-          setOpenReport={setOpenReport}
-          setReportDataForm={setReportDataForm}
-        />
+          <Image
+            source={{ uri: item.avatar }}
+            style={{ width: "100%", height: "100%" }}
+            resizeMode="cover"
+          />
+        </View>
+        <Text style={styles.username}>{item.username}</Text>
       </View>
+
+      {isOwner && (
+        <TouchableOpacity
+          onPress={() => router.push(`/post/edit/${item._id}`)}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Ionicons name="build-outline" size={22} color="black" />
+        </TouchableOpacity>
+      )}
+    </View>
+
+    {/* Created At */}
+    <Text style={styles.createdAt}>
+      {new Date(item.createdAt).toLocaleString("vi-VN", {
+        hour: "2-digit",
+        minute: "2-digit",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      })}
+    </Text>
+
+    {/* Location */}
+    <Text style={styles.createdAt}>
+      {item.ward}, {item.district}, {item.province}
+    </Text>
+
+    {/* Content */}
+    <View style={styles.content}>
+      <Text style={{ fontWeight: "600" }}>{item.title}</Text>
+      <Text>{item.content}</Text>
+    </View>
+
+    {/* Image or Video */}
+    {item?.images?.length > 0 && (
+      <View style={styles.imageWrap}>
+        {item.images[0].type === "image" ? (
+          <Image
+            source={{ uri: item.images[0].uri }}
+            style={styles.image}
+            resizeMode="cover"
+          />
+        ) : (
+          <Video
+            source={{ uri: item.images[0].uri }}
+            style={styles.image}
+            useNativeControls
+            resizeMode="cover"
+            isLooping
+          />
+        )}
+      </View>
+    )}
+  </TouchableOpacity>
+
+  {/* Footer */}
+  <FooterPost
+    item={item}
+    setOpenComment={setOpenComment}
+    setPostId={setPostId}
+    isSaved={isSaved}
+    isOwner={isOwner}
+    setOpenReport={setOpenReport}
+    setReportDataForm={setReportDataForm}
+  />
+</View>
 
       {/* Report Modal */}
       {openReport && (
