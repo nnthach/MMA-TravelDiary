@@ -27,7 +27,7 @@ Although this is a beginner-friendly project, it demonstrates the full workflow 
 ## 📁 Repositories
 
 - **Backend API:** https://github.com/nnthach/MMA-TravelDiary-API
-- **Mobile App (Frontend):** https://github.com/nnthach/MMA-TravelDiary/tree/develop
+- **Mobile App (Frontend):** https://github.com/nnthach/MMA-TravelDiary
 
 ---
 
